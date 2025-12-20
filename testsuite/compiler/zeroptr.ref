@@ -1,4 +1,4 @@
 COMPILER STAGE translation to C (unexpected exception)
 
 COMPILATION FAILED!
-uncaught exception: Cyc_Null_Exception from cyclone/library/compiler/toc.cyc, line 1777
+uncaught exception: Cyc_Null_Exception from cyclone/library/compiler/toc.cyc, line 1732

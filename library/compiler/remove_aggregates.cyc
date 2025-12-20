@@ -81,11 +81,11 @@ static enum ExpResult { WasArray, UsedInitializer, OtherRes };
 static struct Result { enum ExpResult res; };
 typedef struct Result result_t;
 
-static result_t remove_aggrs_exp(env_t, exp_t);
-static void remove_aggrs_stmt(stmt_t);
+static result_t remove_aggrs_exp(Toc::toc_context_t ctxt, env_t, exp_t);
+static void remove_aggrs_stmt(Toc::toc_context_t ctxt, stmt_t);
 
-static void noarray_remove_aggrs_exp(env_t env, exp_t e) {
-  let Result(r) = remove_aggrs_exp(env, e);
+static void noarray_remove_aggrs_exp(Toc::toc_context_t ctxt, env_t env, exp_t e) {
+  let Result(r) = remove_aggrs_exp(ctxt, env, e);
   if (r == WasArray)
     Warn::impos2("remove_aggrs_exp -- unexpected array or comprehension: ", e);
 }
@@ -95,7 +95,7 @@ static bool can_use_initializer(exp_t e, type_t t) {
          Tcutil::typecmp((type_t)e->topt, t) == 0;
 }
 
-static result_t remove_aggrs_exp(env_t env, exp_t e) {
+static result_t remove_aggrs_exp(Toc::toc_context_t ctxt, env_t env, exp_t e) {
   enum ExpResult res = OtherRes;  // changed in several cases
   bool did_assign    = false;     // changed in comprehension, array and aggr cases
 
@@ -112,7 +112,7 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
         }
         dles = List::imp_rev(dles);
         e->r = new Array_e(dles);
-        return remove_aggrs_exp(env, e);
+        return remove_aggrs_exp(ctxt, env, e);
       }
       break;
     case &Const_e(_):
@@ -129,7 +129,7 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
         case &Toc::NewInfo(mexp, typ):
           // for less output, try to special case initializers: t x = new e;
           if (env.ctxt == Initializer && can_use_initializer((exp_t)env.dest, typ)) {
-            remove_aggrs_exp(Env(NewDest, env.dest), e1);
+            remove_aggrs_exp(ctxt, Env(NewDest, env.dest), e1);
             e->r = seq_exp(set_type(assign_exp((exp_t)env.dest, mexp, DL), (type_t)env.dest->topt),
                            e1, DL)
                        ->r;
@@ -137,9 +137,9 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
             res     = UsedInitializer;
             break;
           }
-          let xvar = Toc::temp_var();
+          let xvar = Toc::temp_var(ctxt);
           let xexp = set_type(var_exp(xvar, DL), typ);
-          remove_aggrs_exp(Env(NewDest, xexp), e1);
+          remove_aggrs_exp(ctxt, Env(NewDest, xexp), e1);
           let body_exp = xexp;
           if (e->topt != NULL)
             body_exp =
@@ -161,7 +161,7 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
       let f  = sdopt && sdopt->kind == UnionA ? unionq_type : strctq;
       let ty = f(tdn);
       if (do_stmt_exp) {
-        v    = new Toc::temp_var();
+        v    = new Toc::temp_var(ctxt);
         dest = set_type(var_exp(*v, DL), ty);
       } else {
         v    = NULL;
@@ -174,7 +174,7 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
         let &$(ds, field_exp) = dles2->hd;
         let f                 = designatorlist_to_fieldname(ds);
         let field_dest = set_type(member_exp(deep_copy(dest), f, DL), (type_t)field_exp->topt);
-        remove_aggrs_exp(Env(AggrField, field_dest), field_exp);
+        remove_aggrs_exp(ctxt, Env(AggrField, field_dest), field_exp);
       }
       // note: we must preserve left-to-right since we're linearizing here
       if (dles == NULL) {
@@ -233,7 +233,7 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
         let fielddest =
             set_type(subscript_exp(deep_copy(dest), set_type(signed_int_exp(i, DL), sint_type), DL),
                      dest_type);
-        remove_aggrs_exp(Env(AggrField, fielddest), field_exp);
+        remove_aggrs_exp(ctxt, Env(AggrField, fielddest), field_exp);
       }
       exp_t init_e = (*dles->hd)[1];
       for (dles = dles->tl; dles != NULL; dles = dles->tl) {
@@ -255,7 +255,7 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
         default:
           break;
       }
-      qvar_t max = Toc::temp_var();
+      qvar_t max = Toc::temp_var(ctxt);
       qvar_t i   = vd->name;
       exp_t ea   = assign_exp(set_type(var_exp(i, DL), sint_type),
                             set_type(signed_int_exp(0, DL), sint_type), DL);
@@ -273,7 +273,7 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
       }
       exp_t lval = subscript_exp((exp_t)env.dest, set_type(var_exp(i, DL), uint_type), DL);
       set_type(lval, dest_type);
-      remove_aggrs_exp(Env(AggrField, deep_copy(lval)), body);
+      remove_aggrs_exp(ctxt, Env(AggrField, deep_copy(lval)), body);
       stmt_t s = for_stmt(ea, eb, ec, exp_stmt(body, DL), DL);
       if (zero_term) {
         // used to be in toc.cyc; has nothing to do with aggregate removal
@@ -289,7 +289,7 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
       }
       // Note the generated code for an initializer is a bit uglier than
       // necessary
-      noarray_remove_aggrs_exp(other_env, bd);
+      noarray_remove_aggrs_exp(ctxt, other_env, bd);
       e->r = stmt_exp(seq_stmt(declare_stmt(max, uint_type, bd,
                                             declare_stmt(i, uint_type, NULL, s, DL), DL),
                                exp_stmt(set_type(signed_int_exp(0, DL), sint_type), DL), DL),
@@ -312,28 +312,28 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
       break;
 
     case &AssignOp_e(e1, _, e2):
-      noarray_remove_aggrs_exp(other_env, e1);
-      remove_aggrs_exp(other_env, e2);
+      noarray_remove_aggrs_exp(ctxt, other_env, e1);
+      remove_aggrs_exp(ctxt, other_env, e2);
       break;
     case &SeqExp_e(e1, e2):
       did_assign = true;  // b/c we pass env for e2
-      noarray_remove_aggrs_exp(other_env, e1);
-      noarray_remove_aggrs_exp(no_init(env), e2);
+      noarray_remove_aggrs_exp(ctxt, other_env, e1);
+      noarray_remove_aggrs_exp(ctxt, no_init(env), e2);
       break;
     case &Conditional_e(e1, e2, e3):
       did_assign = true;  // b/c we pass env for e2 and e3
-      noarray_remove_aggrs_exp(other_env, e1);
-      noarray_remove_aggrs_exp(no_init(env), e2);
+      noarray_remove_aggrs_exp(ctxt, other_env, e1);
+      noarray_remove_aggrs_exp(ctxt, no_init(env), e2);
       let env3 = Env(env.ctxt, (env.dest == NULL ? NULL : deep_copy(env.dest)));
-      noarray_remove_aggrs_exp(no_init(env3), e3);  // avoid sharing dest!
+      noarray_remove_aggrs_exp(ctxt, no_init(env3), e3);  // avoid sharing dest!
       break;
 
     case &FnCall_e(e, es, NULL, _):  // NULL b/c varargs already translated away
-      noarray_remove_aggrs_exp(other_env, e);
+      noarray_remove_aggrs_exp(ctxt, other_env, e);
       fallthru(es);
     case &Primop_e(_, es):
       for (; es != NULL; es = es->tl)
-        noarray_remove_aggrs_exp(other_env, es->hd);
+        noarray_remove_aggrs_exp(ctxt, other_env, es->hd);
       break;
 
     case &Subscript_e(e1, e2):
@@ -341,8 +341,8 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
     case &And_e(e1, e2):
       fallthru(e1, e2);
     case &Or_e(e1, e2):
-      noarray_remove_aggrs_exp(other_env, e1);
-      noarray_remove_aggrs_exp(other_env, e2);
+      noarray_remove_aggrs_exp(ctxt, other_env, e1);
+      noarray_remove_aggrs_exp(ctxt, other_env, e2);
       break;
 
       // (maybe do better for some cases??)
@@ -363,12 +363,12 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
     case &Sizeofexp_e(e1):
       fallthru(e1);  // could allow arrays but we do not
     case &Increment_e(e1, _):
-      noarray_remove_aggrs_exp(other_env, e1);
+      noarray_remove_aggrs_exp(ctxt, other_env, e1);
       break;
 
       // we do not bother threading through a dest
     case &StmtExp_e(s):
-      remove_aggrs_stmt(s);
+      remove_aggrs_stmt(ctxt, s);
       break;
 
     default:
@@ -387,14 +387,14 @@ static result_t remove_aggrs_exp(env_t env, exp_t e) {
 // is just recursive descent, except for array-initializers
 // for tests, we use other_env -- WholeStmt would be fine, but
 // assignments to comprehensions cannot appear so there is no point
-static bool remove_aggrs_stmt_f1(int bogus, exp_t e) {
-  remove_aggrs_exp(other_env, e);
+static bool remove_aggrs_stmt_f1(Toc::toc_context_t ctxt, exp_t e) {
+  remove_aggrs_exp(ctxt, other_env, e);
   return false;
 }
-static bool remove_aggrs_stmt_f2(int bogus, stmt_t s) {
+static bool remove_aggrs_stmt_f2(Toc::toc_context_t ctxt, stmt_t s) {
   switch (s->r) {
     case &Decl_s(d, s2):
-      remove_aggrs_stmt(s2);
+      remove_aggrs_stmt(ctxt, s2);
       switch (d->r) {
         case &Var_d(vd):
           if (vd->sc == Static)
@@ -409,7 +409,7 @@ static bool remove_aggrs_stmt_f2(int bogus, stmt_t s) {
           if (vd->initializer != NULL) {
             let var_exp   = varb_exp(new Local_b(vd), DL);
             var_exp->topt = vd->type;
-            let Result(r) = remove_aggrs_exp(Env(Initializer, var_exp), (exp_t)vd->initializer);
+            let Result(r) = remove_aggrs_exp(ctxt, Env(Initializer, var_exp), (exp_t)vd->initializer);
             if (r == WasArray || r == UsedInitializer) {
               s->r = decl_stmt(d, seq_stmt(exp_stmt((exp_t)vd->initializer, DL), s2, DL), DL)->r;
               vd->initializer = NULL;
@@ -417,7 +417,7 @@ static bool remove_aggrs_stmt_f2(int bogus, stmt_t s) {
           }
           return false;
         case &Fn_d(fd):
-          remove_aggrs_stmt(fd->body);
+          remove_aggrs_stmt(ctxt, fd->body);
           return false;
         default:
           Warn::impos("bad local declaration after xlation to C");
@@ -426,16 +426,16 @@ static bool remove_aggrs_stmt_f2(int bogus, stmt_t s) {
       return true;
   }
 }
-static void remove_aggrs_stmt(stmt_t s) {
-  visit_stmt(remove_aggrs_stmt_f1, remove_aggrs_stmt_f2, 0, s);
+static void remove_aggrs_stmt(Toc::toc_context_t ctxt, stmt_t s) {
+  visit_stmt(remove_aggrs_stmt_f1, remove_aggrs_stmt_f2, ctxt, s);
 }
 
-list_t<decl_t> remove_aggrs(list_t<decl_t,`H> ds) {
+list_t<decl_t> remove_aggrs(Toc::toc_context_t ctxt, list_t<decl_t,`H> ds) {
   for (let ds2 = ds; ds2 != NULL; ds2 = ds2->tl)
     switch (ds2->hd->r) {
       case &Fn_d(fd):
         if (fd->orig_scope != ExternC)  // ignore extern C bodies
-          remove_aggrs_stmt(fd->body);
+          remove_aggrs_stmt(ctxt, fd->body);
         break;
       case &Var_d(...):
       case &Aggr_d(_):

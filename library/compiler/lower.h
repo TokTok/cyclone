@@ -21,6 +21,7 @@
 #define _LOWER_H_
 
 #include "absyn.h"
+#include "toc.h"
 
 #include "cyclone/library/std/list.h"
 
@@ -29,7 +30,7 @@ namespace Lower {
   using List;
 
   // translate the declarations to C
-  extern list_t<decl_t> lower(list_t<decl_t, `H>);
+  extern list_t<decl_t> lower(Toc::toc_context_t ctxt, list_t<decl_t, `H>);
 }  // namespace Lower
 
 #endif

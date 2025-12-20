@@ -944,19 +944,18 @@ static void tc_decls(tenv_t te, list_t<decl_t,`H> ds0, bool in_externC, bool che
 
         // FIX: there's a simpler way to do this that does not require
         // remembering to mutate bools other places.  (See binding.)
-      case &ExternCinclude_d(*ds2, ovrs, exports2, wc):
-        if (ovrs) {
-          let tecpy                  = copy_tenv_dicts(te);
-          tecpy->in_extern_c_include = true;
-          tc_decls(tecpy, *ds2, true, check_var_init, NULL);
-          Toc::init();                // bleach: (for typ_to_c)
-          set_scopes(ovrs, ExternC);  // ow scope mismatch warnings -- ovrs are
-                                      // not typechecked independently
-          Cifc::user_overrides(d->loc, tecpy, ds2, ovrs);
-          Toc::finish();
-        }
-        list_t<$(seg_t, qvar_t, bool) @> newexs = List::append(exports2, exports ? *exports : NULL);
-        let te2                                 = enter_extern_c_include(te);
+              case &ExternCinclude_d(*ds2, ovrs, exports2, wc):
+              if (ovrs) {
+                let tecpy                  = copy_tenv_dicts(te);
+                tecpy->in_extern_c_include = true;
+                tc_decls(tecpy, *ds2, true, check_var_init, NULL);
+                Toc::toc_context_t toc_ctxt = Toc::Toc_Ctx_create();                // bleach: (for typ_to_c)
+                set_scopes(ovrs, ExternC);  // ow scope mismatch warnings -- ovrs are
+                                            // not typechecked independently
+                Cifc::user_overrides(toc_ctxt, d->loc, tecpy, ds2, ovrs);
+                Toc::Toc_Ctx_destroy(toc_ctxt);
+              }
+              list_t<$(seg_t, qvar_t, bool) @> newexs = List::append(exports2, exports ? *exports : NULL);        let te2                                 = enter_extern_c_include(te);
         te2->in_extern_c_inc_repeat             = (ovrs != NULL);
         tc_decls(te2, *ds2, true, check_var_init, &newexs);
 

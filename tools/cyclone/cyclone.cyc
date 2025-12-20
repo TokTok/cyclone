@@ -272,12 +272,13 @@ static bool do_insert_checks(JumpAnalysis::jump_anal_res_t tables, list_t<Absyn:
 }
 
 static list_t<Absyn::decl_t> do_translate(
-    table_t<Absyn::fndecl_t, table_t<Absyn::stmt_t, int> > pops, list_t<Absyn::decl_t> tds) {
-  return Toc::toc(pops, tds);
+    $(Toc::toc_context_t, table_t<Absyn::fndecl_t, table_t<Absyn::stmt_t, int> >) @ env, list_t<Absyn::decl_t> tds) {
+  let $(ctxt, pops) = *env;
+  return Toc::toc(ctxt, pops, tds);
 }
 
-static list_t<Absyn::decl_t> do_removeaggrs(bool ignore, list_t<Absyn::decl_t, `H> tds) {
-  return RemoveAggrs::remove_aggrs(tds);
+static list_t<Absyn::decl_t> do_removeaggrs(Toc::toc_context_t ctxt, list_t<Absyn::decl_t, `H> tds) {
+  return RemoveAggrs::remove_aggrs(ctxt, tds);
 }
 
 static list_t<Absyn::decl_t> do_removelabs(bool ignore, list_t<Absyn::decl_t, `H> tds) {
@@ -292,12 +293,12 @@ static list_t<Absyn::decl_t> do_castremove(bool ignore, list_t<Absyn::decl_t, `H
   return RemoveCasts::remove_casts(tds);
 }
 
-static list_t<Absyn::decl_t> do_lower(bool ignore, list_t<Absyn::decl_t, `H> tds) {
-  return Lower::lower(tds);
+static list_t<Absyn::decl_t> do_lower(Toc::toc_context_t ctxt, list_t<Absyn::decl_t, `H> tds) {
+  return Lower::lower(ctxt, tds);
 }
 
-static list_t<Absyn::decl_t> do_toseqc(bool ignore, list_t<Absyn::decl_t, `H> tds) {
-  return Toseqc::toseqc(tds);
+static list_t<Absyn::decl_t> do_toseqc(Toc::toc_context_t ctxt, list_t<Absyn::decl_t, `H> tds) {
+  return Toseqc::toseqc(ctxt, tds);
 }
 
 static list_t<Absyn::decl_t> do_lowtreeshake(bool ignore, list_t<Absyn::decl_t, `H> tds) {
@@ -385,26 +386,29 @@ static void process_file(string_t<`H> filename) {
   if (!compile_failure && Flags::stop_after_pass >= Flags::CheckInsertion)
     do_stage("check insertion", tds, do_insert_checks, (_ @)jump_tables, true);
 
+  // Initialize Toc context
+  Toc::toc_context_t toc_ctxt = Toc::Toc_Ctx_create();
+
   // Translation to C
   if (!compile_failure && Flags::stop_after_pass >= Flags::Toc)
-    tds = do_stage("translation to C", tds, do_translate, jump_tables->pop_tables, tds);
+    tds = do_stage("translation to C", tds, do_translate, new $(toc_ctxt, jump_tables->pop_tables), tds);
   // Removal of aggregates (necessary for comprehensions and to avoid GCC bug)
   if (!compile_failure && Flags::stop_after_pass >= Flags::AggregateRemoval)
-    tds = do_stage("aggregate removal", tds, do_removeaggrs, true, tds);
+    tds = do_stage("aggregate removal", tds, do_removeaggrs, toc_ctxt, tds);
 
   // Lower the C code
   if (!compile_failure && !nolower_r && Flags::stop_after_pass >= Flags::AggregateRemoval)
-    tds = do_stage("lowering C code", tds, do_lower, true, tds);
+    tds = do_stage("lowering C code", tds, do_lower, toc_ctxt, tds);
 
   // Removal of unused labels (optional optimization good b/c of patterns)
   if (!compile_failure && Flags::stop_after_pass >= Flags::LabelRemoval)
     tds = do_stage("unused label removal", tds, do_removelabs, true, tds);
   // Translation to left-to-right evaluation order
   if (!compile_failure && toseqc_r && Flags::stop_after_pass >= Flags::EvalOrder)
-    tds = do_stage("L-to-R evaluation order", tds, do_toseqc, true, tds);
+    tds = do_stage("L-to-R evaluation order", tds, do_toseqc, toc_ctxt, tds);
   // Clean up state common to last three passes
   if (!compile_failure && Flags::stop_after_pass >= Flags::Toc)
-    Toc::finish();
+    Toc::Toc_Ctx_destroy(toc_ctxt);
   // Removal of unused declarations (optional optimization) FIX: make flag
   if (!compile_failure && Flags::stop_after_pass >= Flags::EvalOrder)
     tds = do_stage("low treeshaking", tds, do_lowtreeshake, true, tds);

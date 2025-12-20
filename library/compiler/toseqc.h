@@ -21,10 +21,11 @@
 #define TOSEQC_H
 
 #include "absyn.h"
+#include "toc.h"
 
 namespace Toseqc {
 
-  extern List::list_t<Absyn::decl_t> toseqc(List::list_t<Absyn::decl_t,`H> decls);
+  extern List::list_t<Absyn::decl_t> toseqc(Toc::toc_context_t ctxt, List::list_t<Absyn::decl_t,`H> decls);
 
 }
 #endif

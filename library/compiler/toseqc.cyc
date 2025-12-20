@@ -277,8 +277,8 @@ static bool is_toc_var(exp_t e) {
   }
 }
 
-static void stmt_to_seqc(stmt_t);
-static void exp_to_seqc(exp_t);
+static void stmt_to_seqc(Toc::toc_context_t ctxt, stmt_t);
+static void exp_to_seqc(Toc::toc_context_t ctxt, exp_t);
 
 /* This takes a list of expressions [es] and reorders them to ensure
    left-to-right evaluation order.  This works by (1) creating a new
@@ -295,9 +295,9 @@ static void exp_to_seqc(exp_t);
    If the optimization results in no locals being declared, we don't
    return any statement.
 */
-static stmt_opt_t exps_to_seqc(exp_t e, list_t<exp_t> es) {
+static stmt_opt_t exps_to_seqc(Toc::toc_context_t ctxt, exp_t e, list_t<exp_t> es) {
   // Convert each of the expressions
-  List::iter(exp_to_seqc, es);
+  List::iter_c(exp_to_seqc, ctxt, es);
 
   // See if we need to fix the order of the current expressions
   if (List::length(es) <= 1 || exps_effect(es) != AnyEffect)
@@ -327,7 +327,7 @@ static stmt_opt_t exps_to_seqc(exp_t e, list_t<exp_t> es) {
     did_convert = true;
 
     // Variable expression
-    let v = Toc::temp_var();
+    let v = Toc::temp_var(ctxt);
     let ve = var_exp(v, e1->loc);
 
     // Add to the declaration
@@ -335,7 +335,7 @@ static stmt_opt_t exps_to_seqc(exp_t e, list_t<exp_t> es) {
     e2->annot = e1->annot;
     e2->topt = e1->topt;
 
-    type_t t = (e2->topt == NULL) ? new TypeofType(e2) : Toc::typ_to_c((type_t)e2->topt);
+    type_t t = (e2->topt == NULL) ? new TypeofType(e2) : Toc::typ_to_c(ctxt, (type_t)e2->topt);
     stmt = declare_stmt(v, t, e2, stmt, e->loc);
 
     // Update the expression to be the variable
@@ -350,7 +350,7 @@ static stmt_opt_t exps_to_seqc(exp_t e, list_t<exp_t> es) {
   return NULL;
 }
 
-static void exp_to_seqc(exp_t e) {
+static void exp_to_seqc(Toc::toc_context_t ctxt, exp_t e) {
   switch (e->r) {
     case &Const_e(_):
     case &Var_e(_):
@@ -359,34 +359,34 @@ static void exp_to_seqc(exp_t e) {
     case &FnCall_e(e1, es, ...):
       fallthru(new List(e1, es));
     case &Primop_e(_, es):
-      exps_to_seqc(e, es);
+      exps_to_seqc(ctxt, e, es);
       return;
     case &Subscript_e(e1, e2):
-      exps_to_seqc(e, list(e1, e2));
+      exps_to_seqc(ctxt, e, list(e1, e2));
       return;
 
     case &AssignOp_e(e1, p, e2):
       if (p == NULL)
         switch (e1->r) {
           case &Var_e(_):
-            exp_to_seqc(e2);
+            exp_to_seqc(ctxt, e2);
             return;
           default:
             break;
         }
       // we do assignment statements right to left
-      exps_to_seqc(e, list(e2, e1));
+      exps_to_seqc(ctxt, e, list(e2, e1));
       return;
 
     case &Conditional_e(e1, e2, e3):
-      exp_to_seqc(e3);
+      exp_to_seqc(ctxt, e3);
       fallthru(e1, e2);
     case &And_e(e1, e2):
       fallthru(e1, e2);
     case &Or_e(e1, e2):
       fallthru(e1, e2);
     case &SeqExp_e(e1, e2):
-      exp_to_seqc(e2);
+      exp_to_seqc(ctxt, e2);
       fallthru(e1);
 
     case &Extension_e(e1):
@@ -408,7 +408,7 @@ static void exp_to_seqc(exp_t e) {
     case &AggrArrow_e(e1, ...):
       fallthru(e1);
     case &Increment_e(e1, _):
-      exp_to_seqc(e1);
+      exp_to_seqc(ctxt, e1);
       return;
 
     case &Sizeoftype_e(_):
@@ -418,11 +418,11 @@ static void exp_to_seqc(exp_t e) {
       return;
 
     case &UnresolvedMem_e(_, dles):
-      exps_to_seqc(e, map(snd, dles));
+      exps_to_seqc(ctxt, e, map(snd, dles));
       return;
 
     case &StmtExp_e(s):
-      stmt_to_seqc(s);
+      stmt_to_seqc(ctxt, s);
       return;
 
     case &Asm_e(...):
@@ -432,7 +432,7 @@ static void exp_to_seqc(exp_t e) {
   }
 }
 
-static void stmt_to_seqc(stmt_t s) {
+static void stmt_to_seqc(Toc::toc_context_t ctxt, stmt_t s) {
   // This is just the recursive descent; we are not under a StmtExp.
   while (true)
     switch (s->r) {
@@ -449,7 +449,7 @@ static void stmt_to_seqc(stmt_t s) {
           return;
         fallthru(eopt);
       case &Exp_s(e):
-        exp_to_seqc(e);
+        exp_to_seqc(ctxt, e);
         // Compress out extra indirection if we create a statement expression
         //       switch (e->r) {
         //       case &StmtExp_e(s2):
@@ -459,30 +459,30 @@ static void stmt_to_seqc(stmt_t s) {
         //       }
         return;
       case &IfThenElse_s(e, s1, s2):
-        exp_to_seqc(e);
+        exp_to_seqc(ctxt, e);
         fallthru(s1, s2);
       case &Seq_s(s1, s2):
-        stmt_to_seqc(s1);
+        stmt_to_seqc(ctxt, s1);
         s = s2;
         continue;
       case &Do_s(s2, $(e, _)):
         fallthru(e, s2);
       case &While_s($(e, _), s2):
-        exp_to_seqc(e);
+        exp_to_seqc(ctxt, e);
         s = s2;
         continue;
       case &For_s(e1, $(e2, _), $(e3, _), s2):
-        exp_to_seqc(e1);
-        exp_to_seqc(e2);
-        exp_to_seqc(e3);
+        exp_to_seqc(ctxt, e1);
+        exp_to_seqc(ctxt, e2);
+        exp_to_seqc(ctxt, e3);
         s = s2;
         continue;
       case &Switch_s(e, scs, _):
         // most switches have been translated away -- only C switches remain.
         // there should be no where clauses, so ignore them.
-        exp_to_seqc(e);
+        exp_to_seqc(ctxt, e);
         for (; scs != NULL; scs = scs->tl)
-          stmt_to_seqc(scs->hd->body);
+          stmt_to_seqc(ctxt, scs->hd->body);
         return;
       case &Decl_s(d, s2):
         switch (d->r) {
@@ -503,7 +503,7 @@ static void stmt_to_seqc(stmt_t s) {
                 //              {e1,e2} })
                 // this form causes gcc to barf.
                 case &UnresolvedMem_e(_, dles):
-                  let laststmt = exps_to_seqc((exp_t)vd->initializer, map(snd, dles));
+                  let laststmt = exps_to_seqc(ctxt, (exp_t)vd->initializer, map(snd, dles));
                   // If nothing needed to be translated, then we're done
                   if (laststmt == NULL)
                     break;
@@ -531,7 +531,7 @@ static void stmt_to_seqc(stmt_t s) {
                   break;
                 default:
                   // not an array, struct, etc., so do the standard thing
-                  exp_to_seqc((exp_t)vd->initializer);
+                  exp_to_seqc(ctxt, (exp_t)vd->initializer);
                   break;
               }
             s = s2;
@@ -545,12 +545,12 @@ static void stmt_to_seqc(stmt_t s) {
     }
 }
 
-list_t<decl_t> toseqc(list_t<decl_t,`H> ds) {
+list_t<decl_t> toseqc(Toc::toc_context_t ctxt, list_t<decl_t,`H> ds) {
   for (let old_ds = ds; old_ds != NULL; old_ds = old_ds->tl)
     switch (old_ds->hd->r) {
       case &Fn_d(fd):
         if (fd->orig_scope != ExternC)
-          stmt_to_seqc(fd->body);
+          stmt_to_seqc(ctxt, fd->body);
         break;
       case &Var_d(_):
       case &Aggr_d(_):

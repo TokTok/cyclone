@@ -17,11 +17,9 @@ using Tcpat;
 CT_SUITE_BEGIN(Toc)
 
   void begin() {
-      Toc::init();
   }
 
   void end() {
-      Toc::finish();
   }
 
   exp_t mk_exp(raw_exp_t r) {
@@ -40,15 +38,18 @@ CT_SUITE_BEGIN(Toc)
   }
 
   void test_int_type() {
+    toc_context_t ctxt = Toc_Ctx_create();
     type_t t = int_type(Signed, Int_sz);
-    type_t res = typ_to_c(t);
+    type_t res = typ_to_c(ctxt, t);
     CT_ASSERT(t == res);
+    Toc_Ctx_destroy(ctxt);
   }
   
   void test_thin_ptr() {
+      toc_context_t ctxt = Toc_Ctx_create();
       type_t elt = int_type(Signed, Int_sz);
       type_t t = star_type(elt, heap_rgn_type, al_qual_type, empty_tqual(0), false_type, false_type);
-      type_t res = typ_to_c(t);
+      type_t res = typ_to_c(ctxt, t);
       
       switch (res) {
       case &PointerType(pi):
@@ -57,12 +58,14 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected PointerType");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_fat_ptr() {
+      toc_context_t ctxt = Toc_Ctx_create();
       type_t elt = int_type(Signed, Int_sz);
       type_t t = fatptr_type(elt, heap_rgn_type, al_qual_type, empty_tqual(0), false_type, false_type);
-      type_t res = typ_to_c(t);
+      type_t res = typ_to_c(ctxt, t);
       
       switch (res) {
       case &AppType(&AggrCon(info), _):
@@ -79,20 +82,24 @@ CT_SUITE_BEGIN(Toc)
       default:
            CT_FAILM("Expected AppType AggrCon for fat pointer");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_temp_var() {
-      qvar_t v1 = Toc::temp_var();
-      qvar_t v2 = Toc::temp_var();
+      toc_context_t ctxt = Toc::Toc_Ctx_create();
+      qvar_t v1 = Toc::temp_var(ctxt);
+      qvar_t v2 = Toc::temp_var(ctxt);
       
       let &$(ns1, n1) = v1;
       let &$(ns2, n2) = v2;
       
       CT_ASSERT(strcmp(*n1, *n2) != 0);
       CT_ASSERT(strncmp(*n1, "_tmp", 4) == 0);
+      Toc::Toc_Ctx_destroy(ctxt);
   }
 
   void test_collapse_qvar() {
+      toc_context_t ctxt = Toc_Ctx_create();
       var_t foo_str = new "Foo";
       qvar_t foo_name = new $(Loc_n(), foo_str);
       var_t bar_str = new "Bar";
@@ -116,7 +123,7 @@ CT_SUITE_BEGIN(Toc)
       datatype_field_info_t dfi = KnownDatatypefield(dd, df);
       type_t t = datatype_field_type(dfi, NULL);
       
-      type_t res = typ_to_c(t);
+      type_t res = typ_to_c(ctxt, t);
       
       switch (res) {
       case &AppType(&AggrCon(info), _):
@@ -133,14 +140,16 @@ CT_SUITE_BEGIN(Toc)
       default:
            CT_FAILM("Expected AppType AggrCon");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_array_type() {
+      toc_context_t ctxt = Toc_Ctx_create();
       type_t elt = int_type(Signed, Int_sz);
       exp_t ten = int_exp(Signed, 10, 0);
       type_t t = array_type(elt, empty_tqual(0), ten, true_type, 0);
       
-      type_t res = typ_to_c(t);
+      type_t res = typ_to_c(ctxt, t);
       
       switch (res) {
       case &ArrayType(ai):
@@ -150,9 +159,11 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected ArrayType");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_var_type() {
+      toc_context_t ctxt = Toc_Ctx_create();
       var_t a = new "a";
       tvar_t tv = new Tvar {
           .name = a,
@@ -161,7 +172,7 @@ CT_SUITE_BEGIN(Toc)
           .aquals_bound = NULL
       };
       type_t t = var_type(tv);
-      type_t res = typ_to_c(t);
+      type_t res = typ_to_c(ctxt, t);
       
       switch (res) {
       case &PointerType(pi):
@@ -176,12 +187,15 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected PointerType");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_void_con() {
+      toc_context_t ctxt = Toc_Ctx_create();
       type_t t = void_type;
-      type_t res = typ_to_c(t);
+      type_t res = typ_to_c(ctxt, t);
       CT_ASSERT(t == res);
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_exp_to_c_int() {
@@ -189,11 +203,7 @@ CT_SUITE_BEGIN(Toc)
       e->annot = &InsertChecks::NoCheck_val;
       e->topt = int_type(Signed, Int_sz);
       
-      toc_context_t ctxt = new TocContext {
-          .result_decls = NULL,
-          .pop_tables = NULL,
-          .fn_pop_table = NULL
-      };
+      toc_context_t ctxt = Toc_Ctx_create();
       
       region r;
       env_t<`r> env = empty_env(r, ctxt);
@@ -216,16 +226,13 @@ CT_SUITE_BEGIN(Toc)
       
       type_t t = (type_t)e->topt;
       CT_ASSERT(t == int_type(Signed, Int_sz));
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_stmt_to_c_skip() {
       stmt_t s = skip_stmt(0);
       
-      toc_context_t ctxt = new TocContext {
-          .result_decls = NULL,
-          .pop_tables = NULL,
-          .fn_pop_table = NULL
-      };
+      toc_context_t ctxt = Toc_Ctx_create();
       
       region r;
       env_t<`r> env = empty_env(r, ctxt);
@@ -239,6 +246,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected Skip_s");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_exp_to_c_cast() {
@@ -251,11 +259,7 @@ CT_SUITE_BEGIN(Toc)
       exp_t cast_e = mk_exp(new Cast_e(t_short, e, true, No_coercion));
       cast_e->topt = t_short;
       
-      toc_context_t ctxt = new TocContext {
-          .result_decls = NULL,
-          .pop_tables = NULL,
-          .fn_pop_table = NULL
-      };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -281,6 +285,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected Cast_e");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_primop_plus_int() {
@@ -289,7 +294,7 @@ CT_SUITE_BEGIN(Toc)
       exp_t e = mk_exp(new Primop_e(Plus, new List(e1, new List(e2, NULL))));
       e->topt = int_type(Signed, Int_sz);
 
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -302,6 +307,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected Primop_e");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_stmt_if() {
@@ -310,7 +316,7 @@ CT_SUITE_BEGIN(Toc)
       stmt_t s2 = skip_stmt(0);
       stmt_t s = new_stmt(new IfThenElse_s(cond, s1, s2), 0);
       
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -328,17 +334,15 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected IfThenElse_s");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_stmt_return() {
       exp_t e = int_exp(Signed, 0, 0); e->topt = int_type(Signed, Int_sz); e->annot = &InsertChecks::NoCheck_val;
       stmt_t s = new_stmt(new Return_s(e), 0);
       
-      toc_context_t ctxt = new TocContext { 
-          .result_decls = NULL, 
-          .pop_tables = NULL, 
-          .fn_pop_table = new Hashtable::create(101, cmp_stmt, hash_stmt)
-      };
+      toc_context_t ctxt = Toc_Ctx_create();
+      ctxt->fn_pop_table = new Hashtable::create(101, cmp_stmt, hash_stmt);
       Hashtable::insert(*ctxt->fn_pop_table, s, 0);
       
       region r;
@@ -353,6 +357,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected Return_s");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_seq_exp() {
@@ -361,7 +366,7 @@ CT_SUITE_BEGIN(Toc)
       exp_t e = mk_exp(new SeqExp_e(e1, e2));
       e->topt = int_type(Signed, Int_sz);
       
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -374,6 +379,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected SeqExp_e");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_stmt_while() {
@@ -381,11 +387,8 @@ CT_SUITE_BEGIN(Toc)
       stmt_t body = skip_stmt(0);
       stmt_t s = new_stmt(new While_s($(cond, skip_stmt(0)), body), 0);
       
-      toc_context_t ctxt = new TocContext { 
-          .result_decls = NULL, 
-          .pop_tables = NULL, 
-          .fn_pop_table = new Hashtable::create(101, cmp_stmt, hash_stmt)
-      };
+      toc_context_t ctxt = Toc_Ctx_create();
+      ctxt->fn_pop_table = new Hashtable::create(101, cmp_stmt, hash_stmt);
       
       region r;
       env_t<`r> env = empty_env(r, ctxt);
@@ -398,6 +401,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected While_s");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_stmt_for() {
@@ -432,11 +436,8 @@ CT_SUITE_BEGIN(Toc)
       
       stmt_t s = new_stmt(new For_s(init, $(cond, skip_stmt(0)), $(incr, skip_stmt(0)), body), 0);
       
-      toc_context_t ctxt = new TocContext { 
-          .result_decls = NULL, 
-          .pop_tables = NULL, 
-          .fn_pop_table = new Hashtable::create(101, cmp_stmt, hash_stmt)
-      };
+      toc_context_t ctxt = Toc_Ctx_create();
+      ctxt->fn_pop_table = new Hashtable::create(101, cmp_stmt, hash_stmt);
       
       region r;
       env_t<`r> env = empty_env(r, ctxt);
@@ -450,6 +451,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected For_s");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_exp_fncall() {
@@ -466,7 +468,7 @@ CT_SUITE_BEGIN(Toc)
       exp_t call = mk_exp(new FnCall_e(fn, new List(arg, NULL), NULL, false));
       call->topt = void_type;
       
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -479,6 +481,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected FnCall_e");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_exp_new() {
@@ -488,7 +491,7 @@ CT_SUITE_BEGIN(Toc)
       exp_t newe = mk_exp(new New_e(NULL, e, NULL));
       newe->topt = star_type(int_type(Signed, Int_sz), heap_rgn_type, al_qual_type, empty_tqual(0), false_type, false_type);
       
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -506,6 +509,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected NewInfo annotation");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_exp_var_and_decl() {
@@ -529,7 +533,7 @@ CT_SUITE_BEGIN(Toc)
           break;
       }
       
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -552,6 +556,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected Var_e");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_exp_deref_address() {
@@ -579,7 +584,7 @@ CT_SUITE_BEGIN(Toc)
       exp_t deref = mk_exp(new Deref_e(addr));
       deref->topt = t_int;
       
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -598,6 +603,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected Deref_e");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_exp_assign() {
@@ -622,7 +628,7 @@ CT_SUITE_BEGIN(Toc)
       exp_t assign = mk_exp(new AssignOp_e(ve, NULL, val));
       assign->topt = t_int;
       
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -635,6 +641,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected AssignOp_e");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_exp_subscript() {
@@ -665,7 +672,7 @@ CT_SUITE_BEGIN(Toc)
       exp_t sub = mk_exp(new Subscript_e(arr, idx));
       sub->topt = t_int;
       
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -679,6 +686,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected Subscript_e or Deref_e");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_exp_aggrmember() {
@@ -728,7 +736,7 @@ CT_SUITE_BEGIN(Toc)
       exp_t mem = mk_exp(new AggrMember_e(se, f_name, false, true));
       mem->topt = t_int;
       
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -741,6 +749,7 @@ CT_SUITE_BEGIN(Toc)
       default:
           CT_FAILM("Expected AggrMember_e");
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_exp_aggregate() {
@@ -778,7 +787,7 @@ CT_SUITE_BEGIN(Toc)
       exp_t agg = mk_exp(new Aggregate_e(Point_name, NULL, fields, ad));
       agg->topt = aggr_type(KnownAggr(new ad), NULL);
       
-      toc_context_t ctxt = new TocContext { .result_decls = NULL, .pop_tables = NULL, .fn_pop_table = NULL };
+      toc_context_t ctxt = Toc_Ctx_create();
       region r;
       env_t<`r> env = empty_env(r, ctxt);
       
@@ -795,6 +804,7 @@ CT_SUITE_BEGIN(Toc)
           // CT_FAILM("Expected CompoundLit_e for Aggregate");
           break;
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
   void test_stmt_switch() {
@@ -849,11 +859,9 @@ CT_SUITE_BEGIN(Toc)
       stmt_t sw = new_stmt(new Switch_s(ex, scs, dt), 0);
       
       // Run toc
-      toc_context_t ctxt = new TocContext { 
-          .result_decls = NULL, 
-          .pop_tables = NULL, 
-          .fn_pop_table = new Hashtable::create(101, cmp_stmt, hash_stmt)
-      };
+      toc_context_t ctxt = Toc_Ctx_create();
+      ctxt->fn_pop_table = new Hashtable::create(101, cmp_stmt, hash_stmt);
+      
       // We need pop table entries for return stmts
       Hashtable::insert(*ctxt->fn_pop_table, s_case0, 0);
       Hashtable::insert(*ctxt->fn_pop_table, s_default, 0);
@@ -878,6 +886,7 @@ CT_SUITE_BEGIN(Toc)
           CT_OK();
           break;
       }
+      Toc_Ctx_destroy(ctxt);
   }
 
 CT_SUITE_INIT

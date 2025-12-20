@@ -20,10 +20,11 @@
 #define REMOVE_AGGREGATES_H
 
 #include "absyn.h"
+#include "toc.h"
 
 namespace RemoveAggrs {
 
-  List::list_t<Absyn::decl_t> remove_aggrs(List::list_t<Absyn::decl_t,`H>);
+  List::list_t<Absyn::decl_t> remove_aggrs(Toc::toc_context_t ctxt, List::list_t<Absyn::decl_t,`H>);
 
 }
 #endif

@@ -22,16 +22,17 @@
 
 #include "absyn.h"
 #include "tcenv.h"
+#include "toc.h"
 
 namespace Cifc {
   /* Merges a C version of definition with a user-provided Cyclone
      version, but only if the Cyclone version is
      "representation-compatible" with the C one.  If so, the c_decl is
      changed in place. */
-  void merge_sys_user_decl(Absyn::seg_t, Tcenv::tenv_t, bool is_buildlib, Absyn::decl_t user_decl,
+  void merge_sys_user_decl(Absyn::seg_t, Tcenv::tenv_t, Toc::toc_context_t, bool is_buildlib, Absyn::decl_t user_decl,
                            Absyn::decl_t c_decl);
 
-  void user_overrides(Absyn::seg_t, Tcenv::tenv_t, List::list_t<Absyn::decl_t, `H> *ds,
+  void user_overrides(Toc::toc_context_t, Absyn::seg_t, Tcenv::tenv_t, List::list_t<Absyn::decl_t, `H> *ds,
                       List::list_t<Absyn::decl_t> ovrs);
 
   void set_inst_tvar();
