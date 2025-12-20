@@ -64,18 +64,34 @@ alist_t<`a> append(alist_t<`a> a1, alist_t<`a> a2) {
     }
 }
 
-list_t<`a> list_of_alist_f(alist_t<`a> y, list_t<`a, `H> l) {
-  switch (y) {
-    case &Empty:
-      return l;
-    case &Single(z):
-      return new List(z, l);
-    case &Append(a1, a2):
-      return list_of_alist_f(a1, list_of_alist_f(a2, l));
+list_t<`a> list_of_alist(alist_t<`a> al) {
+  list_t<`a> res = NULL;
+  if (al == NULL) return NULL;
+  let xarr = Xarray::create(16, al);
+  Xarray::add(xarr, al);
+  int last = 0;
+  while (last >= 0) {
+    switch (Xarray::get(xarr, last)) {
+      case &Empty:
+        --last;
+        break;
+      case &Single(z):
+        --last;
+        res = new List(z, res);
+        break;
+      case &Append(a1, a2):
+        Xarray::set(xarr, last, a2);
+        if (last == Xarray::length(xarr) - 1)
+          Xarray::add(xarr, a1);
+        else
+          Xarray::set(xarr, last + 1, a1);
+        ++last;
+        break;
+    }
   }
+  Xarray::reuse(xarr);
+  return List::imp_rev(res);
 }
-
-list_t<`a> list_of_alist(alist_t<`a> x) { return list_of_alist_f(x, NULL); }
 
 // I've inlined the type link as $(int,int,int,string)@ below;
 // it is line, char, length, link content
@@ -494,10 +510,20 @@ doc_t tab(doc_t d) {
 static doc_t ppseq_f(doc_t pp(`a), string_t<`H> sep, list_t<`a> l) {
   if (l == NULL)
     return nil_doc();
-  else if (l->tl == NULL)
+  if (l->tl == NULL)
     return pp(l->hd);
-  else
-    return cat(pp(l->hd), text(sep), oline_doc(), ppseq_f(pp, sep, l->tl));
+
+  list_t<doc_t> ds = NULL;
+  doc_t sep_doc = text(sep);
+  doc_t oline = oline_doc();
+  for (; l != NULL; l = l->tl) {
+    ds = new List(pp(l->hd), ds);
+    if (l->tl != NULL) {
+      ds = new List(sep_doc, ds);
+      ds = new List(oline, ds);
+    }
+  }
+  return cats(List::imp_rev(ds));
 }
 
 doc_t ppseq(doc_t pp(`a), string_t<`H> sep, list_t<`a> l) { return tab(ppseq_f(pp, sep, l)); }
@@ -533,10 +559,20 @@ doc_t seq(string_t<`H> sep, list_t<doc_t, `H> l) { return tab(seq_f(sep, l)); }
 doc_t ppseql_f(doc_t pp(`a), string_t<`H> sep, list_t<`a> l) {
   if (l == NULL)
     return nil_doc();
-  else if (l->tl == NULL)
+  if (l->tl == NULL)
     return pp(l->hd);
-  else
-    return cat(pp(l->hd), text(sep), line_doc(), ppseql_f(pp, sep, l->tl));
+
+  list_t<doc_t> ds = NULL;
+  doc_t sep_doc = text(sep);
+  doc_t l_doc = line_doc();
+  for (; l != NULL; l = l->tl) {
+    ds = new List(pp(l->hd), ds);
+    if (l->tl != NULL) {
+      ds = new List(sep_doc, ds);
+      ds = new List(l_doc, ds);
+    }
+  }
+  return cats(List::imp_rev(ds));
 }
 
 doc_t ppseql(doc_t pp(`a), string_t<`H> sep, list_t<`a> l) { return tab(ppseql_f(pp, sep, l)); }
@@ -544,10 +580,20 @@ doc_t ppseql(doc_t pp(`a), string_t<`H> sep, list_t<`a> l) { return tab(ppseql_f
 static doc_t seql_f(string_t<`H> sep, list_t<doc_t, `H> l) {
   if (l == NULL)
     return nil_doc();
-  else if (l->tl == NULL)
+  if (l->tl == NULL)
     return l->hd;
-  else
-    return cat(l->hd, text(sep), line_doc(), seql_f(sep, l->tl));
+
+  list_t<doc_t> ds = NULL;
+  doc_t sep_doc = text(sep);
+  doc_t l_doc = line_doc();
+  for (; l != NULL; l = l->tl) {
+    ds = new List(l->hd, ds);
+    if (l->tl != NULL) {
+      ds = new List(sep_doc, ds);
+      ds = new List(l_doc, ds);
+    }
+  }
+  return cats(List::imp_rev(ds));
 }
 
 doc_t seql(string_t<`H> sep, list_t<doc_t, `H> l0) { return tab(seql_f(sep, l0)); }

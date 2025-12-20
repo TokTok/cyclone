@@ -2164,9 +2164,27 @@ doc_t stmt2doc(stmt_t st, bool stmtexp, list_t<qvar_t, `H> varsinblock, bool pre
       return cat(exp2doc(e), text(";"));
 
     case &Seq_s(s1, s2):
-      if (!decls_first)
-        return cat(stmt2doc(s1, false, NULL, prevdecl), line_doc(),
-                   stmt2doc(s2, stmtexp, NULL, false));
+      if (!decls_first) {
+        list_t<doc_t> ds = NULL;
+        stmt_t curr = st;
+        bool first = true;
+        bool done = false;
+        while (!done) {
+          switch (curr->r) {
+            case &Seq_s(sub1, sub2):
+              ds = new List(stmt2doc(sub1, false, NULL, first ? prevdecl : false), ds);
+              ds = new List(line_doc(), ds);
+              curr = sub2;
+              first = false;
+              break;
+            default:
+              ds = new List(stmt2doc(curr, stmtexp, NULL, first ? prevdecl : false), ds);
+              done = true;
+              break;
+          }
+        }
+        return cats(List::imp_rev(ds));
+      }
 
       if (is_declaration(s1))
         return cat(block(false, stmt2doc(s1, false, NULL, prevdecl)),

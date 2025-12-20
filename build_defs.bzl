@@ -123,7 +123,7 @@ def _cyc_compile_impl(ctx):
                 # "--inf",
 
                 # Pretty print the C code that Cyclone generates.
-                "-pp",
+                #"-pp",
                 "-o",
                 c_file.path,
                 cyp_file.path,
