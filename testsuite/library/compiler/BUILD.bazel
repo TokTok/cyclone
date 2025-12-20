@@ -1,0 +1,23 @@
+load("//cyclone:build_defs.bzl", "cyc_test")
+
+cyc_test(
+    name = "absyn_test",
+    size = "small",
+    srcs = ["absyn_test.cyc"],
+    deps = [
+        "//cyclone/library/compiler:compiler",
+        "//cyclone/testsuite:cyctest",
+        "//cyclone/library/std",
+    ],
+)
+
+cyc_test(
+    name = "toc_test",
+    size = "small",
+    srcs = ["toc_test.cyc"],
+    deps = [
+        "//cyclone/library/compiler:compiler",
+        "//cyclone/testsuite:cyctest",
+        "//cyclone/library/std",
+    ],
+)

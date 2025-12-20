@@ -78,21 +78,14 @@ static `a toc_impos(... inject Warn::warg_t ap) __attribute__((noreturn)) {
 
 stringptr_t ? globals = NULL;
 
-// Should be folded into environment, but for now use globals.
-// In particular, global pop_tables complicate nested function handling
-static table_t<fndecl_t, table_t<stmt_t, int>> *gpop_tables = NULL;
-static table_t<stmt_t, int> *fn_pop_table                   = NULL;
-static int tuple_type_counter                               = 0;
-static int temp_var_counter                                 = 0;
-static int fresh_label_counter                              = 0;
+// Context for the translation pass, holding state that was previously global.
+static toc_context_t global_ctxt = NULL;
 
-// we aren't re-entrant -- we build this list of output decls (in
-// reverse order)  It's global b/c tuple types, tagged pointer types, and
-// strange top-level initializers need to "splice in" toplevel decls and
-// it's a pain to pass this list around everywhere
-static list_t<decl_t> result_decls = NULL;
+static int tuple_type_counter  = 0;
+static int temp_var_counter    = 0;
+static int fresh_label_counter = 0;
 
-static int get_npop(stmt_t s) { return Hashtable::lookup(*fn_pop_table, s); }
+static int get_npop(toc_context_t ctxt, stmt_t s) { return Hashtable::lookup(*ctxt->fn_pop_table, s); }
 
 // for gensymming, etc.
 struct TocState<`d> {
@@ -486,8 +479,8 @@ static aggrdecl_t make_c_struct_defn(var_t name, list_t<aggrfield_t,`H> fs) {
 // used to generate struct definitions for tuple types
 // we share the struct definitions where possible (need to for C compiler!)
 static type_t add_tuple_type_body(region_t<`d> d, $(struct TocState<`d> @`d,
-                                                    list_t<$(tqual_t, type_t) @`H,`H>) @`r env) {
-  let $(&TocState{.tuple_types = tuple_types, ...}, tqs0) = *env;
+                                                    $(toc_context_t, list_t<$(tqual_t, type_t) @`H,`H>) @`H) @`r env) {
+  let $(&TocState{.tuple_types = tuple_types, ...}, &$(ctxt, tqs0)) = *env;
   // look for the same tuple-type already declared
   for (let tts = *tuple_types; tts != NULL; tts = tts->tl) {
     let &$(x, ts) = tts->hd;
@@ -512,19 +505,20 @@ static type_t add_tuple_type_body(region_t<`d> d, $(struct TocState<`d> @`d,
   ts           = imp_rev(ts);
   let sd       = make_c_struct_defn(xname, fs);
   let ans      = aggr_type(KnownAggr(new sd), NULL);
-  result_decls = new List(new_decl(new Aggr_d(sd), DL), result_decls);
+  ctxt->result_decls = new List(new_decl(new Aggr_d(sd), DL), ctxt->result_decls);
   *tuple_types = rnew(d) List(rnew(d) $(ans, ts), *tuple_types);
   return ans;
 }
-static type_t add_tuple_type(list_t<$(tqual_t, type_t) @`H,`H> tqs0) {
-  return use_toc_state(tqs0, add_tuple_type_body<>);
+static type_t add_tuple_type(toc_context_t ctxt, list_t<$(tqual_t, type_t) @`H,`H> tqs0) {
+  return use_toc_state(new $(ctxt, tqs0), add_tuple_type_body<>);
 }
 
 // similar to add_tuple_type, but for anonymous aggregates (should try to share)
+static type_t trans_type(toc_context_t ctxt, type_t);
 static type_t add_anon_aggr_type_body(region_t<`d> d,
                                       $(struct TocState<`d> @`d,
-                                        $(aggr_kind_t, list_t<aggrfield_t,`H>) @`H) @`r env) {
-  let &$(&TocState{.anon_aggr_types = anon_aggr_types, ...}, &$(ak, fs)) = env;
+                                        $(toc_context_t, aggr_kind_t, list_t<aggrfield_t,`H>) @`H) @`r env) {
+  let $(&TocState{.anon_aggr_types = anon_aggr_types, ...}, &$(ctxt, ak, fs)) = *env;
   // look for the same type already declared
   for (let ts = *anon_aggr_types; ts != NULL; ts = ts->tl) {
     let &$(x, ak2, fs2) = ts->hd;
@@ -537,12 +531,12 @@ static type_t add_anon_aggr_type_body(region_t<`d> d,
   let sd            = make_c_struct_defn(xname, fs);
   sd->kind          = ak;  // might be a union
   let ans           = aggr_type(KnownAggr(new sd), NULL);
-  result_decls      = new List(new_decl(new Aggr_d(sd), DL), result_decls);
+  ctxt->result_decls      = new List(new_decl(new Aggr_d(sd), DL), ctxt->result_decls);
   *anon_aggr_types  = rnew(d) List(rnew(d) $(ans, ak, fs), *anon_aggr_types);
   return ans;
 }
-static type_t add_anon_aggr_type(aggr_kind_t ak, list_t<aggrfield_t,`H> fs) {
-  return use_toc_state(new $(ak, fs), add_anon_aggr_type_body<>);
+static type_t add_anon_aggr_type(toc_context_t ctxt, aggr_kind_t ak, list_t<aggrfield_t,`H> fs) {
+  return use_toc_state(new $(ctxt, ak, fs), add_anon_aggr_type_body<>);
 }
 
 // similar to the above, except that we're working with an instantiated
@@ -550,14 +544,14 @@ static type_t add_anon_aggr_type(aggr_kind_t ak, list_t<aggrfield_t,`H> fs) {
 // struct fields and in addition, we have to worry about the instantiation.
 // It's very important that we share as many instantiations as possible
 // to get the translation right.
-static type_t add_struct_type_body<`r2,`r3,`d,`r>(
-    region_t<`d> d, $(struct TocState<`d> @`d s, $(qvar_t struct_name, list_t<tvar_t,`H> type_vars,
+static type_t add_struct_type_body<`r2,`d,`r>(
+    region_t<`d> d, $(struct TocState<`d> @`d s, $(toc_context_t ctxt, qvar_t struct_name, list_t<tvar_t,`H> type_vars,
                                                    list_t<type_t,`H> type_args,
-                                                   list_t<aggrfield_t,`r2> fields) @`r3) @`r env) {
+                                                   list_t<aggrfield_t,`r2> fields) @`H) @`r env) {
   // first, filter out the type_vars and type_args that are not of
   // type or integer kind.
   let $(&TocState{.abs_struct_types = abs_struct_types, ...},
-        &$(struct_name, type_vars, type_args, fields)) = *env;
+        &$(ctxt, struct_name, type_vars, type_args, fields)) = *env;
 
   // look for the same instantiation of abstract-struct-type already declared
   for (let tts = *abs_struct_types; tts != NULL; tts = tts->tl) {
@@ -573,7 +567,7 @@ static type_t add_struct_type_body<`r2,`r3,`d,`r>(
             //        case &Kind{.kind = RgnKind, _}:
           default:
             // Check if they're the same before translating them to C
-            if (Unify::unify(t, t2) || Unify::unify(typ_to_c(t), typ_to_c(t2)))
+            if (Unify::unify(t, t2) || Unify::unify(trans_type(ctxt, t), trans_type(ctxt, t2)))
               continue;
             okay = false;
             break;
@@ -604,7 +598,7 @@ static type_t add_struct_type_body<`r2,`r3,`d,`r>(
     //     of abstract mem kind
     if (fields->tl == NULL && Kinds::kind_leq(&Kinds::ak, type_kind(t)) && !is_array_type(t))
       atts = new List(new Aligned_att(NULL), atts);
-    t = typ_to_c(rsubstitute(r, inst, t));
+    t = trans_type(ctxt, rsubstitute(r, inst, t));
     // still could be abstract and end up void -- if so, make it
     // a zero-sized array of void*'s and force it to be aligned.
     if (Unify::unify(t, void_type))
@@ -614,14 +608,14 @@ static type_t add_struct_type_body<`r2,`r3,`d,`r>(
   }
   fs           = List::imp_rev(fs);
   let sd       = make_c_struct_defn(xname, fs);
-  result_decls = new List(new_decl(new Aggr_d(sd), DL), result_decls);
+  ctxt->result_decls = new List(new_decl(new Aggr_d(sd), DL), ctxt->result_decls);
   return x;
 }
 
-static type_t add_struct_type(qvar_t struct_name, list_t<tvar_t,`H> type_vars,
+static type_t add_struct_type(toc_context_t ctxt, qvar_t struct_name, list_t<tvar_t,`H> type_vars,
                               list_t<type_t,`H> type_args, list_t<aggrfield_t,`r> fields) {
-  _ env = $(struct_name, type_vars, type_args, fields);
-  return use_toc_state(&env, (add_struct_type_body @<`r,`add_struct_type>)<>);
+  _ env = new $(ctxt, struct_name, type_vars, type_args, fields);
+  return use_toc_state(env, (add_struct_type_body @<`r>)<>);
 }
 
 // generate a temporary variable
@@ -659,15 +653,23 @@ static exp_t datatype_tag(datatypedecl_t td, qvar_t name) {
 ///////////////////////////////////////////////////////////////
 //         Convert a Cyclone type to a C type                //
 ///////////////////////////////////////////////////////////////
-static void enumdecl_to_c(enumdecl_t);
-static void aggrdecl_to_c(aggrdecl_t);
-static void datatypedecl_to_c(datatypedecl_t);
-static void exptypes_to_c(exp_t);
-static void stmttypes_to_c(stmt_t);
+static type_t trans_type(toc_context_t ctxt, type_t);
+static void trans_enumdecl(toc_context_t ctxt, enumdecl_t);
+static void trans_aggrdecl(toc_context_t ctxt, aggrdecl_t);
+static void trans_datatypedecl(toc_context_t ctxt, datatypedecl_t);
+static void trans_exptypes(toc_context_t ctxt, exp_t);
+static void trans_stmttypes(toc_context_t ctxt, stmt_t);
+
+// wrappers for backward compatibility (using global_ctxt)
+static void enumdecl_to_c(enumdecl_t ed) { trans_enumdecl(global_ctxt, ed); }
+static void aggrdecl_to_c(aggrdecl_t ad) { trans_aggrdecl(global_ctxt, ad); }
+static void datatypedecl_to_c(datatypedecl_t dd) { trans_datatypedecl(global_ctxt, dd); }
+static void exptypes_to_c(exp_t e) { trans_exptypes(global_ctxt, e); }
+static void stmttypes_to_c(stmt_t s) { trans_stmttypes(global_ctxt, s); }
 
 // just drop the vars to reduce output
-static $(var_opt_t, tqual_t, type_t) @arg_to_c($(var_opt_t, tqual_t, type_t) @a) {
-  return new $(NULL, (*a)[1], typ_to_c((*a)[2]));
+static $(var_opt_t, tqual_t, type_t) @arg_to_c(toc_context_t ctxt, $(var_opt_t, tqual_t, type_t) @a) {
+  return new $(NULL, (*a)[1], trans_type(ctxt, (*a)[2]));
 }
 
 // Sometimes we translate arrays t[] and t[N] to t*, and sometimes
@@ -685,14 +687,15 @@ static $(var_opt_t, tqual_t, type_t) @arg_to_c($(var_opt_t, tqual_t, type_t) @a)
 // 1. as the parameter of a function
 // The function typ_to_c_array changes them, while typ_to_c
 // changes them to pointers.
-static type_t typ_to_c_array(type_t t) {
+static type_t trans_type_array(toc_context_t ctxt, type_t t) {
   switch (compress(t)) {  // FIX: do we handle tq correctly?
     case &ArrayType(ai):
-      return cstar_type(typ_to_c_array(ai.elt_type), ai.tq);
+      return cstar_type(trans_type_array(ctxt, ai.elt_type), ai.tq);
     default:
-      return typ_to_c(t);
+      return trans_type(ctxt, t);
   }
 }
+static type_t typ_to_c_array(type_t t) { return trans_type_array(global_ctxt, t); }
 
 static aggrfield_t aggrfield_to_c(aggrfield_t f, type_t new_type) {
   // JGM: I'm making the qualifiers non-const here to allow initialization
@@ -735,6 +738,10 @@ static bool is_void_star_or_boxed_tvar(type_t t) { return is_void_star(t) || is_
 static bool is_pointer_or_boxed_tvar(type_t t) { return is_pointer_type(t) || is_boxed_tvar(t); }
 
 type_t typ_to_c(type_t t) {
+  return trans_type(global_ctxt, t);
+}
+
+static type_t trans_type(toc_context_t ctxt, type_t t) {
   switch (t) {
     case &AppType(&VoidCon, _):
       return t;
@@ -742,7 +749,7 @@ type_t typ_to_c(type_t t) {
       return void_star_type();  // Cvar's are purely Cyclone types
     case &Evar(_, *t2, _, _):
       if (*t2 != NULL)
-        return typ_to_c((type_t)(*t2));
+        return trans_type(ctxt, (type_t)(*t2));
       return *t2 = void_star_type();
     case &VarType(tv):
       if (Kinds::tvar_kind(tv, &Kinds::bk)->kind == AnyKind)
@@ -757,7 +764,7 @@ type_t typ_to_c(type_t t) {
     case &PointerType(PtrInfo(t2, tq, PtrAtts(_, _, bnds, ...))):
       // t2? maps to struct fat_ptr.
       // t2* and t2@ map to t2*.  Regions and zero-term are irrelevant.
-      t2 = typ_to_c(t2);
+      t2 = trans_type(ctxt, t2);
       if (get_bounds_exp_constrain(bounds_one(), bnds, true) == NULL)
         return fat_ptr_type();
       return star_type(t2, heap_rgn_type, al_qual_type, tq, false_type, false_type);
@@ -765,20 +772,20 @@ type_t typ_to_c(type_t t) {
     case &AppType(&FloatCon(_), _):
       return t;
     case &ArrayType(ArrayInfo{t2, tq, e, _, ztl}):
-      return array_type(typ_to_c(t2), tq, e, false_type, ztl);
+      return array_type(trans_type(ctxt, t2), tq, e, false_type, ztl);
     case &FnType(FnInfo{_, _, tq2, t2, args, c_vararg, cyc_vararg, _, atts, ...}):
       // just drop the type arguments & effect and translate the nested types
       // also, drop any format descriptors
       let new_atts = Atts::atts2c(atts);
-      let new_args = List::map(arg_to_c, args);
+      let new_args = List::map_c(arg_to_c, ctxt, args);
       if (cyc_vararg != NULL) {
         // region for array type irrelevant
-        let t      = typ_to_c(fatptr_type(cyc_vararg->type, heap_rgn_type, al_qual_type, mt_tq,
+        let t      = trans_type(ctxt, fatptr_type(cyc_vararg->type, heap_rgn_type, al_qual_type, mt_tq,
                                      false_type, false_type));
         let vararg = new $(cyc_vararg->name, cyc_vararg->tq, t);
         new_args   = List::imp_append(new_args, new List(vararg, NULL));
       }
-      return new FnType(FnInfo{NULL, NULL,     tq2,  typ_to_c(t2), new_args, c_vararg, NULL,
+      return new FnType(FnInfo{NULL, NULL,     tq2,  trans_type(ctxt, t2), new_args, c_vararg, NULL,
                                NULL, new_atts, NULL, NULL,         NULL,     NULL,     NULL,
                                NULL, NULL,     NULL, NULL,         NULL,     NULL});
     case &AnonAggrType(k, _, fs):
@@ -786,8 +793,8 @@ type_t typ_to_c(type_t t) {
       // but we have full aggrfields to deal with
       let fs2 = NULL;
       for (; fs != NULL; fs = fs->tl)
-        fs2 = new List(aggrfield_to_c(fs->hd, typ_to_c(fs->hd->type)), fs2);
-      return add_anon_aggr_type(k, imp_rev(fs2));
+        fs2 = new List(aggrfield_to_c(fs->hd, trans_type(ctxt, fs->hd->type)), fs2);
+      return add_anon_aggr_type(ctxt, k, imp_rev(fs2));
     case &AppType(c as & AggrCon(info), ts):
       // If we are in C code, the implementation may not be set here.
       switch (info) {
@@ -819,7 +826,9 @@ type_t typ_to_c(type_t t) {
         let t    = rsubstitute(r, inst, last_type);
         if (is_abstract_type(t))
           return aggrdecl_type(ad->name, strctq);
-        return add_struct_type(ad->name, ad->tvs, ts, ad->impl->fields);
+        let res = add_struct_type(ctxt, ad->name, ad->tvs, ts, ad->impl->fields);
+        if (is_void_star(res)) Warn::warn(DL, "add_struct_type returned void* for %s", *(*ad->name)[1]);
+        return res;
       }
       return aggrdecl_type(ad->name, strctq);
     case &AppType(&EnumCon(tdn, _), _):
@@ -832,7 +841,14 @@ type_t typ_to_c(type_t t) {
       // typedef expansion is done in Absynpp::to_tms.
       if (topt == NULL)  // drop type args
         return (ts == NULL) ? t : new TypedefType(tdn, NULL, td, NULL);
-      return new TypedefType(tdn, NULL, td, typ_to_c(topt));
+      {
+        type_t res = trans_type(ctxt, topt);
+        if (strcmp(*(*tdn)[1], "iter_t") == 0) {
+           if (is_void_star(res)) Warn::warn(DL, "iter_t translated to void*");
+           else Warn::warn(DL, "iter_t translated to non-void*");
+        }
+        return new TypedefType(tdn, NULL, td, res);
+      }
     case &AppType(&TagCon, _):
       return uint_type;  // must be unsigned!
     case &AppType(&RgnHandleCon, _):
@@ -857,19 +873,19 @@ type_t typ_to_c(type_t t) {
       // JGM: we have to eliminate typeof(e)'s since these might
       // occur within a type declaration and we will pull the
       // type-declaration out of scope and put it to the top-level.
-      exptypes_to_c(e);
-      return (e->topt == NULL) ? t : typ_to_c((type_t)e->topt);
+      trans_exptypes(ctxt, e);
+      return (e->topt == NULL) ? t : trans_type(ctxt, (type_t)e->topt);
     case &TypeDeclType(&{.r = &Aggr_td(ad), ...}, _):
-      aggrdecl_to_c(ad);
+      trans_aggrdecl(ctxt, ad);
       return aggrdecl_type(ad->name, ((ad->kind == UnionA) ? unionq_type : strctq));
     case &TypeDeclType(&{.r = &Enum_td(ed), ...}, _):
-      enumdecl_to_c(ed);
+      trans_enumdecl(ctxt, ed);
       return t;
     case &TypeDeclType(&{.r = &Datatype_td(dd), ...}, t):
-      datatypedecl_to_c(dd);
-      return typ_to_c(*t);
+      trans_datatypedecl(ctxt, dd);
+      return trans_type(ctxt, *t);
     case &SubsetType(vd, ...):
-      return typ_to_c(vd->type);
+      return trans_type(ctxt, vd->type);
   }
 }
 
@@ -1023,7 +1039,7 @@ static stmt_t throw_match_stmt() {
 }
 
 // t*{sz} -> t? at top-level
-static exp_t make_toplevel_dyn_arr(type_t t, exp_t sz, exp_t e) {
+static exp_t make_toplevel_dyn_arr(toc_context_t ctxt, type_t t, exp_t sz, exp_t e) {
   // Note e must be either (a) a string or else (b) a [possibly cast]
   // identifier that is an array.
   // For case a, we generate
@@ -1039,7 +1055,7 @@ static exp_t make_toplevel_dyn_arr(type_t t, exp_t sz, exp_t e) {
       qvar_t x      = temp_var();
       type_t vd_typ = array_type(char_type, mt_tq, sz, false_type, DL);
       vardecl_t vd  = static_vardecl(x, vd_typ, e);
-      result_decls  = new List(new_decl(new Var_d(vd), DL), result_decls);
+      ctxt->result_decls  = new List(new_decl(new Var_d(vd), DL), ctxt->result_decls);
       xexp          = cast_it(cstar_type(uchar_type, mt_tq),
                      set_type(var_exp(x, DL), cstar_type(char_type, mt_tq)));
       xplussz       = set_type(add_exp(xexp, sz, DL), cstar_type(uchar_type, mt_tq));
@@ -1066,25 +1082,9 @@ static exp_t make_toplevel_dyn_arr(type_t t, exp_t sz, exp_t e) {
 // v1 = trans(e1); ... vn = trans(en);
 // goto fallthru_info->v[0]
 // where the ith element of fallthru_info->v[1] is vi
-//
-// We can alpha-convert just by mutating a vd->name.  When we hoist
-// a declaration (in pattern-compilation), we must alpha-convert.
-static struct FallthruInfo {
-  var_t label;
-  list_t<vardecl_t> binders;
-};
-static struct Env<`r> {
-  var_t *`r break_lab;
-  var_t *`r continue_lab;
-  struct FallthruInfo *`r fallthru_info;
-  bool toplevel;
-  bool @`r in_lhs;
-  region_t<`r> rgn;
-};
-typedef struct Env<`r> @`r env_t<`r>;
 
-static env_t<`r> empty_env(region_t<`r> r) {
-  return rnew(r) Env(NULL, NULL, NULL, true, rnew(r) false, r);
+env_t<`r> empty_env(region_t<`r> r, toc_context_t ctxt) {
+  return rnew(r) Env(ctxt, NULL, NULL, NULL, true, rnew(r) false, r);
 }
 
 static bool is_toplevel(env_t nv) {
@@ -1092,12 +1092,12 @@ static bool is_toplevel(env_t nv) {
   return t;
 }
 static env_t<`r +`r2> clear_toplevel(region_t<`r> r, env_t<`r2> e) {
-  let &Env{b, c, f, t, lhs, _} = e;
-  return rnew(r) Env{b, c, f, false, lhs, r};
+  let &Env{ctxt, b, c, f, t, lhs, _} = e;
+  return rnew(r) Env{ctxt, b, c, f, false, lhs, r};
 }
 static env_t<`r +`r2> set_toplevel(region_t<`r> r, env_t<`r2> e) {
-  let &Env{b, c, f, t, lhs, _} = e;
-  return rnew(r) Env{b, c, f, true, lhs, r};
+  let &Env{ctxt, b, c, f, t, lhs, _} = e;
+  return rnew(r) Env{ctxt, b, c, f, true, lhs, r};
 }
 static bool in_lhs(env_t nv) {
   let &Env{.in_lhs = b, ...} = nv;
@@ -1109,28 +1109,28 @@ static void set_lhs(env_t<`r> e, bool b) {
 }
 
 static env_t<`r +`r2> share_env(region_t<`r> r, env_t<`r2> e) {
-  let &Env{b, c, f, t, lhs, _} = e;
-  return rnew(r) Env{b, c, f, t, lhs, r};
+  let &Env{ctxt, b, c, f, t, lhs, _} = e;
+  return rnew(r) Env{ctxt, b, c, f, t, lhs, r};
 }
 
 // env for loop body: break and continue labels are set to null,
 // exception handler pop counters for break and continue are zeroed
 static env_t<`r +`r2> loop_env(region_t<`r> r, env_t<`r2> e) {
-  let &Env{b, c, f, t, lhs, _} = e;
-  return rnew(r) Env{NULL, NULL, f, t, lhs, r};
+  let &Env{ctxt, b, c, f, t, lhs, _} = e;
+  return rnew(r) Env{ctxt, NULL, NULL, f, t, lhs, r};
 }
 
 // env for a switch clause: give new label for break, and zero its pop counter
 static env_t<`r +`r2> non_last_switchclause_env(region_t<`r> r, env_t<`r2> e, var_t break_l,
                                                 var_t fallthru_l,
                                                 list_t<vardecl_t,`H> fallthru_binders) {
-  let &Env{b, c, f, t, lhs, _} = e;
+  let &Env{ctxt, b, c, f, t, lhs, _} = e;
   struct FallthruInfo *`r fi   = rnew(r) FallthruInfo{fallthru_l, fallthru_binders};
-  return rnew(r) Env{rnew(r) break_l, c, fi, t, lhs, r};
+  return rnew(r) Env{ctxt, rnew(r) break_l, c, fi, t, lhs, r};
 }
 static env_t<`r +`r2> last_switchclause_env(region_t<`r> r, env_t<`r2> e, var_t break_l) {
-  let &Env{b, c, f, t, lhs, _} = e;
-  return rnew(r) Env{rnew(r) break_l, c, NULL, t, lhs, r};
+  let &Env{ctxt, b, c, f, t, lhs, _} = e;
+  return rnew(r) Env{ctxt, rnew(r) break_l, c, NULL, t, lhs, r};
 }
 
 #ifdef COARSE_REGIONS
@@ -1142,8 +1142,8 @@ static env_t<`r +`r2> last_switchclause_env(region_t<`r> r, env_t<`r2> e, var_t 
 ///////////////////////////////////////////////////////////////
 //              Translation of Expressions                   //
 ///////////////////////////////////////////////////////////////
-static void exp_to_c(env_t, exp_t);  // forward declarations
-static void stmt_to_c(env_t, stmt_t);
+void exp_to_c(env_t, exp_t);  // forward declarations
+void stmt_to_c(env_t, stmt_t);
 static stmt_t letdecl_to_c(env_t, pat_t, Tcpat::decision_opt_t, type_t, exp_t, stmt_t);
 static void local_decl_to_c(env_t, vardecl_t, stmt_t);
 static void fndecl_to_c(env_t, fndecl_t, bool cinclude);
@@ -1747,7 +1747,7 @@ static raw_exp_t tagged_union_assignop(exp_t e1, type_t e1_cyc_type, primop_opt_
   return stmt_exp_r(s1);
 }
 
-static void exp_to_c(env_t nv, exp_t e) {
+void exp_to_c(env_t nv, exp_t e) {
   if (e->topt == NULL)
     Warn::impos_loc2(e->loc, "exp_to_c: no type for ", e);
   type_t old_typ = (type_t)e->topt;
@@ -1776,7 +1776,7 @@ static void exp_to_c(env_t nv, exp_t e) {
 
       if (get_bounds_exp_constrain(bounds_one(), get_pointer_bounds(old_typ), true) == NULL) {
         if (is_toplevel(nv))
-          e->r = make_toplevel_dyn_arr(old_typ, zero, zero)->r;
+          e->r = make_toplevel_dyn_arr(nv->ctxt, old_typ, zero, zero)->r;
         else
           e->r = fncall_exp_r(_tag_fat_e, zero, zero, zero);
       } else
@@ -2333,7 +2333,7 @@ static void exp_to_c(env_t nv, exp_t e) {
                 if (zt1 && !p2.elt_tq.real_const && !zt2)
                   e2 = set_type(prim2_exp(Minus, e2, set_type(uint_exp(1, DL), uint_type), DL),
                                 (type_t)e2->topt);
-                e->r = make_toplevel_dyn_arr(old_t2, e2, e1)->r;
+                e->r = make_toplevel_dyn_arr(nv->ctxt, old_t2, e2, e1)->r;
               } else if (zt1) {
                 // cast from t*{n} or t@{n} to t? or t?
                 // if p1 is zero-terminated then calculate the size dynamically:
@@ -3963,7 +3963,7 @@ void do_npop_before(int n, stmt_t s) {  // mutates s as necessary!
     s->r = seq_stmt_r(make_npop_handler(n), new_stmt(s->r, DL));
 }
 
-static void stmt_to_c(env_t nv, stmt_t s) {
+void stmt_to_c(env_t nv, stmt_t s) {
   // written to be self-tail recursive
   while (true)
     switch (s->r) {
@@ -3973,13 +3973,13 @@ static void stmt_to_c(env_t nv, stmt_t s) {
         exp_to_c(nv, e);
         return;
       case &Return_s(NULL):
-        do_npop_before(get_npop(s), s);
+        do_npop_before(get_npop(nv->ctxt, s), s);
         return;
       case &Return_s(e):
         // pop **after** evaluating expression
         type_t t = typ_to_c((type_t)e->topt);
         exp_to_c(nv, e);
-        int npop = get_npop(s);
+        int npop = get_npop(nv->ctxt, s);
         if (npop > 0) {
           let x         = temp_var();
           let retn_stmt = return_stmt(set_type(var_exp(x, DL), t), DL);
@@ -4011,7 +4011,7 @@ static void stmt_to_c(env_t nv, stmt_t s) {
         if (b != NULL)
           s->r = goto_stmt_r(*b);
         // reset handler
-        do_npop_before(get_npop(s), s);
+        do_npop_before(get_npop(nv->ctxt, s), s);
         return;
       case &Continue_s:
         let &Env{.continue_lab = c, ...} = nv;
@@ -4019,7 +4019,7 @@ static void stmt_to_c(env_t nv, stmt_t s) {
           s->r = goto_stmt_r(*c);
         fallthru;
       case &Goto_s(_):  // reset handler (earlier checks prevent jump into handler)
-        do_npop_before(get_npop(s), s);
+        do_npop_before(get_npop(nv->ctxt, s), s);
         return;
       case &Label_s(lab, s1):
         s = s1;
@@ -4034,7 +4034,7 @@ static void stmt_to_c(env_t nv, stmt_t s) {
         let FallthruInfo{l, vs} = *fi;
         stmt_t s2               = goto_stmt(l, DL);
         // reset handler (after the es evaluation)
-        do_npop_before(get_npop(s), s2);
+        do_npop_before(get_npop(nv->ctxt, s), s2);
         let vs2 = List::rev(vs);
         let es2 = List::rev(es);
         for (; vs2 != NULL; vs2 = vs2->tl, es2 = es2->tl) {
@@ -4099,9 +4099,9 @@ static void stmt_to_c(env_t nv, stmt_t s) {
             /* The save/restore is necessary because pop_tables are not
                in the environment but rather in globals at the moment.
                Should change this. */
-            let old_pop_table = fn_pop_table;  // save
+            let old_pop_table = nv->ctxt->fn_pop_table;  // save
             fndecl_to_c(nv, fd, false);
-            fn_pop_table = old_pop_table;  // restore
+            nv->ctxt->fn_pop_table = old_pop_table;  // restore
             stmt_to_c(nv, body);
             break;
           case &Region_d(tv, vd, open_exp_opt):
@@ -4244,6 +4244,7 @@ static void stmt_to_c(env_t nv, stmt_t s) {
 //              Translation of Declarations                  //
 ///////////////////////////////////////////////////////////////
 static void fndecl_to_c(env_t nv, fndecl_t f, bool cinclude) {
+  let ctxt = nv->ctxt;
   f->i.tvars  = NULL;
   f->i.effect = NULL;
   //  f->i.rgn_po = NULL;
@@ -4253,22 +4254,22 @@ static void fndecl_to_c(env_t nv, fndecl_t f, bool cinclude) {
   f->i.ensures_clause  = NULL;
   f->i.throws_clause   = NULL;
   f->i.effconstr       = NULL;
-  f->i.ret_type        = typ_to_c(f->i.ret_type);
-  f->cached_type       = typ_to_c((type_t)f->cached_type);
+  f->i.ret_type        = trans_type(ctxt, f->i.ret_type);
+  f->cached_type       = trans_type(ctxt, (type_t)f->cached_type);
   region frgn;
   let nv = share_env(frgn, nv);
   for (let args = f->i.args; args != NULL; args = args->tl)
-    (*args->hd)[2] = typ_to_c((*args->hd)[2]);
+    (*args->hd)[2] = trans_type(ctxt, (*args->hd)[2]);
   // for C code, we need to go through and convert all of the types
   // from Cyclone types to C, but otherwise leave the code alone.
   if (cinclude) {
-    stmttypes_to_c(f->body);
+    trans_stmttypes(ctxt, f->body);
     return;
   }
-  fn_pop_table = new Hashtable::lookup(*gpop_tables, f);
+  ctxt->fn_pop_table = new Hashtable::lookup(*ctxt->pop_tables, f);
   if (f->i.cyc_varargs && f->i.cyc_varargs->name != NULL) {
     let VarargInfo{n, tq, t, i} = *f->i.cyc_varargs;
-    let t2           = typ_to_c(fatptr_type(t, heap_rgn_type, al_qual_type, tq, false_type,
+    let t2           = trans_type(ctxt, fatptr_type(t, heap_rgn_type, al_qual_type, tq, false_type,
                                   false_type));  // region irrelevant
     let x2           = new $((nmspace_t)Loc_n(), (var_t)n);
     f->i.args        = append(f->i.args, new List(new $((var_t)n, tq, t2), NULL));
@@ -4299,11 +4300,11 @@ static scope_t scope_to_c(scope_t s) {
 //   ...
 //   struct _union_Foo_mn { int tag; Tn val; };
 //   union Foo { struct _union_Foo_m1 m1; ... struct _union_Foo_mn mn; };
-static int aggrdecl_to_c_body<`r2,`d,`r>(region_t<`d> d,
-                                         $(struct TocState<`d> @`d, aggrdecl_t @`r2) @`r env) {
-  let $(s, &ad)                                   = *env;
-  let n                                           = ad->name;
-  let TocState{.aggrs_so_far = aggrs_so_far, ...} = *s;
+static int aggrdecl_to_c_body<`d,`r>(region_t<`d> d,
+                                        $(struct TocState<`d> @`d, $(toc_context_t, aggrdecl_t) @`H) @`r env) {
+  let $(s, &$(ctxt, ad))                              = *env;
+  let n                                               = ad->name;
+  let &TocState{.aggrs_so_far = aggrs_so_far, ...} = s;
   bool seen_defn_before;
   let dopt = Dict::lookup_opt(*aggrs_so_far, n);
   if (dopt == NULL) {
@@ -4365,7 +4366,7 @@ static int aggrdecl_to_c_body<`r2,`d,`r>(region_t<`d> d,
       let new_field =
           new Aggrfield{.name       = old_field->name,
                         .tq         = mt_tq,
-                        .type       = typ_to_c(old_type),
+                        .type       = trans_type(ctxt, old_type),
                         .width      = old_field->width,
                         .attributes = Atts::atts2c(old_atts),  // NKS added conversion to C atts
                         .requires_clause = NULL};
@@ -4381,7 +4382,7 @@ static int aggrdecl_to_c_body<`r2,`d,`r>(region_t<`d> d,
         let value_field = new Aggrfield(val_sp, mt_tq, T, NULL, NULL, NULL);
         let tag_field   = new Aggrfield(tag_sp, mt_tq, sint_type, NULL, NULL, NULL);
         let ad2         = make_c_struct_defn(str, list(tag_field, value_field));
-        result_decls    = new List(new_decl(new Aggr_d(ad2), DL), result_decls);
+        ctxt->result_decls    = new List(new_decl(new Aggr_d(ad2), DL), ctxt->result_decls);
         new_field->type = strct(str);
       }
       new_fields = new List(new_field, new_fields);
@@ -4390,11 +4391,11 @@ static int aggrdecl_to_c_body<`r2,`d,`r>(region_t<`d> d,
   }
   // DJG: !seen_defn_before a hack because of TypedefType
   if (!seen_defn_before)
-    result_decls = new List(new Decl(new Aggr_d(new_ad), DL), result_decls);
+    ctxt->result_decls = new List(new Decl(new Aggr_d(new_ad), DL), ctxt->result_decls);
   return 0;
 }
-static void aggrdecl_to_c(aggrdecl_t ad) {
-  use_toc_state(&ad, (aggrdecl_to_c_body @<`aggrdecl_to_c>)<>);
+static void trans_aggrdecl(toc_context_t ctxt, aggrdecl_t ad) {
+  use_toc_state(new $(ctxt, ad), aggrdecl_to_c_body<>);
 }
 
 // datatype declarations -- tricky
@@ -4422,8 +4423,8 @@ static void aggrdecl_to_c(aggrdecl_t ad) {
 //     extern and what not is only a link-checker thing.  Unfortunately,
 //     the static trick doesn't work for xdatatype, which uses the addresses.
 static int datatypedecl_to_c_body<`d,`r>(region_t<`d> d,
-                                         $(struct TocState<`d> @`d, datatypedecl_t tud) @`r env) {
-  let $(&TocState{.datatypes_so_far = datatypes_so_far, ...}, tud) = *env;
+                                         $(struct TocState<`d> @`d, $(toc_context_t, datatypedecl_t) @`H) @`r env) {
+  let $(&TocState{.datatypes_so_far = datatypes_so_far, ...}, &$(ctxt, tud)) = *env;
   let n                                                            = tud->name;
   if (tud->fields == NULL || Set::member(*datatypes_so_far, n))
     return 0;
@@ -4434,18 +4435,18 @@ static int datatypedecl_to_c_body<`d,`r>(region_t<`d> d,
     let fs = NULL;
     int i  = 1;
     for (let ts = f->typs; ts != NULL; ts = ts->tl, i++) {
-      let f = new Aggrfield(fieldname(i), (*ts->hd)[0], typ_to_c((*ts->hd)[1]), NULL, NULL, NULL);
+      let f = new Aggrfield(fieldname(i), (*ts->hd)[0], trans_type(ctxt, (*ts->hd)[1]), NULL, NULL, NULL);
       fs    = new List(f, fs);
     }
     fs           = new List(new Aggrfield(tag_sp, mt_tq, sint_type, NULL, NULL, NULL), imp_rev(fs));
     let ad       = make_c_struct_defn(new "", fs);
     ad->name     = collapse_qvars(f->name, tud->name);
-    result_decls = new List(new_decl(new Aggr_d(ad), DL), result_decls);
+    ctxt->result_decls = new List(new_decl(new Aggr_d(ad), DL), ctxt->result_decls);
   }
   return 0;
 }
 
-static void datatypedecl_to_c(datatypedecl_t tud) { use_toc_state(tud, datatypedecl_to_c_body<>); }
+static void trans_datatypedecl(toc_context_t ctxt, datatypedecl_t tud) { use_toc_state(new $(ctxt, tud), datatypedecl_to_c_body<>); }
 // @extensible datatype declarations -- similar to datatype declarations
 // For a declaration extending an existing xdatatype, e.g.,
 //   "@extensible datatype foo {Bar,Baz(t1,t2)}"
@@ -4464,8 +4465,8 @@ static void datatypedecl_to_c(datatypedecl_t tud) { use_toc_state(tud, datatyped
 // true if already seen & initialized, false if seen but non initialized
 // (extern)
 static int xdatatypedecl_to_c_body<`d,`r>(region_t<`d> d,
-                                          $(struct TocState<`d> @`d, datatypedecl_t xd) @`r env) {
-  let $(s, xd) = *env;
+                                          $(struct TocState<`d> @`d, $(toc_context_t, datatypedecl_t) @`H) @`r env) {
+  let $(s, &$(ctxt, xd)) = *env;
   if (xd->fields == NULL)
     return 0;
   let TocState{.xdatatypes_so_far = xdatatypes_so_far, ...} = *s;
@@ -4483,14 +4484,14 @@ static int xdatatypedecl_to_c_body<`d,`r>(region_t<`d> d,
           initopt = string_exp(*fn, DL);
         let tag_decl               = new_vardecl(0, f->name, tag_typ, initopt, NULL);
         tag_decl->sc               = f->sc;
-        result_decls               = new List(new_decl(new Var_d(tag_decl), DL), result_decls);
+        ctxt->result_decls         = new List(new_decl(new Var_d(tag_decl), DL), ctxt->result_decls);
         *xdatatypes_so_far         = Dict::insert(*xdatatypes_so_far, f->name, f->sc != Extern);
         list_t<aggrfield_t> fields = NULL;
         int i                      = 1;
         for (let tqts = f->typs; tqts != NULL; tqts = tqts->tl, i++) {
           let field_n = fieldname(i);
           let newf =
-              new Aggrfield(field_n, (*tqts->hd)[0], typ_to_c((*tqts->hd)[1]), NULL, NULL, NULL);
+              new Aggrfield(field_n, (*tqts->hd)[0], trans_type(ctxt, (*tqts->hd)[1]), NULL, NULL, NULL);
           fields = new List(newf, fields);
         }
         fields =
@@ -4498,14 +4499,14 @@ static int xdatatypedecl_to_c_body<`d,`r>(region_t<`d> d,
                      List::imp_rev(fields));
         let strct_decl   = make_c_struct_defn(new "", fields);
         strct_decl->name = collapse_qvars(f->name, xd->name);
-        result_decls     = new List(new_decl(new Aggr_d(strct_decl), DL), result_decls);
+        ctxt->result_decls     = new List(new_decl(new Aggr_d(strct_decl), DL), ctxt->result_decls);
         break;
       case & false:
         if (f->sc != Extern) {
           let initopt        = string_exp(*fn, DL);
           let tag_decl       = new_vardecl(0, f->name, tag_typ, initopt, NULL);
           tag_decl->sc       = f->sc;
-          result_decls       = new List(new_decl(new Var_d(tag_decl), DL), result_decls);
+          ctxt->result_decls       = new List(new_decl(new Var_d(tag_decl), DL), ctxt->result_decls);
           *xdatatypes_so_far = Dict::insert(*xdatatypes_so_far, f->name, true);
         }
         break;
@@ -4516,9 +4517,10 @@ static int xdatatypedecl_to_c_body<`d,`r>(region_t<`d> d,
   return 0;
 }
 
-static void xdatatypedecl_to_c(datatypedecl_t xd) { use_toc_state(xd, xdatatypedecl_to_c_body<>); }
+static void trans_xdatatypedecl(toc_context_t ctxt, datatypedecl_t xd) { use_toc_state(new $(ctxt, xd), xdatatypedecl_to_c_body<>); }
+static void xdatatypedecl_to_c(datatypedecl_t xd) { trans_xdatatypedecl(global_ctxt, xd); }
 
-static void enumdecl_to_c(enumdecl_t ed) {
+static void trans_enumdecl(toc_context_t ctxt, enumdecl_t ed) {
   ed->sc = Public;  // gcc warns if we have Extern or Static on an enum
   if (ed->fields != NULL)
     enumfields_to_c(ed->fields->v);
@@ -4691,13 +4693,13 @@ static bool types_to_c_f2(bool ignore, stmt_t s) {
             (*args->hd)[2] = typ_to_c((*args->hd)[2]);
           break;
         case &Aggr_d(ad):
-          aggrdecl_to_c(ad);
+          trans_aggrdecl(global_ctxt, ad);
           break;
         case &Enum_d(ed):
           if (ed->fields != NULL)
             for (let fs = ed->fields->v; fs != NULL; fs = fs->tl)
               if (fs->hd->tag != NULL)
-                exptypes_to_c((exp_t)fs->hd->tag);
+                trans_exptypes(global_ctxt, (exp_t)fs->hd->tag);
           break;
         case &Typedef_d(td):
           td->defn = typ_to_c((type_t)td->defn);
@@ -4709,19 +4711,19 @@ static bool types_to_c_f2(bool ignore, stmt_t s) {
     case &Fallthru_s(...):
       // in C code, this is implicit, so we replace it with a skip
       s->r = new Skip_s;
-      return false;
+      break;
     default:
       break;
   }
   return true;
 }
-static void exptypes_to_c(exp_t e) { visit_exp(types_to_c_f1, types_to_c_f2, true, e); }
-static void stmttypes_to_c(stmt_t s) { visit_stmt(types_to_c_f1, types_to_c_f2, true, s); }
-
-// Translate the given declarations, producing a new list of declarations
+        
+        static void trans_exptypes(toc_context_t ctxt, exp_t e) { visit_exp(types_to_c_f1, types_to_c_f2, true, e); }
+        static void trans_stmttypes(toc_context_t ctxt, stmt_t s) { visit_stmt(types_to_c_f1, types_to_c_f2, true, s); }// Translate the given declarations, producing a new list of declarations
 // and a new translation environment.  Top-level variable
 // declarations are treated differently.
 static void decls_to_c(env_t nv, list_t<decl_t> ds, bool cinclude) {
+  let ctxt = nv->ctxt;
   for (; ds != NULL; ds = ds->tl) {
     fresh_label_counter = 0;  // DJG: why not?
     decl_t d            = ds->hd;
@@ -4735,14 +4737,14 @@ static void decls_to_c(env_t nv, list_t<decl_t> ds, bool cinclude) {
           if (vd->sc == ExternC)
             vd->sc = Public;
           if (cinclude)
-            exptypes_to_c((exp_t)vd->initializer);
+            trans_exptypes(ctxt, (exp_t)vd->initializer);
           else
             exp_to_c(nv, (exp_t)vd->initializer);
         }
         vd->name     = c_name;
         vd->sc       = scope_to_c(vd->sc);
-        vd->type     = typ_to_c(vd->type);
-        result_decls = new List(d, result_decls);
+        vd->type     = trans_type(ctxt, vd->type);
+        ctxt->result_decls = new List(d, ctxt->result_decls);
         break;
       case &Fn_d(fd):
         // strip any namespace from an extern C declaration
@@ -4752,7 +4754,7 @@ static void decls_to_c(env_t nv, list_t<decl_t> ds, bool cinclude) {
           fd->sc   = Public;  // function declarations can't be extern
         }
         fndecl_to_c(nv, fd, cinclude);
-        result_decls = new List(d, result_decls);
+        ctxt->result_decls = new List(d, ctxt->result_decls);
         break;
       case &Let_d(...):
       case &Letv_d(_):
@@ -4760,25 +4762,25 @@ static void decls_to_c(env_t nv, list_t<decl_t> ds, bool cinclude) {
       case &Region_d(...):
         toc_impos("region decl at toplevel");
       case &Aggr_d(sd):
-        aggrdecl_to_c(sd);
+        trans_aggrdecl(ctxt, sd);
         break;
       case &Datatype_d(tud):
-        tud->is_extensible ? xdatatypedecl_to_c(tud) : datatypedecl_to_c(tud);
+        tud->is_extensible ? trans_xdatatypedecl(ctxt, tud) : trans_datatypedecl(ctxt, tud);
         break;
       case &Enum_d(ed):
-        enumdecl_to_c(ed);
-        result_decls = new List(d, result_decls);
+        trans_enumdecl(ctxt, ed);
+        ctxt->result_decls = new List(d, ctxt->result_decls);
         break;
       case &Typedef_d(td):
         td->tvs = NULL;
         if (td->defn != NULL) {
-          td->defn = typ_to_c((type_t)td->defn);
+          td->defn = trans_type(ctxt, (type_t)td->defn);
           // JGM: when we're expanding typedef's, we need to add back as
           // a declaration any enum's since they are dropped otherwise.
           switch (td->defn) {
             case &TypeDeclType(&{.r = &Enum_td(ed2), .loc = loc}, _):
               let ed       = new Decl{.r = new Enum_d(ed2), .loc = loc};
-              result_decls = new List(ed, result_decls);
+              ctxt->result_decls = new List(ed, ctxt->result_decls);
               td->defn     = new AppType(new EnumCon(ed2->name, ed2), NULL);
               break;
             default:
@@ -4790,7 +4792,7 @@ static void decls_to_c(env_t nv, list_t<decl_t> ds, bool cinclude) {
         // will skip any use of the typedef
         // DJG: anonymous aggregates are now hoisted
         if (Flags::noexpand_r)
-          result_decls = new List(d, result_decls);
+          ctxt->result_decls = new List(d, ctxt->result_decls);
         break;
       case &Porton_d:
       case &Portoff_d:
@@ -4814,6 +4816,19 @@ static void decls_to_c(env_t nv, list_t<decl_t> ds, bool cinclude) {
 // initialize all globals
 // static
 void init() {
+  if (global_ctxt == NULL) {
+    global_ctxt = new TocContext{
+      .result_decls = NULL,
+      .pop_tables = NULL,
+      .fn_pop_table = NULL
+    };
+  } else {
+    global_ctxt->result_decls = NULL;
+  }
+  tuple_type_counter = 0;
+  temp_var_counter = 0;
+  fresh_label_counter = 0;
+
   //  let RealNewDynamicRegion{dyn} = real_new_rckey();
   let NewDynamicRegion{dyn} = new_rckey();
   let ts;
@@ -4822,10 +4837,6 @@ void init() {
     ts       = empty_toc_state(h);
   }
   toc_state           = qunew TocStateWrap{dyn, ts};
-  result_decls        = NULL;
-  tuple_type_counter  = 0;
-  temp_var_counter    = 0;
-  fresh_label_counter = 0;
   // must turn all of the Abs_n's into C_n
   _throw_pr.f0.C_n                            = NULL;
   setjmp_pr.f0.C_n                            = NULL;
@@ -4935,17 +4946,23 @@ void finish() {
   //  Core::real_free_rckey(dyn);
   Core::free_rckey(dyn);
   Core::ufree(ts);
-
-  gpop_tables  = NULL;
-  fn_pop_table = NULL;
 }
 
 // The entry point:  translate the list of Cyclone declarations to
 // a list of C declarations.
 list_t<decl_t> toc(table_t<fndecl_t, table_t<stmt_t, int>> pop_tables, list_t<decl_t> ds) {
-  gpop_tables = new pop_tables;
+  toc_context_t ctxt = new TocContext{
+    .result_decls = NULL,
+    .pop_tables = new pop_tables,
+    .fn_pop_table = NULL
+  };
+  toc_context_t prev = global_ctxt;
+  global_ctxt = ctxt;
+  
   init();
+
   region start;
-  decls_to_c(empty_env(start), ds, false);
-  return imp_rev(result_decls);
+  decls_to_c(empty_env(start, ctxt), ds, false);
+  global_ctxt = prev;
+  return imp_rev(ctxt->result_decls);
 }

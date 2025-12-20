@@ -1,0 +1,50 @@
+#include "cyclone/testsuite/cyctest.h"
+#include "cyclone/library/compiler/absyn.h"
+#include "cyclone/library/std/position.h"
+
+using Absyn;
+using Core;
+using Position;
+
+CT_SUITE_BEGIN(Absyn)
+
+void begin() {}
+void end() {}
+
+  void test_qvar_cmp_same() {
+    var_t v1 = new "foo";
+    qvar_t q1 = new $(Loc_n(), v1);
+    
+    CT_ASSERT(qvar_cmp(q1, q1) == 0);
+  }
+
+  void test_qvar_cmp_diff() {
+    var_t v1 = new "foo";
+    var_t v2 = new "bar";
+    qvar_t q1 = new $(Loc_n(), v1);
+    qvar_t q2 = new $(Loc_n(), v2);
+    
+    // "bar" < "foo", so q2 < q1. qvar_cmp(q1, q2) should be > 0.
+    CT_ASSERT(qvar_cmp(q1, q2) > 0);
+    CT_ASSERT(qvar_cmp(q2, q1) < 0);
+  }
+
+  void test_tqual_equal() {
+    seg_t seg = loc_to_seg(0); // Dummy location
+    tqual_t tq1 = const_tqual(seg);
+    tqual_t tq2 = const_tqual(seg);
+    tqual_t tq3 = empty_tqual(seg);
+
+    CT_ASSERT(equal_tqual(tq1, tq2));
+    CT_ASSERT(!equal_tqual(tq1, tq3));
+  }
+
+CT_SUITE_INIT
+  CT_ADD_TEST(test_qvar_cmp_same)
+  CT_ADD_TEST(test_qvar_cmp_diff)
+  CT_ADD_TEST(test_tqual_equal)
+CT_SUITE_END
+
+CT_MAIN_BEGIN(print_level)
+  CT_SUITE_REGISTER(Absyn);
+CT_MAIN_END(print_level)
