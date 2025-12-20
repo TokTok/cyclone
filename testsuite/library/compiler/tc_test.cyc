@@ -26,8 +26,10 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_init() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
       CT_ASSERT(te != NULL);
+      tc_context_t ctx = Tc::tc_init();
+      CT_ASSERT(ctx != NULL);
       // Check that exn is defined
       try {
           qvar_t exn_q = Absyn::exn_name;
@@ -40,8 +42,9 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_empty() {
-      tenv_t te = tc_init();
-      tc(te, false, NULL);
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
+      tc(ctx, te, false, NULL);
       CT_OK();
   }
 
@@ -54,14 +57,15 @@ CT_SUITE_BEGIN(Tc)
   }
   
   void test_tc_enum() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("MyEnum");
       enumfield_t f1 = new Enumfield(mk_qvar("E1"), NULL, 0);
       enumfield_t f2 = new Enumfield(mk_qvar("E2"), NULL, 0);
       
       enumdecl_t ed = new Enumdecl(Public, name, new Opt(new List(f1, new List(f2, NULL))));
       
-      tcEnumdecl(te, 0, ed);
+      tcEnumdecl(ctx, te, 0, ed);
       
       // Check if it is in the environment
       try {
@@ -74,7 +78,8 @@ CT_SUITE_BEGIN(Tc)
   }
   
   void test_tc_struct_simple() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("MyStruct");
       
       // struct MyStruct { int x; };
@@ -98,7 +103,7 @@ CT_SUITE_BEGIN(Tc)
           .expected_mem_kind = false
       };
       
-      tcAggrdecl(te, 0, ad);
+      tcAggrdecl(ctx, te, 0, ad);
       
       try {
           lookup_aggrdecl(te, 0, name);
@@ -111,7 +116,8 @@ CT_SUITE_BEGIN(Tc)
 
   void test_tc_typedef() {
       // typedef int MyInt;
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("MyInt");
       
       typedefdecl_t td = new Typedefdecl {
@@ -126,7 +132,7 @@ CT_SUITE_BEGIN(Tc)
       
       decl_t d = new_decl(new Typedef_d(td), 0);
       
-      tc(te, false, new List(d, NULL));
+      tc(ctx, te, false, new List(d, NULL));
       
       try {
           lookup_typedefdecl(te, 0, name);
@@ -138,7 +144,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_treeshake() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       // extern int ext_var;
       qvar_t name = mk_qvar("ext_var");
       vardecl_t vd = new_vardecl(0, name, int_type(Signed, Int_sz), NULL, NULL);
@@ -148,7 +155,7 @@ CT_SUITE_BEGIN(Tc)
       list_t<decl_t> ds = new List(d, NULL);
       
       // Run tc first to register it
-      tc(te, false, ds);
+      tc(ctx, te, false, ds);
       
       list_t<decl_t> ds2 = treeshake(te, ds);
       // It should be removed because it is unused.
@@ -169,7 +176,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_datatype() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("MyData");
       
       // datatype MyData { A, B(int) };
@@ -197,7 +205,7 @@ CT_SUITE_BEGIN(Tc)
           .is_extensible = false
       };
       
-      tcDatatypedecl(te, 0, dd);
+      tcDatatypedecl(ctx, te, 0, dd);
       
       try {
           lookup_datatypedecl(te, 0, name);
@@ -209,7 +217,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_fndecl() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("my_func");
       
       // Body: return 0;
@@ -256,7 +265,7 @@ CT_SUITE_BEGIN(Tc)
       decl_t d = new_decl(new Fn_d(fd), 0);
       
       // Using tc() to invoke tcFndecl
-      tc(te, false, new List(d, NULL));
+      tc(ctx, te, false, new List(d, NULL));
       
       // Check existence
        try {
@@ -269,7 +278,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_redecl_var() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("redecl_var");
       
       // extern int x;
@@ -282,13 +292,14 @@ CT_SUITE_BEGIN(Tc)
       v2->sc = Public;
       
       int start_errs = Warn::num_errors;
-      tc(te, false, new List(new_decl(new Var_d(v1), 0), new List(new_decl(new Var_d(v2), 0), NULL)));
+      tc(ctx, te, false, new List(new_decl(new Var_d(v1), 0), new List(new_decl(new Var_d(v2), 0), NULL)));
       
       CT_ASSERT(Warn::num_errors == start_errs);
   }
 
   void test_tc_conflict_var() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("conflict_var");
       
       // int x;
@@ -300,7 +311,7 @@ CT_SUITE_BEGIN(Tc)
       int start_errs = Warn::num_errors;
       
       try {
-          tc(te, false, new List(new_decl(new Var_d(v1), 0), new List(new_decl(new Var_d(v2), 0), NULL)));
+          tc(ctx, te, false, new List(new_decl(new Var_d(v1), 0), new List(new_decl(new Var_d(v2), 0), NULL)));
       } catch {
           default:
               // If it throws, it counts as a failure of the compilation (success of the test)
@@ -323,7 +334,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_body_error() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("bad_body");
       
       // return 42;
@@ -368,7 +380,7 @@ CT_SUITE_BEGIN(Tc)
       
       int start_errs = Warn::num_errors;
       try {
-        tc(te, false, new List(new_decl(new Fn_d(fd), 0), NULL));
+        tc(ctx, te, false, new List(new_decl(new Fn_d(fd), 0), NULL));
       } catch {
           default: ; break;
       }
@@ -385,7 +397,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_var_init_error() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("bad_init");
       
       // int x = "hello";
@@ -395,7 +408,7 @@ CT_SUITE_BEGIN(Tc)
       
       int start_errs = Warn::num_errors;
       try {
-          tc(te, false, new List(new_decl(new Var_d(v), 0), NULL));
+          tc(ctx, te, false, new List(new_decl(new Var_d(v), 0), NULL));
       } catch {
           default: ; break;
       }
@@ -413,7 +426,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_main_valid() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_global_qvar("main");
       CT_ASSERT(Tcutil::is_main(name));
       
@@ -457,12 +471,13 @@ CT_SUITE_BEGIN(Tc)
           .escapes = false
       };
       
-      tc(te, false, new List(new_decl(new Fn_d(fd), 0), NULL));
+      tc(ctx, te, false, new List(new_decl(new Fn_d(fd), 0), NULL));
       CT_OK();
   }
 
   void test_tc_main_valid_args() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_global_qvar("main");
       
       // Arg: int argc
@@ -506,12 +521,13 @@ CT_SUITE_BEGIN(Tc)
       
       CT_ASSERT(fd->i.args != NULL);
       
-      tc(te, false, new List(new_decl(new Fn_d(fd), 0), NULL));
+      tc(ctx, te, false, new List(new_decl(new Fn_d(fd), 0), NULL));
       CT_OK();
   }
 
   void test_tc_recursive_struct() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("Node");
       
       type_t next_type = star_type(strctq(name), heap_rgn_type, al_qual_type, empty_tqual(0), false_type, false_type);
@@ -536,7 +552,7 @@ CT_SUITE_BEGIN(Tc)
           .expected_mem_kind = false
       };
       
-      tcAggrdecl(te, 0, ad);
+      tcAggrdecl(ctx, te, 0, ad);
       
       try {
           lookup_aggrdecl(te, 0, name);
@@ -548,7 +564,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_struct_redecl() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("S");
       
       // struct S;
@@ -581,7 +598,7 @@ CT_SUITE_BEGIN(Tc)
           .expected_mem_kind = false
       };
 
-      tc(te, false, new List(new_decl(new Aggr_d(fwd), 0), new List(new_decl(new Aggr_d(def), 0), NULL)));
+      tc(ctx, te, false, new List(new_decl(new Aggr_d(fwd), 0), new List(new_decl(new Aggr_d(def), 0), NULL)));
       
       try {
           aggrdecl_t @ad = lookup_aggrdecl(te, 0, name);
@@ -594,7 +611,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_struct_mutual_recursive() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t nameA = mk_qvar("A");
       qvar_t nameB = mk_qvar("B");
       
@@ -628,12 +646,13 @@ CT_SUITE_BEGIN(Tc)
                              new List(new_decl(new Aggr_d(defA), 0),
                              new List(new_decl(new Aggr_d(defB), 0), NULL))));
                              
-      tc(te, false, decls);
+      tc(ctx, te, false, decls);
       CT_OK();
   }
 
   void test_tc_union_tagged() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("U");
       
       // tagged union U { int i; float f; };
@@ -658,7 +677,7 @@ CT_SUITE_BEGIN(Tc)
           .expected_mem_kind = false
       };
       
-      tc(te, false, new List(new_decl(new Aggr_d(ad), 0), NULL));
+      tc(ctx, te, false, new List(new_decl(new Aggr_d(ad), 0), NULL));
       
       try {
           aggrdecl_t @ad_res = lookup_aggrdecl(te, 0, name);
@@ -675,7 +694,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_struct_generic() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("Box");
       
       // struct Box<`a> { `a val; };
@@ -703,7 +723,7 @@ CT_SUITE_BEGIN(Tc)
           .expected_mem_kind = false
       };
       
-      tcAggrdecl(te, 0, ad);
+      tcAggrdecl(ctx, te, 0, ad);
       
       try {
           aggrdecl_t @res = lookup_aggrdecl(te, 0, name);
@@ -717,7 +737,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_struct_bitfield() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("Bits");
       
       // struct Bits { int x : 3; };
@@ -742,7 +763,7 @@ CT_SUITE_BEGIN(Tc)
           .expected_mem_kind = false
       };
       
-      tcAggrdecl(te, 0, ad);
+      tcAggrdecl(ctx, te, 0, ad);
       
       try {
           aggrdecl_t @res = lookup_aggrdecl(te, 0, name);
@@ -756,7 +777,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_var_attribute() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("aligned_var");
       
       // int x __attribute__((aligned(4)));
@@ -765,7 +787,7 @@ CT_SUITE_BEGIN(Tc)
       // Attributes are a list
       vd->attributes = new List(new Absyn::Aligned_att(int_exp(Signed, 4, 0)), NULL);
       
-      tc(te, false, new List(new_decl(new Var_d(vd), 0), NULL));
+      tc(ctx, te, false, new List(new_decl(new Var_d(vd), 0), NULL));
       
       try {
           binding_t b = lookup_ordinary_global(te, 0, name, false);
@@ -778,7 +800,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_func_varargs() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("my_printf");
       
       // void my_printf(const char *fmt, ...);
@@ -823,7 +846,7 @@ CT_SUITE_BEGIN(Tc)
           .escapes = false
       };
       
-      tc(te, false, new List(new_decl(new Fn_d(fd), 0), NULL));
+      tc(ctx, te, false, new List(new_decl(new Fn_d(fd), 0), NULL));
       
       try {
           binding_t b = lookup_ordinary_global(te, 0, name, false);
@@ -835,7 +858,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_func_noreturn() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("my_exit");
       
       // void my_exit() __attribute__((noreturn));
@@ -875,7 +899,7 @@ CT_SUITE_BEGIN(Tc)
           .escapes = false
       };
       
-      tc(te, false, new List(new_decl(new Fn_d(fd), 0), NULL));
+      tc(ctx, te, false, new List(new_decl(new Fn_d(fd), 0), NULL));
       
       try {
           binding_t b = lookup_ordinary_global(te, 0, name, false);
@@ -887,7 +911,8 @@ CT_SUITE_BEGIN(Tc)
   }
 
   void test_tc_typedef_attribute() {
-      tenv_t te = tc_init();
+      tenv_t te = Tcenv::tc_init();
+      tc_context_t ctx = Tc::tc_init();
       qvar_t name = mk_qvar("aligned_int");
       
       // typedef int aligned_int __attribute__((aligned(8)));
@@ -901,7 +926,7 @@ CT_SUITE_BEGIN(Tc)
           .extern_c = false
       };
       
-      tc(te, false, new List(new_decl(new Typedef_d(td), 0), NULL));
+      tc(ctx, te, false, new List(new_decl(new Typedef_d(td), 0), NULL));
       
       try {
           lookup_typedefdecl(te, 0, name);

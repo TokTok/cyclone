@@ -20,12 +20,13 @@
 #define _TCEXP_H_
 
 #include "tcenv.h"
+#include "tc.h"
 
 namespace Tcexp {
 
-  Absyn::type_t tcExp(Tcenv::tenv_t, Absyn::type_t *, Absyn::exp_t);
-  Absyn::type_t tcExpInitializer(Tcenv::tenv_t, Absyn::type_t *, Absyn::exp_t);
-  void tcTest(Tcenv::tenv_t, Absyn::exp_t, string_t<`H> msg_part);
+  Absyn::type_t tcExp(Tc::tc_context_t, Tcenv::tenv_t, Absyn::type_t *, Absyn::exp_t);
+  Absyn::type_t tcExpInitializer(Tc::tc_context_t, Tcenv::tenv_t, Absyn::type_t *, Absyn::exp_t);
+  void tcTest(Tc::tc_context_t, Tcenv::tenv_t, Absyn::exp_t, string_t<`H> msg_part);
   void check_consume(Position::seg_t, Absyn::aqualbnds_t, Absyn::type_t, Absyn::exp_t);
 
   // for tcpat:

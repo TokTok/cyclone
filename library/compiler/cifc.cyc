@@ -135,7 +135,7 @@ static void fail_merge(bool warn, seg_t loc, bool is_buildlib, qvar_t n, string_
       return;                     \
   } while (0)
 
-static type_t expand_c_type(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_t ctyp) {
+static type_t expand_c_type(Tc::tc_context_t ctx, seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_t ctyp) {
 #if 0
   fprintf (stderr, "expand_c_type(%s)\n", Absynpp::typ2string (ctyp));
 #endif
@@ -144,7 +144,7 @@ static type_t expand_c_type(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_
 #if 0
       fprintf (stderr, "Got typedef type %s expanded to--> ", Absynpp::typ2string (ctyp));
 #endif
-      Tctyp::check_valid_toplevel_type(loc, te, ctyp);
+      Tctyp::check_valid_toplevel_type(ctx, loc, te, ctyp);
       switch (ctyp) {
         case &TypedefType(_, _, _, to):
 #if 0
@@ -157,15 +157,15 @@ static type_t expand_c_type(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_
       }
       return ctyp;
     case &FnType(*finfo):
-      Tctyp::check_valid_toplevel_type(loc, te, ctyp);
+      Tctyp::check_valid_toplevel_type(ctx, loc, te, ctyp);
 #if 0
       fprintf (stderr, "Got function type %s -- \n", Absynpp::typ2string (ctyp));
 #endif
-      finfo->ret_type = expand_c_type(loc, te, ctxt, Toc::typ_to_c(ctxt, finfo->ret_type));
+      finfo->ret_type = expand_c_type(ctx, loc, te, ctxt, Toc::typ_to_c(ctxt, finfo->ret_type));
       let args        = finfo->args;
       while (args) {
         let &$(_, _, *argType) = args->hd;
-        *argType               = expand_c_type(loc, te, ctxt, Toc::typ_to_c(ctxt, *argType));
+        *argType               = expand_c_type(ctx, loc, te, ctxt, Toc::typ_to_c(ctxt, *argType));
         args                   = args->tl;
       }
       // nuke tvars reintroduced  by check_valid_toplevel_type
@@ -174,27 +174,27 @@ static type_t expand_c_type(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_
       return ctyp;
     case &PointerType(*pinfo):
 #if 0
-      Tctyp::check_valid_toplevel_type (loc, te, ctyp);
+      Tctyp::check_valid_toplevel_type (ctx, loc, te, ctyp);
       fprintf (stderr, "Got pointer type %s\n", Absynpp::typ2string (ctyp));
 #endif
-      pinfo->elt_type = expand_c_type(loc, te, ctxt, Toc::typ_to_c(ctxt, pinfo->elt_type));
+      pinfo->elt_type = expand_c_type(ctx, loc, te, ctxt, Toc::typ_to_c(ctxt, pinfo->elt_type));
       return ctyp;
     case &ArrayType(*ainfo):
-      Tctyp::check_valid_toplevel_type(loc, te, ctyp);
+      Tctyp::check_valid_toplevel_type(ctx, loc, te, ctyp);
 #if 0
       fprintf (stderr, "Got array type %s\n", Absynpp::typ2string (ctyp));
 #endif
-      ainfo->elt_type = expand_c_type(loc, te, ctxt, Toc::typ_to_c(ctxt, ainfo->elt_type));
+      ainfo->elt_type = expand_c_type(ctx, loc, te, ctxt, Toc::typ_to_c(ctxt, ainfo->elt_type));
       return ctyp;
     case &AnonAggrType(knd, is_tuple, flst):
 #if 0
       fprintf (stderr, "Got anonaggr type %s\n", Absynpp::typ2string (ctyp));
 #endif
       if (is_tuple) {
-        Tctyp::check_valid_toplevel_type(loc, te, ctyp);
+        Tctyp::check_valid_toplevel_type(ctx, loc, te, ctyp);
         for (; flst != NULL; flst = flst->tl) {
           let elt_type = &flst->hd->type;
-          *elt_type    = expand_c_type(loc, te, ctxt, Toc::typ_to_c(ctxt, *elt_type));
+          *elt_type    = expand_c_type(ctx, loc, te, ctxt, Toc::typ_to_c(ctxt, *elt_type));
           flst         = flst->tl;
         }
       }
@@ -233,8 +233,8 @@ static type_t expand_c_type(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_
 #if 0
       fprintf (stderr, "Got subset type %s\n", Absynpp::typ2string (ctyp));
 #endif
-      Tctyp::check_valid_toplevel_type(loc, te, ctyp);
-      vd->type = expand_c_type(loc, te, ctxt, Toc::typ_to_c(ctxt, vd->type));
+      Tctyp::check_valid_toplevel_type(ctx, loc, te, ctyp);
+      vd->type = expand_c_type(ctx, loc, te, ctxt, Toc::typ_to_c(ctxt, vd->type));
       return ctyp;
     case &Cvar(...):
       return ctyp;
@@ -276,13 +276,13 @@ static bool is_boxed_kind(type_t t) {
 }
 
 // forward decl
-static bool check_fntype_kinds(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_t c_typ, type_t u_typ);
+static bool check_fntype_kinds(Tc::tc_context_t ctx, seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_t c_typ, type_t u_typ);
 
 // Make copies of the types to make sure we don't get screwed up by]
 // side-effects with unification
 // FIX: we could be more liberal than unification alone.  E.g. we could allow
 //   an int where an unsigned int is expected.
-static bool c_types_ok(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_t ctyp, type_t cyctyp) {
+static bool c_types_ok(Tc::tc_context_t ctx, seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_t ctyp, type_t cyctyp) {
   tqual_t tq;
 
   let ctyp_cp = Tcutil::copy_type(ctyp);
@@ -298,13 +298,13 @@ static bool c_types_ok(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_t cty
 
   if (!Unify::unify(c_typ, u_typ))  // if types are the same, we're ok, o.w
   {
-    c_typ = expand_c_type(loc, te, ctxt, c_typ);  // try expanding typedefs
-    u_typ = expand_c_type(loc, te, ctxt, u_typ);
+    c_typ = expand_c_type(ctx, loc, te, ctxt, c_typ);  // try expanding typedefs
+    u_typ = expand_c_type(ctx, loc, te, ctxt, u_typ);
     if (!Unify::unify(c_typ, u_typ)) {
       // ow, accept if they're both boxed kinds
       // need to de-construct the types ... damn!
       if (Tcutil::is_function_type(c_typ))
-        return check_fntype_kinds(loc, te, ctxt, c_typ, u_typ);
+        return check_fntype_kinds(ctx, loc, te, ctxt, c_typ, u_typ);
       return is_boxed_kind(c_typ) && is_boxed_kind(u_typ);
     }
   }
@@ -324,17 +324,17 @@ static bool c_types_ok(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_t cty
 #endif
 }
 
-static bool check_fntype_kinds(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_t c_typ, type_t u_typ) {
+static bool check_fntype_kinds(Tc::tc_context_t ctx, seg_t loc, tenv_t te, Toc::toc_context_t ctxt, type_t c_typ, type_t u_typ) {
   switch ($(c_typ, u_typ)) {
     case $(&FnType(cfi), &FnType(ufi)):
-      bool typesOk = c_types_ok(loc, te, ctxt, cfi.ret_type, ufi.ret_type);
+      bool typesOk = c_types_ok(ctx, loc, te, ctxt, cfi.ret_type, ufi.ret_type);
       if (typesOk) {
         let ca = cfi.args;
         let ua = ufi.args;
         while (ca && typesOk) {
           if (!ua)
             return false;
-          typesOk = c_types_ok(loc, te, ctxt, (*ca->hd)[2], (*ua->hd)[2]);
+          typesOk = c_types_ok(ctx, loc, te, ctxt, (*ca->hd)[2], (*ua->hd)[2]);
           ca      = ca->tl;
           ua      = ua->tl;
         }
@@ -349,10 +349,10 @@ static bool check_fntype_kinds(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, ty
 // Merges a C declaration with a representation-compatible Cyclone
 // one.  If successful, [c_decl] is side-effected to be changed
 // appropriately.  Otherwise it is left alone.
-void merge_sys_user_decl(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, bool is_buildlib, decl_t user_decl, decl_t c_decl) {
+void merge_sys_user_decl(Tc::tc_context_t ctx, seg_t loc, tenv_t te, Toc::toc_context_t ctxt, bool is_buildlib, decl_t user_decl, decl_t c_decl) {
   switch ($(c_decl->r, user_decl->r)) {
     case $(&Var_d(cd), &Var_d(ud)):
-      if (!c_types_ok(loc, te, ctxt, cd->type, ud->type))
+      if (!c_types_ok(ctx, loc, te, ctxt, cd->type, ud->type))
         FAIL_MERGE(false, loc, is_buildlib, cd->name,
                    aprintf(": type %s != %s", Absynpp::typ2string(ud->type),
                            Absynpp::typ2string(cd->type)));
@@ -374,7 +374,7 @@ void merge_sys_user_decl(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, bool is_
         cdtype = cd->cached_type;
       else
         cdtype = new FnType(cd->i);
-      if (!c_types_ok(loc, te, ctxt, cdtype, ud->type))
+      if (!c_types_ok(ctx, loc, te, ctxt, cdtype, ud->type))
         FAIL_MERGE(
             false, loc, is_buildlib, ud->name,
             aprintf(": type %s != %s", Absynpp::typ2string(cdtype), Absynpp::typ2string(ud->type)));
@@ -383,7 +383,7 @@ void merge_sys_user_decl(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, bool is_
         switch (ud->type) {
           case &FnType(fi):
             let old_tvars = fi.tvars;
-            Tctyp::check_valid_toplevel_type(loc, te, ud->type);
+            Tctyp::check_valid_toplevel_type(ctx, loc, te, ud->type);
             if (cd->i.attributes != NULL)
               fi.attributes = Atts::merge_attributes(fi.attributes, cd->i.attributes);
             cd->i = fi;
@@ -426,7 +426,7 @@ void merge_sys_user_decl(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, bool is_
               // make sure these are representation-compatible.  To do this,
               // convert them to C types, and then unify these.  If they match,
               // we're OK.
-              if (!c_types_ok(loc, te, ctxt, cfield->type, ufield->type))
+              if (!c_types_ok(ctx, loc, te, ctxt, cfield->type, ufield->type))
                 FAIL_MERGE(false, loc, is_buildlib, cd->name,
                            aprintf(": type %s of user definition of field %s != %s",
                                    Absynpp::typ2string(ufield->type), *cfield->name,
@@ -491,7 +491,7 @@ void merge_sys_user_decl(seg_t loc, tenv_t te, Toc::toc_context_t ctxt, bool is_
         return;
       }
       // Now check that the actual definitions are representation-compatible
-      if (!c_types_ok(loc, te, ctxt, (type_t)cd->defn, (type_t)ud->defn))
+      if (!c_types_ok(ctx, loc, te, ctxt, (type_t)cd->defn, (type_t)ud->defn))
         FAIL_MERGE(
             false, loc, is_buildlib, cd->name,
             aprintf(": type definition %s of user definition != %s",
@@ -1212,7 +1212,7 @@ static bool eq(`a a, `a b) { return a == b; }
 
 static bool decl_not_present(list_t<decl_t> l, decl_t a) { return !List::exists_c(eq, a, l); }
 
-void user_overrides(Toc::toc_context_t ctxt, seg_t loc, tenv_t te, list_t<decl_t, `H> *ds, list_t<decl_t> ovrs) {
+void user_overrides(Tc::tc_context_t ctx, Toc::toc_context_t ctxt, seg_t loc, tenv_t te, list_t<decl_t, `H> *ds, list_t<decl_t> ovrs) {
   list_t<decl_t> type_overrides  = NULL;
   list_t<decl_t> overriden_decls = NULL;
   list_t<decl_t> abs_decls       = NULL;
@@ -1228,7 +1228,7 @@ void user_overrides(Toc::toc_context_t ctxt, seg_t loc, tenv_t te, list_t<decl_t
       else {
         overriden_decls = new List(d, overriden_decls);
         let pre_tvars_d = contains_type_vars(d);
-        merge_sys_user_decl(loc, te, ctxt, false, ud, d);
+        merge_sys_user_decl(ctx, loc, te, ctxt, false, ud, d);
         clear_vartype_ids(ud);
         if (contains_type_vars(ud) && !pre_tvars_d) {
           abs_decls      = new List(make_abstract_decl(ud), abs_decls);

@@ -45,7 +45,7 @@ namespace Tcpat;
 // qualifiers (e.g., const).
 /////////////////////////////////////////////////////////////////////////
 
-static void resolve_pat(tenv_t te, type_t *topt, pat_t p) {
+static void resolve_pat(Tc::tc_context_t ctx, tenv_t te, type_t *topt, pat_t p) {
   switch (p->r) {
     case &Aggr_p(NULL, is_tuple, exist_ts, dps, dots):
       if (topt == NULL) {
@@ -69,11 +69,11 @@ static void resolve_pat(tenv_t te, type_t *topt, pat_t p) {
         switch (type) {
           case &AppType(&AggrCon(_), _):
             p->r = new Aggr_p(type, is_tuple, exist_ts, dps, dots);
-            resolve_pat(te, topt, p);
+            resolve_pat(ctx, te, topt, p);
             break;
           case &AnonAggrType(...):
             p->r = new Aggr_p(type, is_tuple, exist_ts, dps, dots);
-            resolve_pat(te, topt, p);
+            resolve_pat(ctx, te, topt, p);
             break;
           default:
             Warn::err2(p->loc, "pattern expects aggregate type instead of ", *topt);
@@ -112,7 +112,7 @@ static void resolve_pat(tenv_t te, type_t *topt, pat_t p) {
           Warn::impos2("resolve_pat unknown aggrtype ", (type_t)topt);
       }
     case &Exp_p(e):
-      Tcexp::tcExp(te, NULL, e);
+      Tcexp::tcExp(ctx, te, NULL, e);
       if (!is_const_exp(e)) {
         Warn::err2(p->loc, "non-constant expression in case pattern");
         p->r = &Wild_p_val;
@@ -211,9 +211,9 @@ static type_t pat_promote_array(tenv_t te, type_t t, type_opt_t rgn_opt) {
 
 static $(tvar_t, bool) @add_false(tvar_t tv) { return new $(tv, false); }
 
-static tcpat_result_t tcPatRec(tenv_t te, pat_t p, type_t *topt, type_opt_t rgn_pat,
+static tcpat_result_t tcPatRec(Tc::tc_context_t ctx, tenv_t te, pat_t p, type_t *topt, type_opt_t rgn_pat,
                                bool allow_ref_pat, exp_opt_t access_exp) {
-  resolve_pat(te, topt, p);
+  resolve_pat(ctx, te, topt, p);
   type_t t;
   tcpat_result_t res = TcPatResult(NULL, NULL, NULL);
 
@@ -228,7 +228,7 @@ static tcpat_result_t tcPatRec(tenv_t te, pat_t p, type_t *topt, type_opt_t rgn_
       let &$(_, &v) = vd->name;
       if (strcmp(v, "true") == 0 || strcmp(v, "false") == 0)
         Warn::warn2(p->loc, "you probably do not want to use ", v, " as a local variable");
-      res = tcPatRec(te, p2, topt, rgn_pat, allow_ref_pat, access_exp);
+      res = tcPatRec(ctx, te, p2, topt, rgn_pat, allow_ref_pat, access_exp);
       t   = (type_t)p2->topt;
       // We allow arrays as long as the rgn_pat is defined, since
       // you can't update them (i.e., the whole array).
@@ -250,7 +250,7 @@ static tcpat_result_t tcPatRec(tenv_t te, pat_t p, type_t *topt, type_opt_t rgn_
         res.tvars_and_effconstr_opt = new $(NULL, NULL);
       (*res.tvars_and_effconstr_opt)[0] =
           append((*res.tvars_and_effconstr_opt)[0], new List(new $(tv, true), NULL));
-      Tctyp::check_type(p->loc, te2, lookup_type_vars(te2), &Kinds::mk, true, false, vd->type);
+      Tctyp::check_type(ctx, p->loc, te2, lookup_type_vars(te2), &Kinds::mk, true, false, vd->type);
       switch (vd->type) {  // ensure that the top level region matches the new
                            // type variable
         case &PointerType(PtrInfo{_, _, PtrAtts { eff, ... }}):
@@ -278,7 +278,7 @@ static tcpat_result_t tcPatRec(tenv_t te, pat_t p, type_t *topt, type_opt_t rgn_
       break;
 
     case &Reference_p(vd, p2):
-      res = tcPatRec(te, p2, topt, rgn_pat, allow_ref_pat, access_exp);
+      res = tcPatRec(ctx, te, p2, topt, rgn_pat, allow_ref_pat, access_exp);
       t   = (type_t)p2->topt;
       if (!allow_ref_pat || rgn_pat == NULL) {
         Warn::err2(p->loc, "* pattern would point into an unknown/unallowed region");
@@ -369,7 +369,7 @@ static tcpat_result_t tcPatRec(tenv_t te, pat_t p, type_t *topt, type_opt_t rgn_
       exp_opt_t new_access_exp = NULL;
       if (access_exp)
         new_access_exp = deref_exp(access_exp, DL);
-      res = combine_results(res, tcPatRec(te, p2, inner_topt, ptr_rgn, true, new_access_exp));
+      res = combine_results(res, tcPatRec(ctx, te, p2, inner_topt, ptr_rgn, true, new_access_exp));
       // if p2 is a datatype field pattern (e.g., datatype F.C), then unless
       // topt says otherwise, we make the type datatype F@.  We also change
       // p2's type from a datatype field to a datatype so that the match
@@ -536,7 +536,7 @@ static tcpat_result_t tcPatRec(tenv_t te, pat_t p, type_t *topt, type_opt_t rgn_
               if (access_exp)
                 new_access_exp = aggrmember_exp(access_exp, field->name, DL);
               res = combine_results(
-                  res, tcPatRec(te2, pat, &inst_fieldtyp, rgn_pat, allow_ref_pat, new_access_exp));
+                  res, tcPatRec(ctx, te2, pat, &inst_fieldtyp, rgn_pat, allow_ref_pat, new_access_exp));
               // must unify here or the type we gave pat won't ever get checked
               // against the exp we're matching against.  Even if we succeed
               // now, we could be constraining so as to catch an error later.
@@ -570,7 +570,7 @@ static tcpat_result_t tcPatRec(tenv_t te, pat_t p, type_t *topt, type_opt_t rgn_
               if (access_exp)
                 new_access_exp = aggrmember_exp(access_exp, field->name, DL);
               res = combine_results(
-                  res, tcPatRec(te, pat, &fieldtyp, rgn_pat, allow_ref_pat, new_access_exp));
+                  res, tcPatRec(ctx, te, pat, &fieldtyp, rgn_pat, allow_ref_pat, new_access_exp));
               // must unify here or the type we gave pat won't ever get checked
               // against the exp we're matching against.  Even if we succeed
               // now, we could be constraining so as to catch an error later.
@@ -608,7 +608,7 @@ static tcpat_result_t tcPatRec(tenv_t te, pat_t p, type_t *topt, type_opt_t rgn_
         // datatype must be escaped/consumed
         if (access_exp)
           set_vd(NULL, access_exp, &res.patvars, char_type /* dummy */);
-        res = combine_results(res, tcPatRec(te, p2, &field_typ, rgn_pat, allow_ref_pat, NULL));
+        res = combine_results(res, tcPatRec(ctx, te, p2, &field_typ, rgn_pat, allow_ref_pat, NULL));
         // must unify here or the type we gave pat won't ever get checked
         // against the exp we're matching against.  Even if we succeed now,
         // we could be constraining so as to catch an error later.
@@ -633,8 +633,8 @@ tcpat_end:
   return res;
 }
 
-tcpat_result_t tcPat(tenv_t te, pat_t p, type_t @topt, exp_opt_t pat_var_exp) {
-  let ans = tcPatRec(te, p, topt, NULL, false, pat_var_exp);
+tcpat_result_t tcPat(Tc::tc_context_t ctx, tenv_t te, pat_t p, type_t @topt, exp_opt_t pat_var_exp) {
+  let ans = tcPatRec(ctx, te, p, topt, NULL, false, pat_var_exp);
   // caller will check tvar uniqueness when adding to environment
   let $(vs1, _) = List::split(ans.patvars);
   let vs        = NULL;
@@ -1137,11 +1137,11 @@ static simple_pat_t compile_pat(pat_t p) {
           // leave out bit fields without a name
           bool found = (strcmp(*fields->hd->name, "") == 0);
           for (_ dlps0 = dlps; !found && dlps0 != NULL; dlps0 = dlps0->tl) {
-            let &$(dl, p) = dlps0->hd;
+            let &$(dl, sub_pat) = dlps0->hd;
             switch (dl) {
-              case &List{.hd = &FieldName(f), .tl = NULL}:
+              case &List{&FieldName(f), NULL}:
                 if (strptrcmp(f, fields->hd->name) == 0) {
-                  ps    = new List(compile_pat(p), ps);
+                  ps    = new List(compile_pat(sub_pat), ps);
                   found = true;
                 }
                 break;

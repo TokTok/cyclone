@@ -20,10 +20,15 @@
 #ifndef _TCSTMT_H_
 #define _TCSTMT_H_
 
+#include "absyn.h"
 #include "tcenv.h"
+#include "tc.h"
 
 namespace Tcstmt {
-  void tcStmt(Tcenv::tenv_t, Absyn::stmt_t, bool new_block);
+  using Absyn;
+
+  void tcStmt(Tc::tc_context_t, Tcenv::tenv_t, stmt_t, bool);
+
   bool ensure_no_throw_stmt(Absyn::stmt_t s);
 }  // namespace Tcstmt
 

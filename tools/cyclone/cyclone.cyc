@@ -250,7 +250,8 @@ static bool do_adjust(bool ignore, list_t<Absyn::decl_t, `H> tds) {
 }
 
 static list_t<Absyn::decl_t> do_typecheck(Tcenv::tenv_t te, list_t<Absyn::decl_t, `H> tds) {
-  Tc::tc(te, true, tds);
+  Tc::tc_context_t ctx = Tc::tc_init();
+  Tc::tc(ctx, te, true, tds);
   if (!noshake_r)
     tds = Tc::treeshake(te, tds);
   return tds;

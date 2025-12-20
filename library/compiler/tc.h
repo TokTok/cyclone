@@ -26,18 +26,24 @@ namespace Tc {
   using Absyn;
   using Tcenv;
 
-  extern bool debug;
+  struct TcContext {
+    bool debug;
+    string_t tc_msg;
+  };
+  typedef struct TcContext Tc_context;
+  typedef struct TcContext *tc_context_t;
+  tc_context_t tc_init();
 
-  void tc(tenv_t, bool var_default_init, List::list_t<decl_t,`H>);
+  void tc(tc_context_t, tenv_t, bool, List::list_t<decl_t,`H>);
 
   // if called, must be after tc is called
   // removes extern variables that are never referred to
   List::list_t<decl_t> treeshake(tenv_t, List::list_t<decl_t>);
 
   // internal functions needed by tcutil
-  void tcAggrdecl(tenv_t, seg_t, aggrdecl_t);
-  void tcDatatypedecl(tenv_t, seg_t, datatypedecl_t);
-  void tcEnumdecl(tenv_t, seg_t, enumdecl_t);
+  void tcAggrdecl(tc_context_t, tenv_t, seg_t, aggrdecl_t);
+  void tcDatatypedecl(tc_context_t, tenv_t, seg_t, datatypedecl_t);
+  void tcEnumdecl(tc_context_t, tenv_t, seg_t, enumdecl_t);
 
 }  // namespace Tc
 #endif

@@ -20,6 +20,7 @@
 #define _TCTYP_H_
 
 #include "tcenv.h"
+#include "tc.h"
 
 namespace Tctyp {
   using Absyn;
@@ -31,8 +32,8 @@ namespace Tctyp {
   // * set the kind field of type variables
   // * add default effects for function types
 
-  void check_valid_toplevel_type(seg_t, Tcenv::tenv_t, type_t);
-  void check_fndecl_valid_type(seg_t, Tcenv::tenv_t, fndecl_t);
+  void check_valid_toplevel_type(Tc::tc_context_t, seg_t, Tcenv::tenv_t, type_t);
+  void check_fndecl_valid_type(Tc::tc_context_t, seg_t, Tcenv::tenv_t, fndecl_t);
 
   // DJG: not sure how out of date this next comment is
   // Ensures that the resulting free variables
@@ -44,10 +45,10 @@ namespace Tctyp {
   // NB: This function disallows aliasqual bounds from appearing on type variables
   // These are only legal in function decls and aggregates
   // This behaviour of check_type rules out bounds from local variable decls, casts etc.
-  void check_type(seg_t, Tcenv::tenv_t, List::list_t<tvar_t,`H> bound_tvars, kind_t k,
+  void check_type(Tc::tc_context_t, seg_t, Tcenv::tenv_t, List::list_t<tvar_t,`H> bound_tvars, kind_t k,
                   bool allow_evars, bool allow_abs_aggr, type_t);
 
-  void check_type_with_bounds(seg_t, Tcenv::tenv_t,
+  void check_type_with_bounds(Tc::tc_context_t, seg_t, Tcenv::tenv_t,
                               List::list_t<$(tvar_t, bool) @,`H> flagged_tvars,
                               List::list_t<$(type_t, type_t) @`H, `H> @qb, kind_t k,
                               bool allow_evars, bool allow_abs_aggr, type_t);

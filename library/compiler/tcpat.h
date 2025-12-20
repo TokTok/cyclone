@@ -20,6 +20,7 @@
 #define _TCPAT_H_
 
 #include "tcenv.h"
+#include "tc.h"
 
 namespace Tcpat {
   using Absyn;
@@ -55,7 +56,7 @@ namespace Tcpat {
   // You must call tcPat, then unify with the type of the value on which
   // you're switching, then call check_pat_regions.
   // If someone has a less clumsy proposal, I'd love to hear it.
-  tcpat_result_t tcPat(tenv_t, pat_t, type_t @topt, exp_opt_t pat_var_exp);
+  tcpat_result_t tcPat(Tc::tc_context_t, tenv_t, pat_t, type_t @topt, exp_opt_t pat_var_exp);
   void check_pat_regions(tenv_t, pat_t, tcpat_result_t @);
 
   extern datatype PatTest {

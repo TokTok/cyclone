@@ -1776,7 +1776,8 @@ int process_file(const char @`H filename, list_t<stringptr_t<`H,`H>,`H> start_sy
     /* make sure the declarations are well-formed */
     try {
       Binding::resolve_all(print_decls);
-      Tc::tc(Tcenv::tc_init(), true, print_decls);
+      Tc::tc_context_t ctx = Tc::tc_init();
+      Tc::tc(ctx, Tcenv::tc_init(), true, print_decls);
     } catch {
       default:
         throw new NO_SUPPORT("can't typecheck acquired declarations");
