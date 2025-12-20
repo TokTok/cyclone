@@ -21,3 +21,14 @@ cyc_test(
         "//cyclone/library/std",
     ],
 )
+
+cyc_test(
+    name = "tc_test",
+    size = "small",
+    srcs = ["tc_test.cyc"],
+    deps = [
+        "//cyclone/library/compiler:compiler",
+        "//cyclone/testsuite:cyctest",
+        "//cyclone/library/std",
+    ],
+)
