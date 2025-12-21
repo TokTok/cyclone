@@ -753,41 +753,9 @@ attribute
 		{
 		  $$ = ^$(&Atts::Const_att_val);
 		}                                  // because const a keyword!
-	| IDENTIFIER '(' assignment_expression ')'
+	| IDENTIFIER '(' argument_expression_list ')'
 		{
-		  $$ = ^$(Atts::parse_unary_att(SLOC(@1), $1, SLOC(@3), $3));
-		}
-	| IDENTIFIER '(' INTEGER_CONSTANT ',' INTEGER_CONSTANT ')'
-		{
-		  $$ = ^$(Atts::parse_binary_att(SLOC(@1), $1, cnst2uint(SLOC(@3), $3), cnst2uint(SLOC(@5), $5)));
-		}
-	| IDENTIFIER '(' IDENTIFIER ',' IDENTIFIER '=' FLOATING_CONSTANT ')'
-		{
-		  // TODO: Parse this correctly:
-		  // __attribute__((availability(macosx,introduced=10.12)))
-		  $$ = ^$(Atts::parse_nullary_att (SLOC (@1), $1));
-		}
-	| IDENTIFIER '(' IDENTIFIER ',' IDENTIFIER ',' IDENTIFIER '=' STRING ')'
-		{
-		  // TODO: Parse this correctly:
-		  // __attribute__((__availability__(swift, unavailable, message="Use snprintf instead.")))
-		  $$ = ^$(Atts::parse_nullary_att (SLOC (@1), $1));
-		}
-	| IDENTIFIER '(' STRING ')'
-		{
-		  // TODO: Parse this correctly:
-		  // __attribute__((deprecated("...")))
-		  $$ = ^$(Atts::parse_nullary_att (SLOC (@1), $1));
-		}
-	| IDENTIFIER '(' IDENTIFIER ',' INTEGER_CONSTANT ')'
-		{
-		  $$ = ^$(&Atts::Malloc_att_val);
-		}
-	| IDENTIFIER '(' IDENTIFIER ',' INTEGER_CONSTANT ',' INTEGER_CONSTANT ')'
-		{
-		  $$ = ^$(Atts::parse_format_att(LOC(@1, @8), SLOC (@3), $1, $3,
-						 cnst2uint(SLOC(@5), $5),
-						 cnst2uint(SLOC(@7), $7)));
+		  $$ = ^$(Atts::parse_args_att(SLOC(@1), $1, $3));
 		}
 
 

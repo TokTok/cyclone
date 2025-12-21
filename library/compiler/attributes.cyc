@@ -57,6 +57,9 @@ datacon(Attribute, Malloc_att);
 datacon(Attribute, Cold_att);
 datacon(Attribute, WarnUnusedResult_att);
 datacon(Attribute, MayAlias_att);
+datacon(Attribute, Transparent_union_att);
+datacon(Attribute, Overloadable_att);
+datacon(Attribute, Unavailable_att);
 
 static attribute_t bad_attribute(seg_t loc) {
   Warn::err(loc, "unrecognized attribute");
@@ -94,6 +97,9 @@ attribute_t parse_nullary_att(seg_t loc, string_t<`H> s) {
     $("cold", &Atts::Cold_att_val),
     $("warn_unused_result", &Atts::WarnUnusedResult_att_val),
     $("may_alias", &Atts::MayAlias_att_val),
+    $("transparent_union", &Atts::Transparent_union_att_val),
+    $("overloadable", &Atts::Overloadable_att_val),
+    $("unavailable", &Atts::Unavailable_att_val),
   };
 
   // drop the surrounding __ in s, if it's there
@@ -122,10 +128,56 @@ static string_t exp2string(seg_t loc, exp_t e) {
   switch (e->r) {
     case &Const_e({.String_c = s}):
       return s;
+    case &Var_e(&Unresolved_b(q)):
+      return *((*q)[1]);
     default:
       Warn::err(loc, "expecting string constant");
       return NULL;
   }
+}
+
+static list_t<int> exps2ints(seg_t loc, list_t<exp_t> es) {
+  list_t<int> ints = NULL;
+  for (; es != NULL; es = es->tl)
+    ints = new List(exp2int(loc, es->hd), ints);
+  return imp_rev(ints);
+}
+
+attribute_t parse_args_att(seg_t loc, string_t<`H> s, list_t<exp_t> args) {
+  if (zstrcmp(s, "nonnull") == 0 || zstrcmp(s, "__nonnull__") == 0)
+    return new Nonnull_att(exps2ints(loc, args));
+  if (zstrcmp(s, "deprecated") == 0 || zstrcmp(s, "__deprecated__") == 0)
+    return &Deprecated_att_val;
+  if (zstrcmp(s, "malloc") == 0 || zstrcmp(s, "__malloc__") == 0)
+    return &Malloc_att_val;
+  if (zstrcmp(s, "availability") == 0 || zstrcmp(s, "__availability__") == 0)
+    return &Availability_att_val;
+
+  if (args == NULL) return parse_nullary_att(loc, s);
+
+  if (args->tl == NULL) {
+      return parse_unary_att(loc, s, loc, args->hd);
+  }
+
+  if (args->tl->tl == NULL) {
+      // 2 args
+      if (zstrcmp(s, "alloc_size") == 0 || zstrcmp(s, "__alloc_size__") == 0) {
+          return new AllocSize_att((unsigned)exp2int(loc, args->hd), (unsigned)exp2int(loc, args->tl->hd));
+      }
+  }
+
+  if (args->tl->tl != NULL && args->tl->tl->tl == NULL) {
+      // 3 args: format or access
+      string_t archetype = exp2string(loc, args->hd);
+      if (archetype != NULL) {
+          return parse_format_att(loc, loc, s, archetype, 
+                                  (unsigned)exp2int(loc, args->tl->hd), 
+                                  (unsigned)exp2int(loc, args->tl->tl->hd));
+      }
+  }
+
+  Warn::err(loc, "unrecognized attribute");
+  return bad_attribute(loc);
 }
 
 attribute_t parse_unary_att(seg_t sloc, string_t s, seg_t eloc, exp_t e) {
@@ -155,6 +207,8 @@ attribute_t parse_unary_att(seg_t sloc, string_t s, seg_t eloc, exp_t e) {
     return new AllocAlign_att(n);
   if (zstrcmp(s, "vector_size") == 0 || zstrcmp(s, "__vector_size__") == 0)
     return new VectorSize_att(n);
+  if (zstrcmp(s, "nonnull") == 0 || zstrcmp(s, "__nonnull__") == 0)
+    return new Nonnull_att(new List(exp2int(eloc, e), NULL));
 
   Warn::err(sloc, "unrecognized attribute");
 
@@ -164,6 +218,8 @@ attribute_t parse_unary_att(seg_t sloc, string_t s, seg_t eloc, exp_t e) {
 attribute_t parse_binary_att(seg_t sloc, string_t s, unsigned u1, unsigned u2) {
   if (zstrcmp(s, "alloc_size") == 0 || zstrcmp(s, "__alloc_size__") == 0)
     return new AllocSize_att(u1, u2);
+  if (zstrcmp(s, "nonnull") == 0 || zstrcmp(s, "__nonnull__") == 0)
+    return new Nonnull_att(new List((int)u1, new List((int)u2, NULL)));
 
   Warn::err(sloc, "unrecognized attribute");
 
@@ -436,6 +492,14 @@ static int attribute_case_number(attribute_t att) {
       return 38;
     case &VectorSize_att(...):
       return 39;
+    case &Nonnull_att(_):
+      return 40;
+    case &Transparent_union_att:
+      return 41;
+    case &Overloadable_att:
+      return 42;
+    case &Unavailable_att:
+      return 43;
   }
 }
 
@@ -455,6 +519,8 @@ int attribute_cmp(attribute_t att1, attribute_t att2) {
       return Evexp::exp_cmp(e1, e2);
     case $(&Section_att(s1), &Section_att(s2)):
       return strcmp(s1, s2);
+    case $(&Nonnull_att(l1), &Nonnull_att(l2)):
+      return List::list_cmp(Core::intcmp, l1, l2);
     case $(&Format_att(ft1, i1, j1), &Format_att(ft2, i2, j2)):
       let ftc = Core::intcmp((unsigned)ft1, (unsigned)ft2);
       if (ftc != 0)
@@ -493,6 +559,9 @@ bool fntype_att(attribute_t a) {
     case &Leaf_att:
     case &Malloc_att:
     case &Cold_att:
+    case &Nonnull_att(_):
+    case &Overloadable_att:
+    case &Unavailable_att:
       return true;
     default:
       return false;

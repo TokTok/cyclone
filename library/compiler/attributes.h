@@ -50,6 +50,9 @@ namespace Atts {
   extern_datacon(Attribute, Cold_att);
   extern_datacon(Attribute, WarnUnusedResult_att);
   extern_datacon(Attribute, MayAlias_att);
+  extern_datacon(Attribute, Transparent_union_att);
+  extern_datacon(Attribute, Overloadable_att);
+  extern_datacon(Attribute, Unavailable_att);
 
   // parsing: locations just in case of errors
   attribute_t parse_nullary_att(seg_t, string_t<`H>);
@@ -57,6 +60,7 @@ namespace Atts {
   attribute_t parse_binary_att(seg_t sloc, string_t s, unsigned u1, unsigned u2);
   attribute_t parse_format_att(seg_t loc, seg_t s2loc, string_t s1, string_t s2, unsigned u1,
                                unsigned u2);
+  attribute_t parse_args_att(seg_t loc, string_t<`H> s, List::list_t<exp_t> args);
 
   // does the function (or fn pointer) type have the "noreturn" attribute?
   bool is_noreturn_fn_type(type_t);

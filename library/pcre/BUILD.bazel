@@ -4,16 +4,14 @@ buildlib(
     name = "pcre_buildlib",
     src = "pcre.cys",
     hdrs = ["pcre.h"],
-    includes = ["external/pcre/include"],
     visibility = ["//cyclone/library/std:__pkg__"],
-    deps = ["@pcre//:include"],
+    deps = ["@pcre"],
 )
 
 cyc_library(
     name = "pcre",
     srcs = [":pcre_buildlib"],
     cdeps = ["@pcre"],
-    copts = ["-Iexternal/pcre/include"],
     csrcs = [
         ":pcre_buildlib",
         "@pcre//:include",

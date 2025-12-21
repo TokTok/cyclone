@@ -285,6 +285,111 @@ def errorgen(name, src = None, stage = None):
         ],
     )
 
+def _buildlib_impl(ctx):
+    buildlib_tool = ctx.executable.buildlib_tool
+    src = ctx.file.src
+    
+    # Resolve C Compiler
+    cc_toolchain = find_cpp_toolchain(ctx)
+    feature_configuration = cc_common.configure_features(
+        ctx = ctx,
+        cc_toolchain = cc_toolchain,
+        requested_features = ctx.features,
+        unsupported_features = ctx.disabled_features,
+    )
+    c_compiler_path = cc_common.get_tool_for_action(
+        feature_configuration = feature_configuration,
+        action_name = C_COMPILE_ACTION_NAME,
+    )
+
+    # Outputs
+    outputs = []
+    for out_name in ctx.attr.outs:
+        outputs.append(ctx.actions.declare_file(out_name))
+    
+    cstubs = ctx.actions.declare_file("cstubs.c")
+    cycstubs = ctx.actions.declare_file("cycstubs.cyc")
+    log_file = ctx.actions.declare_file("BUILDLIB.LOG")
+    outputs.extend([cstubs, cycstubs, log_file])
+    
+    out_dir = cstubs.dirname
+
+    # Inputs
+    transitive_inputs = []
+    cc_includes = []
+    
+    for dep in ctx.attr.deps:
+        if CcInfo in dep:
+             cc_ctx = dep[CcInfo].compilation_context
+             transitive_inputs.append(cc_ctx.headers)
+             cc_includes.extend(cc_ctx.includes.to_list())
+             cc_includes.extend(cc_ctx.quote_includes.to_list())
+             cc_includes.extend(cc_ctx.system_includes.to_list())
+        transitive_inputs.append(dep[DefaultInfo].files)
+    
+    inputs_depset = depset(
+        direct = [src],
+        transitive = transitive_inputs + [cc_toolchain.all_files]
+    )
+
+    # Construct command arguments
+    include_args = []
+    seen_includes = {}
+    
+    def add_include(path):
+        if path not in seen_includes:
+            seen_includes[path] = True
+            include_args.append("-I" + path)
+
+    for inc in cc_includes:
+        add_include(inc)
+
+    # Legacy/Manual includes from attribute
+    for inc in ctx.attr.includes:
+        expanded = ctx.expand_location(inc, targets=ctx.attr.deps)
+        for path in expanded.split(" "):
+            if path:
+                add_include(path)
+
+    # buildlib args
+    args = ctx.actions.args()
+    args.add("-d", out_dir)
+    args.add("-cc", c_compiler_path)
+    args.add("-log", log_file)
+    args.add("-cstubs", cstubs)
+    args.add("-cycstubs", cycstubs)
+    args.add("-v")
+    
+    # Add includes directly (they are strings like -I...)
+    args.add_all(include_args)
+    
+    args.add(src)
+
+    ctx.actions.run(
+        outputs = outputs,
+        inputs = inputs_depset,
+        executable = buildlib_tool,
+        arguments = [args],
+        mnemonic = "BuildLib",
+        progress_message = "Generating Cyclone bindings for " + src.path,
+    )
+
+    return DefaultInfo(files=depset(outputs))
+
+_buildlib = rule(
+    implementation = _buildlib_impl,
+    attrs = {
+        "src": attr.label(allow_single_file=True, mandatory=True),
+        "deps": attr.label_list(),
+        "includes": attr.string_list(),
+        "outs": attr.string_list(),
+        "buildlib_tool": attr.label(executable=True, cfg="exec", mandatory=True),
+        "_cc_toolchain": attr.label(default=Label("@rules_cc//cc:current_cc_toolchain")),
+    },
+    fragments = ["cpp"],
+    toolchains = use_cc_toolchain(),
+)
+
 def buildlib(name, src, hdrs, stage = None, visibility = None, deps = [], includes = []):
     """Generate Cyclone bindings.
 
@@ -297,34 +402,12 @@ def buildlib(name, src, hdrs, stage = None, visibility = None, deps = [], includ
         deps: The dependencies.
         includes: The include directories.
     """
-    buildlib = _tool("buildlib", stage)
-
-    native.genrule(
+    _buildlib(
         name = name,
-        srcs = [src] + deps,
-        outs = hdrs + [
-            "cstubs.c",
-            "cycstubs.cyc",
-            "BUILDLIB.LOG",
-        ],
-        cmd = " ".join([
-            "$(location %s)" % buildlib,
-            "  -cc \"$$(echo $(CC) | sed -e \"s|^[^/]|$$PWD/&|\")\"",
-            "  -v",
-            " ".join(["-I$$(realpath %s)" % i for i in includes]),
-            "  $(location %s) >& BUILDLIB.LOG;" % src,
-            "for i in $(OUTS);",
-            "  do cp BUILDLIB.OUT/$$(echo $$i | sed -e 's!$(GENDIR)/%s/!!') $$i;" % native.package_name(),
-            "done; cat BUILDLIB.LOG",
-        ]),
-        tags = ["no-cross"],
-        tools = [buildlib],
-        toolchains = ["@rules_cc//cc:current_cc_toolchain"],
-        visibility = visibility,
-    )
-
-    native.filegroup(
-        name = "%s_hdrs" % name,
-        srcs = hdrs,
+        src = src,
+        outs = hdrs,
+        deps = deps,
+        includes = includes,
+        buildlib_tool = _tool("buildlib", stage),
         visibility = visibility,
     )

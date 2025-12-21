@@ -463,65 +463,15 @@ and slurp = parse /* returns 1 if more to do, 0 if all done */
 | "__extension__" /* Used in cygwin in sys/reent.h */
 { log("Warning: use of __extension__ deleted\n");
   return 1; }
-| "__attribute__" ws* "((__nonnull__ (" [^')']* ")))"
-/* We should just support this directly in Cyclone*/
-{ log("Warning: use of nonnull attribute deleted\n");
-  return 1; }
-| "__attribute__" ws* "((__mode__ (__HI__)))" /* Used in linux in _G_config.h */
-/* These mode hacks WILL cause bugs; best solution is to
-   support mode directly in Cyclone */
-{ log("Warning: use of mode HI deleted\n");
-  return 1; }
-| "__attribute__" ws* "((__mode__ (__SI__)))" /* Used in linux in _G_config.h */
-{ log("Warning: use of mode SI deleted\n");
-  return 1; }
-| "__attribute__" ws* "((__mode__ (__QI__)))" /* Used in linux in sys/types.h */
-{ log("Warning: use of mode QI deleted\n");
-  return 1; }
-| "__attribute__" ws* "((__mode__ (__DI__)))" /* Used in linux in sys/types.h */
-{ log("Warning: use of mode DI deleted\n");
-  return 1; }
-| "__attribute__" ws* "((__mode__(__DI__)))" /* Used in freebsd in a number of places */
-{ log("Warning: use of mode DI deleted\n");
-  return 1; }
-| "__attribute__" ws* "((__mode__ (__word__)))" /* Used in linux in sys/types.h */
-{ log("Warning: use of mode word deleted\n");
-  return 1; }
-| "__attribute__" ws* "((deprecated))"
-{ log("Warning: use of __attribute__((deprecated)) deleted\n");
-  return 1; }
-| "__attribute__" ws* "((__deprecated__))"
-{ log("Warning: use of __attribute__((__deprecated__)) deleted\n");
-  return 1; }
-| "__attribute__" ws* "((__transparent_union__))"
-{ log("Warning: use of __attribute__((__transparent_union__)) deleted\n");
-  return 1; }
+
 | "__asm__" ws* "(" [^')']+ ")"
 { log("Warning: use of __asm__ on declaration deleted\n");
   return 1; }
-| "__inline__" /* Used in cygwin in stdio.h */
-{ fputs("inline",(FILE @)slurp_out); return 1; }
-| "__inline" /* Used in OS X */
-{ fputs("inline",(FILE @)slurp_out); return 1; }
-| "__const__"
-{ fputs("const",(FILE @)slurp_out); return 1; }
-| "__const" /* Used in cygwin in unistd.h; an undocumented gcc extension?? */
-{ fputs("const",(FILE @)slurp_out); return 1; }
-| "__signed__" /* Used in Fedora 9 gcc-4.3 glibc-2.8-3; an undocumented gcc extension?? */
-{ fputs("signed",(FILE @)slurp_out); return 1; }
-| "__signed" /* Used in Mac OS in netdb.h, stdint.h; an undocumented gcc extension?? */
-{ fputs("signed",(FILE @)slurp_out); return 1; }
-| "signed__" /* Used in Fedora 9 gcc-4.3 glibc-2.8-3; an undocumented gcc extension?? */
-{ fputs("signed",(FILE @)slurp_out); return 1; }
-| "__builtin_va_list"
-/* Used in linux in /usr/lib/gcc-lib/i386-redhat-linux/2.96/include/stdarg.h;
-   an undocumented gcc extension?  This is a HACK -- shouldn't matter since
-   we don't use va_list */
-{ fputs("int",(FILE @)slurp_out); return 1; }
 | "__restrict" /* Used in linux in libio.h; an undocumented gcc extension?? */
 { return 1; }
-| [^ '"']
-{ fputc(lexeme_char(lexbuf,0),(FILE @)slurp_out); return 1; }
+| "__restrict_arr" /* glibc C99 restrict array */
+{ return 1; }
+| [^ '"']{ fputc(lexeme_char(lexbuf,0),(FILE @)slurp_out); return 1; }
 
 and slurp_string = parse /* returns 1 if more to do, 0 if all done */
   eof
@@ -1435,7 +1385,7 @@ static string_t sh_escape_string(string_t<`H> s) {
 static stringptr_t sh_escape_stringptr(stringptr_t<`H,`H> sp) { return new sh_escape_string(*sp); }
 
 /* Returns 1 on a fatal error (can't create files, etc.) or 0 otherwise. */
-int process_file(const char @`H filename, list_t<stringptr_t<`H,`H>,`H> start_symbols,
+int process_file(const char @ output_prefix, const char @`H filename, list_t<stringptr_t<`H,`H>,`H> start_symbols,
                  list_t<userdef_t,`H> user_defs, list_t<stringptr_t<`H,`H>,`H> omit_symbols,
                  list_t<ifdefined_t,`H> hstubs, list_t<ifdefined_t,`H> cstubs,
                  list_t<ifdefined_t,`H> cycstubs, list_t<stringptr_t<`H,`H>,`H> cpp_insert) {
@@ -1462,9 +1412,10 @@ int process_file(const char @`H filename, list_t<stringptr_t<`H,`H>,`H> start_sy
      filtereddeclsfile = sys/types.iD
   */
   let basename = Filename::basename(filename);
-  let dirname = Filename::dirname(filename);
+  let raw_dirname = Filename::dirname(filename);
+  let dirname = Filename::concat(output_prefix, raw_dirname);
   let choppedname = Filename::chop_extension(basename);
-  let cppinfile = (const char @)(strconcat(choppedname, ".iA"));
+  let cppinfile = (const char @)(Filename::concat(output_prefix, strconcat(choppedname, ".iA")));
   /* The macrosfile just contains the #define's in the header (filename) */
   let macrosfile = (const char @)((numelts(dirname) == 0)
                                       ? (aprintf("%s.iB", choppedname))
@@ -1478,9 +1429,11 @@ int process_file(const char @`H filename, list_t<stringptr_t<`H,`H>,`H> start_sy
       (numelts(dirname) == 0) ? (aprintf("%s.iD", choppedname))
                               : (Filename::concat(dirname, aprintf("%s.iD", choppedname))));
 
+  let full_filename = Filename::concat(output_prefix, filename);
+
   try {
     /* Make sure we'll be able to create files in the right directories */
-    if (force_directory_prefixes(filename)) {
+    if (force_directory_prefixes(full_filename)) {
       return 1;
     }
 
@@ -1503,15 +1456,13 @@ int process_file(const char @`H filename, list_t<stringptr_t<`H,`H>,`H> start_sy
     // TJIM: dangerous...
     char @cmd = (char @)aprintf("%s %s -E -dM -o %s -x c %s %s", cyclone_cc,
                                 cppargs_string, macrosfile, cppinfile, verbose ? "" : "-w");
-    if (verbose)
-      fprintf(stderr, "%s\n", cmd);
+    fprintf(stderr, "%s\n", cmd);
     if (!system(cmd)) {
       /* No error in creating the file of macros, so go ahead and create
           the file of declarations */
       cmd = (char @)aprintf("%s %s -E -o %s -x c %s %s", cyclone_cc,
                             cppargs_string, declsfile, cppinfile, verbose ? "" : "-w");
-      if (verbose)
-        fprintf(stderr, "%s\n", cmd);
+      fprintf(stderr, "%s\n", cmd);
       system(cmd);  // if err, no declsfile created, and we'll handle later
     }
     // JGM:remove(cppinfile);
@@ -1679,7 +1630,7 @@ int process_file(const char @`H filename, list_t<stringptr_t<`H,`H>,`H> start_sy
 
     // reachable_decls = imp_rev(reachable_decls);
     if (!do_setjmp) {
-      maybe = fopen(filename, "w");
+      maybe = fopen(full_filename, "w");
       if (!maybe)
         return 1;
       out_file = (FILE @)maybe;
@@ -1923,9 +1874,9 @@ int process_file(const char @`H filename, list_t<stringptr_t<`H,`H>,`H> start_sy
   /* We could get here because of a throw NO_SUPPORT or because of
      a parse error or other error.  In either case, we create a
      default header and don't otherwise signal an error. */
-  maybe = fopen(filename, "w");
+  maybe = fopen(full_filename, "w");
   if (!maybe) {
-    fprintf(stderr, "Error: could not create file %s\n", filename);
+    fprintf(stderr, "Error: could not create file %s\n", full_filename);
     return 1;
   }
   out_file = (FILE @)maybe;
@@ -1940,7 +1891,7 @@ int process_file(const char @`H filename, list_t<stringptr_t<`H,`H>,`H> start_sy
   // JGM:remove(declsfile);
   // JGM:remove(filtereddeclsfile);
 
-  return 0;
+  return 1;
 }
 
 /* Return 1 on fatal error, else 0 */
@@ -1954,54 +1905,27 @@ int process_specfile(const char @file, const char @dir) {
   }
   let in_file = (FILE @)maybe;
 
-  /* Cd into dir, where the header files will be built.  Remember
-     the current dir so we can cd back after we're done. */
-  char ?buf = new {for
-      i < 1024 : '\0'
-  };
-  let cwd = getcwd(buf, numelts(buf));
-  if (chdir(dir)) {
-    fprintf(stderr, "Error: can't change directory to %s\n", dir);
-    return 1;
-  }
-
   let l = Lexing::from_file(in_file);
   let entry;
   while ((entry = spec(l)) != NULL) {
     let &$(headerfile, start_symbols, user_defs, omit_symbols, hstubs, cstubs, cycstubs,
            cpp_insert) = (_ @)entry;
-    if (process_file((const char @)headerfile, start_symbols, user_defs, omit_symbols, hstubs,
-                     cstubs, cycstubs, cpp_insert))
+    if (process_file(dir, (const char @)headerfile, start_symbols, user_defs, omit_symbols, hstubs,
+                     cstubs, cycstubs, cpp_insert)) {
+      fprintf(stderr, "process_file failed for %s\n", headerfile);
       return 1; /* fatal error in process_file */
+    }
   }
   fclose(in_file);
 
-  if (chdir((char @)cwd)) {
-    fprintf(stderr, "Error: could not change directory to %s\n", cwd);
-    return 1;
-  }
   return 0;
 }
 
 /* Return 1 on fatal error, else 0 */
 int process_setjmp(const char @dir) {
-  /* Cd into dir, where the header files will be built.  Remember
-     the current dir so we can cd back after we're done. */
-  char ?buf = new {for
-      i < 1024 : '\0'
-  };
-  let cwd = getcwd(buf, numelts(buf));
-  if (chdir(dir)) {
-    fprintf(stderr, "Error: can't change directory to %s\n", dir);
-    return 1;
-  }
-  if (process_file("setjmp.h", list(new "jmp_buf"), NULL, NULL,
+  if (process_file(dir, "setjmp.h", list(new "jmp_buf"), NULL, NULL,
                    list(new $("setjmp", "extern int setjmp(jmp_buf);\n")), NULL, NULL, NULL))
     return 1; /* fatal error */
-  if (chdir((char @)cwd)) {
-    fprintf(stderr, "Error: could not change directory to %s\n", cwd);
-    return 1;
-  }
   return 0;
 }
 
@@ -2009,10 +1933,20 @@ int process_setjmp(const char @dir) {
 static string_t output_dir = "BUILDLIB.OUT";
 static void set_output_dir(string_t<`H> s) { output_dir = s; }
 static void set_compiler(string_t<`H> s) { cyclone_cc = s; }
+static string_t log_file_name = NULL;
+static void set_log_file(string_t<`H> s) { log_file_name = s; }
+static string_t cstubs_file_name = NULL;
+static void set_cstubs_file(string_t<`H> s) { cstubs_file_name = s; }
+static string_t cycstubs_file_name = NULL;
+static void set_cycstubs_file(string_t<`H> s) { cycstubs_file_name = s; }
 static list_t<const char @`H> spec_files = NULL;
 static void add_spec_file(string_t<`H> s) { spec_files = new List((const char @)s, spec_files); }
 static bool no_other(string_t<`H> s) { return false; }
 static void add_cpparg(string_t<`H> s) { cppargs = new List(new s, cppargs); }
+static bool handle_unknown_flag(string_t<`H> s) {
+  add_cpparg(s);
+  return true;
+}
 static bool badparse = false;
 static void unsupported_option(string_t<`H> s) {
   fprintf(stderr, "Unsupported option %s\n", s);
@@ -2028,9 +1962,20 @@ using Arg;
 
 /********************** Main *********************/
 int main(int argc, const char ?`H?`H argv) {
+  fprintf(stderr, "DEBUG: argc = %d\n", argc);
+  for (int i = 0; i < argc; i++) {
+    fprintf(stderr, "DEBUG: argv[%d] = %s\n", i, argv[i]);
+  }
+
   Arg::speclist_t<`H,`H> options =
       list(new $("-d", false, " <file>", new String_spec(set_output_dir),
                  "Set the output directory to <file>"),
+           new $("-log", false, " <file>", new String_spec(set_log_file),
+                 "Log to <file>"),
+           new $("-cstubs", false, " <file>", new String_spec(set_cstubs_file),
+                 "Write cstubs to <file>"),
+           new $("-cycstubs", false, " <file>", new String_spec(set_cycstubs_file),
+                 "Write cycstubs to <file>"),
            new $("-cc", false, " <compiler>", new String_spec(&set_compiler),
                  "Use this compiler instead of 'gcc'."),
            new $("-setjmp", false, "", new Set_spec(&do_setjmp),
@@ -2040,12 +1985,35 @@ int main(int argc, const char ?`H?`H argv) {
                  " used with specfiles."),
            new $("-h", false, " <header>", new String_spec(set_header),
                  "Produce this header, and other -h headers only"),
-           new $("-v", false, "", new Set_spec(&verbose), "Verbose operation"),
-           new $("-", true, "", /* pass all other - flags to cpp */
-                 new Flag_spec(add_cpparg), ""));
+           new $("-v", false, "", new Set_spec(&verbose), "Verbose operation"));
+  
+  if (options != NULL) {
+      fprintf(stderr, "DEBUG: First option flag: %s\n", (*options->hd)[0]);
+  } else {
+      fprintf(stderr, "DEBUG: Options list is NULL!\n");
+  }
+
   // Process options
   Arg::current = 0;
-  Arg::parse(options, add_spec_file, no_other, "Options:", argv);
+  Arg::parse(options, add_spec_file, handle_unknown_flag, "Options:", argv);
+
+  /* Fix up compiler path if necessary (if it contains a slash but is relative) */
+  {
+    bool has_slash = false;
+    int len = strlen(cyclone_cc);
+    for (int i=0; i<len; i++) {
+        if (cyclone_cc[i] == '/') {
+            has_slash = true;
+            break;
+        }
+    }
+    if (has_slash && cyclone_cc[0] != '/') {
+       char ?buf = new {for i < 1024 : '\0'};
+       let cwd = getcwd(buf, numelts(buf));
+       cyclone_cc = Filename::concat(cwd, cyclone_cc);
+    }
+  }
+
   if (badparse || (!do_setjmp && spec_files == NULL) || (do_setjmp && spec_files != NULL)) {
     Arg::usage(options,
                "Usage: buildlib [options] specfile1 specfile2 ...\n"
@@ -2063,24 +2031,33 @@ int main(int argc, const char ?`H?`H argv) {
 
   /* Create an empty log file -- most importantly, any previous log
   file will be truncated */
-  log_file = fopen((const char @)(Filename::concat(output_dir, "BUILDLIB.LOG")), "w");
+  if (log_file_name != NULL)
+    log_file = fopen(log_file_name, "w");
+  else
+    log_file = fopen((const char @)(Filename::concat(output_dir, "BUILDLIB.LOG")), "w");
   if (!log_file) {
-    fprintf(stderr, "Error: could not create log file in directory %s\n", output_dir);
+    fprintf(stderr, "Error: could not create log file\n");
     return 1;
   }
 
   if (!do_setjmp) {
     /* Create an empty cstubs.cyc file */
-    cstubs_file = fopen((const char @)(Filename::concat(output_dir, "cstubs.c")), "w");
+    if (cstubs_file_name != NULL)
+      cstubs_file = fopen(cstubs_file_name, "w");
+    else
+      cstubs_file = fopen((const char @)(Filename::concat(output_dir, "cstubs.c")), "w");
     if (!cstubs_file) {
-      fprintf(stderr, "Error: could not create cstubs.c in directory %s\n", output_dir);
+      fprintf(stderr, "Error: could not create cstubs.c\n");
       return 1;
     }
 
     /* Create a cycstubs.cyc file with the standard prologue */
-    cycstubs_file = fopen((const char @)(Filename::concat(output_dir, "cycstubs.cyc")), "w");
+    if (cycstubs_file_name != NULL)
+      cycstubs_file = fopen(cycstubs_file_name, "w");
+    else
+      cycstubs_file = fopen((const char @)(Filename::concat(output_dir, "cycstubs.cyc")), "w");
     if (!cycstubs_file) {
-      fprintf(stderr, "Error: could not create cycstubs.c in directory %s\n", output_dir);
+      fprintf(stderr, "Error: could not create cycstubs.cyc\n");
       return 1;
     }
     fprintf((FILE @)cycstubs_file,

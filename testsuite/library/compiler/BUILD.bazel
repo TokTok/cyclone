@@ -5,9 +5,9 @@ cyc_test(
     size = "small",
     srcs = ["absyn_test.cyc"],
     deps = [
-        "//cyclone/library/compiler:compiler",
-        "//cyclone/testsuite:cyctest",
+        "//cyclone/library/compiler",
         "//cyclone/library/std",
+        "//cyclone/testsuite:cyctest",
     ],
 )
 
@@ -16,9 +16,9 @@ cyc_test(
     size = "small",
     srcs = ["toc_test.cyc"],
     deps = [
-        "//cyclone/library/compiler:compiler",
-        "//cyclone/testsuite:cyctest",
+        "//cyclone/library/compiler",
         "//cyclone/library/std",
+        "//cyclone/testsuite:cyctest",
     ],
 )
 
@@ -27,8 +27,8 @@ cyc_test(
     size = "small",
     srcs = ["tc_test.cyc"],
     deps = [
-        "//cyclone/library/compiler:compiler",
-        "//cyclone/testsuite:cyctest",
+        "//cyclone/library/compiler",
         "//cyclone/library/std",
+        "//cyclone/testsuite:cyctest",
     ],
 )

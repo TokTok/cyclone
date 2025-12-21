@@ -594,17 +594,32 @@ doc_t noncallconv2doc(attributes_t atts) {
         hasatt = true;
         break;
     }
-  if (!hasatt)
-    return nil_doc();
-  return cat(text(" __declspec("), group("", "", " ", List::map(noncallatt2doc, atts)), text(")"));
-}
-
-string_t attribute2string(attribute_t a) {
-  switch (a) {
-    case &Regparm_att(i):
-      return aprintf("regparm(%d)", i);
-    case &Stdcall_att:
-      return "stdcall";
+      if (!hasatt)
+      return nil_doc();
+    return cat(text(" __declspec("), group("", "", " ", List::map(noncallatt2doc, atts)), text(")"));
+  }
+  
+  static list_t<stringptr_t> ints2strings(list_t<int> l) {
+    list_t<stringptr_t> res = NULL;
+    for (; l != NULL; l = l->tl) {
+      res = new List(new (string_t)aprintf("%d", l->hd), res);
+    }
+    return imp_rev(res);
+  }
+  
+  string_t attribute2string(attribute_t a) {
+    switch (a) {
+      case &Regparm_att(i):
+        return aprintf("regparm(%d)", i);
+      case &Nonnull_att(l):
+        return aprintf("nonnull(%s)", str_sepstr(ints2strings(l), ","));
+      case &Transparent_union_att:
+        return "transparent_union";
+      case &Overloadable_att:
+        return "overloadable";
+      case &Unavailable_att:
+        return "unavailable";
+      case &Stdcall_att:      return "stdcall";
     case &Cdecl_att:
       return "cdecl";
     case &Fastcall_att:

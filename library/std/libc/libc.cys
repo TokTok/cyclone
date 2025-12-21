@@ -13,10 +13,7 @@ cpp {
   // OS X does not include struct in_addr in arpa/inet.h, but here instead
   #include <sys/types.h> // needed by in_addr, defines u_int32_t
   #include <netinet/in.h>
-  #ifdef __APPLE__
-  // for uint32_t and uint16_t on OS X
   #include <stdint.h>
-  #endif
 }
 include {
   in_port_t
@@ -347,15 +344,15 @@ include {
 }
 ;
 
-crypt.h:
-hstub encrypt {
-  // FIX: should this be null-terminated or not?
-  extern "C" void encrypt(char @{64}, int);
-}
-hstub crypt {
-  extern "C" char * crypt(const char @ key, const char @ salt);
-}
-;
+// crypt.h:
+// hstub encrypt {
+//   // FIX: should this be null-terminated or not?
+//   extern "C" void encrypt(char @{64}, int);
+// }
+// hstub crypt {
+//   extern "C" char * crypt(const char @ key, const char @ salt);
+// }
+// ;
 
 ctype.h:
 hstub {
@@ -4635,9 +4632,24 @@ hstub umask {
 sys/statvfs.h:
 ;
 
-// This seems to work but produces plenty of warnings so I'm waiting
-tgmath.h:
-;
+// tgmath.h:
+// include {
+//   //__TGMATH_UNARY_REAL_ONLY
+//   //__TGMATH_UNARY_REAL_RET_REAL
+//   //__TGMATH_BINARY_FIRST_REAL_ONLY
+//   //__TGMATH_BINARY_REAL_ONLY
+//   //__TGMATH_BINARY_REAL_RET_REAL
+//   //__TGMATH_TERNARY_FIRST_SECOND_REAL_ONLY
+//   //__TGMATH_TERNARY_REAL_ONLY
+//   //__TGMATH_UNARY_REAL_IMAG
+//   //__TGMATH_UNARY_IMAG
+//   //__TGMATH_UNARY_REAL_IMAG_RET_REAL
+//   //__TGMATH_BINARY_REAL_IMAG
+// }
+// hstub {
+//   // extern "C" ...
+// }
+// ;
 
 sys/time.h:
 include {

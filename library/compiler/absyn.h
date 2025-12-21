@@ -545,6 +545,10 @@ namespace Absyn {
     WarnUnusedResult_att;
     MayAlias_att;
     VectorSize_att(int);
+    Nonnull_att(list_t<int>);
+    Transparent_union_att;
+    Overloadable_att;
+    Unavailable_att;
   };
 
   // used when parsing/pretty-printing function definitions.
