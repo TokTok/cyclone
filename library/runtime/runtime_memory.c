@@ -953,7 +953,7 @@ static void _profile_check_gc() {
   if (GC_gc_no != last_GC_no) {
     last_GC_no = GC_gc_no;
     if (alloc_log != NULL) {
-      fprintf(alloc_log, "%lu gc-%d\theap\tgc\t%zu\t%zu\t%zu\n", clock(), last_GC_no,
+      fprintf(alloc_log, "%ld gc-%u\theap\tgc\t%zu\t%zu\t%zu\n", clock(), last_GC_no,
               GC_get_heap_size(), GC_get_free_bytes(), GC_get_total_bytes());
     }
   }
@@ -973,7 +973,7 @@ struct _RegionHandle _profile_new_region(unsigned int disable_reap, const char *
     snprintf(buf, len, "%d-%s", cnt++, rgn_name);
 
   if (alloc_log != NULL) {
-    fprintf(alloc_log, "%lu %s:%s:%u\t%s\tcreate\t%zu\t%zu\t%zu\n", clock(), file, func, lineno,
+    fprintf(alloc_log, "%ld %s:%s:%d\t%s\tcreate\t%zu\t%zu\t%zu\n", clock(), file, func, lineno,
             buf, GC_get_heap_size(), GC_get_free_bytes(), GC_get_total_bytes());
   }
 
@@ -985,10 +985,10 @@ void _profile_free_region(struct _RegionHandle *r, const char *file, const char 
   _free_region(r);
   if (alloc_log != NULL) {
     if (file == NULL)
-      fprintf(alloc_log, "%lu @\t%s\tfree\t%zu\t%zu\t%zu\n", clock(), r->name, GC_get_heap_size(),
+      fprintf(alloc_log, "%ld @\t%s\tfree\t%zu\t%zu\t%zu\n", clock(), r->name, GC_get_heap_size(),
               GC_get_free_bytes(), GC_get_total_bytes());
     else
-      fprintf(alloc_log, "%lu %s:%s:%d\t%s\tfree\t%zu\t%zu\t%zu\n", clock(), file, func, lineno,
+      fprintf(alloc_log, "%ld %s:%s:%d\t%s\tfree\t%zu\t%zu\t%zu\n", clock(), file, func, lineno,
               r->name, GC_get_heap_size(), GC_get_free_bytes(), GC_get_total_bytes());
   }
 }
@@ -1019,7 +1019,7 @@ void *_profile_region_malloc(struct _RegionHandle *r, _AliasQualHandle_t aq, siz
     // logging for reaps isn't exact right now. In particular, if U and RC stuff
     // allocated in a reap, aprof will still treat it as if it was in the old `U, `RC
     // Need to beef up aprof to handle reaps.
-    fprintf(alloc_log, "%lu %s:%s:%d\t%s\talloc\t%zu\t%zu\t%zu\t%zu\t%x\n", clock(), file, func,
+    fprintf(alloc_log, "%ld %s:%s:%d\t%s\talloc\t%zu\t%zu\t%zu\t%zu\t%x\n", clock(), file, func,
             lineno,
             (aq == Cyc_Core_unique_qual
                  ? "unique"
@@ -1061,7 +1061,7 @@ void *_profile_region_calloc(struct _RegionHandle *r, _AliasQualHandle_t aq, siz
     // logging for reaps isn't exact right now. In particular, if U and RC stuff
     // allocated in a reap, aprof will still treat it as if it was in the old `U, `RC
     // Need to beef up aprof to handle reaps.
-    fprintf(alloc_log, "%lu %s:%s:%d\t%s\talloc\t%zu\t%zu\t%zu\t%zu\t%x\n", clock(), file, func,
+    fprintf(alloc_log, "%ld %s:%s:%d\t%s\talloc\t%zu\t%zu\t%zu\t%zu\t%x\n", clock(), file, func,
             lineno,
             (aq == Cyc_Core_unique_qual
                  ? "unique"
@@ -1091,7 +1091,7 @@ static void *_do_profile(void *result, int is_atomic, const char *file, const ch
   if (is_atomic)
     heap_total_atomic_bytes += n;
   if (alloc_log != NULL) {
-    fprintf(alloc_log, "%lu %s:%s:%d\theap\talloc\t%u\t%zu\t%zu\t%zu\t%x\n", clock(), file, func,
+    fprintf(alloc_log, "%ld %s:%s:%d\theap\talloc\t%d\t%zu\t%zu\t%zu\t%x\n", clock(), file, func,
             lineno, n, GC_get_heap_size(), GC_get_free_bytes(), GC_get_total_bytes(),
             (unsigned int)result);
   }

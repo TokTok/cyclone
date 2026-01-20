@@ -62,7 +62,7 @@ static void default_error_handler(gen_e e1, gen_e e2, banshee_error_kind k) {
       fprintf(stderr, "Unhandled banshee error: occurs check\n");
       break;
     default:
-      fprintf(stderr, "Unhandled banshee error: unknown code %d\n", k);
+      fprintf(stderr, "Unhandled banshee error: unknown code %u\n", k);
   }
 }
 

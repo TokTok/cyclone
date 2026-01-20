@@ -63,7 +63,7 @@ struct page {
   /* number of pages in this allocation unit. Negative for free pages. */
   pageid pagecount : PAGECOUNTBITS;
 
-  unsigned int free : 1;
+  pageid free : 1;
 
   char *available; /* next available location on the page */
 

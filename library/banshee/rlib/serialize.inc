@@ -135,7 +135,7 @@ void serialize_pages(struct page_list *pgs, int data, int state, int first_page,
   }
 #ifndef NMEMDEBUG
   if (total != 0)
-    fprintf(stderr, "\tPage list of size %d bytes uses %d bytes = %0.2f\n", total, used,
+    fprintf(stderr, "\tPage list of size %u bytes uses %u bytes = %0.2f\n", total, used,
             (float)used / (float)total);
 #endif
 }

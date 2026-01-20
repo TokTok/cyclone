@@ -82,7 +82,6 @@ def _cyc_compile_impl(ctx):
                 "-xc",
                 "-E",
                 "-CC",
-                "-nostdinc",
                 "-Wno-unicode",
                 "-iquote",
                 ctx.genfiles_dir.path,
