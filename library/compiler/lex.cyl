@@ -196,6 +196,7 @@ static $(string_t, short, bool) rw_array[] = {
   $("__inline",             INLINE,          true ),
   $("int",                  INT,             true ),
   $("__int128_t",           INT128_T,        true ),
+  $("__uint128_t",          UINT128_T,       true ),
   $("let",                  LET,             false),
   $("long",                 LONG,            true ),
   $("malloc",               MALLOC,          false),
