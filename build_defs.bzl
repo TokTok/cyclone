@@ -1,7 +1,7 @@
 """Build rules and macros for building Cyclone programs."""
 
 load("@rules_cc//cc:action_names.bzl", "C_COMPILE_ACTION_NAME")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_binary", "cc_common", "cc_library", "cc_test")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cpp_toolchain", "use_cc_toolchain")
 
 # Set to -m32 if you run into 64 bit issues.
