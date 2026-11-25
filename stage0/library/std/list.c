@@ -90,7 +90,7 @@ struct Cyc_List_List*result;struct Cyc_List_List*prev;
 if(x!=0)goto _TL16;if(y!=0)goto _TL16;
 return 0;_TL16:
  if(x==0)goto _TL1A;else{goto _TL1B;}_TL1B: if(y==0)goto _TL1A;else{goto _TL18;}
-_TL1A: _T0= & Cyc_List_List_mismatch_val;_T1= (struct Cyc_List_List_mismatch_exn_struct*)_T0;_throw(_T1);goto _TL19;_TL18: _TL19: _T3= r;{struct Cyc_List_List*_T17=_region_malloc(_T3,0U,sizeof(struct Cyc_List_List));_T4= x;_T5= _T4->hd;_T6= y;_T7= _T6->hd;
+_TL1A: _T0= & Cyc_List_List_mismatch_val;_T1= (struct Cyc_List_List_mismatch_exn_struct*)_T0;_rethrow(_T1);goto _TL19;_TL18: _TL19: _T3= r;{struct Cyc_List_List*_T17=_region_malloc(_T3,0U,sizeof(struct Cyc_List_List));_T4= x;_T5= _T4->hd;_T6= y;_T7= _T6->hd;
 # 118
 ({__typeof__(f(_T5,_T7))_T18=f(_T5,_T7);_T17->hd= _T18;});_T17->tl= 0;_T2= (struct Cyc_List_List*)_T17;}result= _T2;
 prev= result;_T8= x;
@@ -105,7 +105,7 @@ x= _T12->tl;_T13= y;
 y= _T13->tl;}goto _TL1C;_TL1E:
 # 130
  if(x!=0)goto _TL22;else{goto _TL23;}_TL23: if(y!=0)goto _TL22;else{goto _TL20;}
-_TL22: _T14= & Cyc_List_List_mismatch_val;_T15= (struct Cyc_List_List_mismatch_exn_struct*)_T14;_throw(_T15);goto _TL21;_TL20: _TL21: _T16= result;
+_TL22: _T14= & Cyc_List_List_mismatch_val;_T15= (struct Cyc_List_List_mismatch_exn_struct*)_T14;_rethrow(_T15);goto _TL21;_TL20: _TL21: _T16= result;
 return _T16;}
 # 135
 struct Cyc_List_List*Cyc_List_map2(void*(*f)(void*,void*),struct Cyc_List_List*x,struct Cyc_List_List*y){struct _RegionHandle*_T0;void*(*_T1)(void*,void*);struct Cyc_List_List*_T2;struct Cyc_List_List*_T3;struct Cyc_List_List*_T4;_T0= Cyc_Core_heap_region;_T1= f;_T2= x;_T3= y;_T4= Cyc_List_rmap2(_T0,_T1,_T2,_T3);return _T4;}
@@ -116,7 +116,7 @@ struct Cyc_List_List*result;struct Cyc_List_List*prev;
 if(x!=0)goto _TL24;if(y!=0)goto _TL24;if(z!=0)goto _TL24;
 return 0;_TL24:
  if(x==0)goto _TL28;else{goto _TL2A;}_TL2A: if(y==0)goto _TL28;else{goto _TL29;}_TL29: if(z==0)goto _TL28;else{goto _TL26;}
-_TL28: _T0= & Cyc_List_List_mismatch_val;_T1= (struct Cyc_List_List_mismatch_exn_struct*)_T0;_throw(_T1);goto _TL27;_TL26: _TL27: _T3= r;{struct Cyc_List_List*_T1D=_region_malloc(_T3,0U,sizeof(struct Cyc_List_List));_T4= x;_T5= _T4->hd;_T6= y;_T7= _T6->hd;_T8= z;_T9= _T8->hd;
+_TL28: _T0= & Cyc_List_List_mismatch_val;_T1= (struct Cyc_List_List_mismatch_exn_struct*)_T0;_rethrow(_T1);goto _TL27;_TL26: _TL27: _T3= r;{struct Cyc_List_List*_T1D=_region_malloc(_T3,0U,sizeof(struct Cyc_List_List));_T4= x;_T5= _T4->hd;_T6= y;_T7= _T6->hd;_T8= z;_T9= _T8->hd;
 # 146
 ({__typeof__(f(_T5,_T7,_T9))_T1E=f(_T5,_T7,_T9);_T1D->hd= _T1E;});_T1D->tl= 0;_T2= (struct Cyc_List_List*)_T1D;}result= _T2;
 prev= result;_TA= x;
@@ -134,7 +134,7 @@ y= _T18->tl;_T19= z;
 z= _T19->tl;}goto _TL2B;_TL2D:
 # 161
  if(x!=0)goto _TL32;else{goto _TL34;}_TL34: if(y!=0)goto _TL32;else{goto _TL33;}_TL33: if(z!=0)goto _TL32;else{goto _TL30;}
-_TL32: _T1A= & Cyc_List_List_mismatch_val;_T1B= (struct Cyc_List_List_mismatch_exn_struct*)_T1A;_throw(_T1B);goto _TL31;_TL30: _TL31: _T1C= result;
+_TL32: _T1A= & Cyc_List_List_mismatch_val;_T1B= (struct Cyc_List_List_mismatch_exn_struct*)_T1A;_rethrow(_T1B);goto _TL31;_TL30: _TL31: _T1C= result;
 return _T1C;}
 # 166
 struct Cyc_List_List*Cyc_List_map3(void*(*f)(void*,void*,void*),struct Cyc_List_List*x,struct Cyc_List_List*y,struct Cyc_List_List*z){struct _RegionHandle*_T0;void*(*_T1)(void*,void*,void*);struct Cyc_List_List*_T2;struct Cyc_List_List*_T3;struct Cyc_List_List*_T4;struct Cyc_List_List*_T5;_T0= Cyc_Core_heap_region;_T1= f;_T2= x;_T3= y;_T4= z;_T5= 
@@ -171,7 +171,7 @@ _TL46: _T0= x;_T1= _T0->hd;_T2= y;_T3= _T2->hd;f(_T1,_T3);_T4= x;
 x= _T4->tl;_T5= y;y= _T5->tl;goto _TL48;_TL47:
 # 201
  if(x!=0)goto _TL4C;else{goto _TL4D;}_TL4D: if(y!=0)goto _TL4C;else{goto _TL4A;}
-_TL4C: _T6= & Cyc_List_List_mismatch_val;_T7= (struct Cyc_List_List_mismatch_exn_struct*)_T6;_throw(_T7);goto _TL4B;_TL4A: _TL4B:;}
+_TL4C: _T6= & Cyc_List_List_mismatch_val;_T7= (struct Cyc_List_List_mismatch_exn_struct*)_T6;_rethrow(_T7);goto _TL4B;_TL4A: _TL4B:;}
 # 205
 void Cyc_List_app2_c(void*(*f)(void*,void*,void*),void*env,struct Cyc_List_List*x,struct Cyc_List_List*y){void*_T0;struct Cyc_List_List*_T1;void*_T2;struct Cyc_List_List*_T3;void*_T4;struct Cyc_List_List*_T5;struct Cyc_List_List*_T6;struct Cyc_List_List_mismatch_exn_struct*_T7;struct Cyc_List_List_mismatch_exn_struct*_T8;
 _TL51: if(x!=0)goto _TL52;else{goto _TL50;}_TL52: if(y!=0)goto _TL4F;else{goto _TL50;}
@@ -180,7 +180,7 @@ _TL4F: _T0= env;_T1= x;_T2= _T1->hd;_T3= y;_T4= _T3->hd;f(_T0,_T2,_T4);_T5= x;
 x= _T5->tl;_T6= y;y= _T6->tl;goto _TL51;_TL50:
 # 208
  if(x!=0)goto _TL55;else{goto _TL56;}_TL56: if(y!=0)goto _TL55;else{goto _TL53;}
-_TL55: _T7= & Cyc_List_List_mismatch_val;_T8= (struct Cyc_List_List_mismatch_exn_struct*)_T7;_throw(_T8);goto _TL54;_TL53: _TL54:;}
+_TL55: _T7= & Cyc_List_List_mismatch_val;_T8= (struct Cyc_List_List_mismatch_exn_struct*)_T7;_rethrow(_T8);goto _TL54;_TL53: _TL54:;}
 # 214
 void Cyc_List_iter2(void(*f)(void*,void*),struct Cyc_List_List*x,struct Cyc_List_List*y){struct Cyc_List_List*_T0;void*_T1;struct Cyc_List_List*_T2;void*_T3;struct Cyc_List_List*_T4;struct Cyc_List_List*_T5;struct Cyc_List_List_mismatch_exn_struct*_T6;struct Cyc_List_List_mismatch_exn_struct*_T7;
 _TL5A: if(x!=0)goto _TL5B;else{goto _TL59;}_TL5B: if(y!=0)goto _TL58;else{goto _TL59;}
@@ -189,7 +189,7 @@ _TL58: _T0= x;_T1= _T0->hd;_T2= y;_T3= _T2->hd;f(_T1,_T3);_T4= x;
 x= _T4->tl;_T5= y;y= _T5->tl;goto _TL5A;_TL59:
 # 217
  if(x!=0)goto _TL5E;else{goto _TL5F;}_TL5F: if(y!=0)goto _TL5E;else{goto _TL5C;}
-_TL5E: _T6= & Cyc_List_List_mismatch_val;_T7= (struct Cyc_List_List_mismatch_exn_struct*)_T6;_throw(_T7);goto _TL5D;_TL5C: _TL5D:;}
+_TL5E: _T6= & Cyc_List_List_mismatch_val;_T7= (struct Cyc_List_List_mismatch_exn_struct*)_T6;_rethrow(_T7);goto _TL5D;_TL5C: _TL5D:;}
 # 220
 void Cyc_List_iter2_c(void(*f)(void*,void*,void*),void*env,struct Cyc_List_List*x,struct Cyc_List_List*y){void*_T0;struct Cyc_List_List*_T1;void*_T2;struct Cyc_List_List*_T3;void*_T4;struct Cyc_List_List*_T5;struct Cyc_List_List*_T6;struct Cyc_List_List_mismatch_exn_struct*_T7;struct Cyc_List_List_mismatch_exn_struct*_T8;
 _TL63: if(x!=0)goto _TL64;else{goto _TL62;}_TL64: if(y!=0)goto _TL61;else{goto _TL62;}
@@ -198,7 +198,7 @@ _TL61: _T0= env;_T1= x;_T2= _T1->hd;_T3= y;_T4= _T3->hd;f(_T0,_T2,_T4);_T5= x;
 x= _T5->tl;_T6= y;y= _T6->tl;goto _TL63;_TL62:
 # 223
  if(x!=0)goto _TL67;else{goto _TL68;}_TL68: if(y!=0)goto _TL67;else{goto _TL65;}
-_TL67: _T7= & Cyc_List_List_mismatch_val;_T8= (struct Cyc_List_List_mismatch_exn_struct*)_T7;_throw(_T8);goto _TL66;_TL65: _TL66:;}
+_TL67: _T7= & Cyc_List_List_mismatch_val;_T8= (struct Cyc_List_List_mismatch_exn_struct*)_T7;_rethrow(_T8);goto _TL66;_TL65: _TL66:;}
 # 230
 void*Cyc_List_fold_left(void*(*f)(void*,void*),void*accum,struct Cyc_List_List*x){void*_T0;struct Cyc_List_List*_T1;void*_T2;struct Cyc_List_List*_T3;void*_T4;
 _TL6C: if(x!=0)goto _TL6A;else{goto _TL6B;}
@@ -398,10 +398,10 @@ struct Cyc_List_Nth_exn_struct Cyc_List_Nth_val={Cyc_List_Nth};
 void*Cyc_List_nth(struct Cyc_List_List*x,int i){struct Cyc_List_List*_T0;struct Cyc_List_List*_T1;void*_T2;_T0= Cyc_List_nth_tail(x,i);_T1= _check_null(_T0);_T2= _T1->hd;return _T2;}
 # 467
 struct Cyc_List_List*Cyc_List_nth_tail(struct Cyc_List_List*x,int i){struct Cyc_List_Nth_exn_struct*_T0;struct Cyc_List_Nth_exn_struct*_T1;struct Cyc_List_Nth_exn_struct*_T2;struct Cyc_List_Nth_exn_struct*_T3;struct Cyc_List_List*_T4;struct Cyc_List_List*_T5;
-if(i >= 0)goto _TLB6;_T0= & Cyc_List_Nth_val;_T1= (struct Cyc_List_Nth_exn_struct*)_T0;_throw(_T1);goto _TLB7;_TLB6: _TLB7:
+if(i >= 0)goto _TLB6;_T0= & Cyc_List_Nth_val;_T1= (struct Cyc_List_Nth_exn_struct*)_T0;_rethrow(_T1);goto _TLB7;_TLB6: _TLB7:
 # 470
  _TLBB: if(i > 0)goto _TLB9;else{goto _TLBA;}
-_TLB9: if(x!=0)goto _TLBC;_T2= & Cyc_List_Nth_val;_T3= (struct Cyc_List_Nth_exn_struct*)_T2;_throw(_T3);goto _TLBD;_TLBC: _TLBD:
+_TLB9: if(x!=0)goto _TLBC;_T2= & Cyc_List_Nth_val;_T3= (struct Cyc_List_Nth_exn_struct*)_T2;_rethrow(_T3);goto _TLBD;_TLBC: _TLBD:
 # 470
  i= i + -1;_T4= x;x= _T4->tl;goto _TLBB;_TLBA: _T5= x;
 # 473
@@ -459,7 +459,7 @@ struct Cyc_List_List*result;struct Cyc_List_List*prev;struct Cyc_List_List*temp;
 if(x!=0)goto _TLDE;if(y!=0)goto _TLDE;
 return 0;_TLDE:
  if(x==0)goto _TLE2;else{goto _TLE3;}_TLE3: if(y==0)goto _TLE2;else{goto _TLE0;}
-_TLE2: _T0= & Cyc_List_List_mismatch_val;_T1= (struct Cyc_List_List_mismatch_exn_struct*)_T0;_throw(_T1);goto _TLE1;_TLE0: _TLE1: _T3= r3;{struct Cyc_List_List*_T16=_region_malloc(_T3,0U,sizeof(struct Cyc_List_List));_T5= r4;{struct _tuple2*_T17=_region_malloc(_T5,0U,sizeof(struct _tuple2));_T6= x;
+_TLE2: _T0= & Cyc_List_List_mismatch_val;_T1= (struct Cyc_List_List_mismatch_exn_struct*)_T0;_rethrow(_T1);goto _TLE1;_TLE0: _TLE1: _T3= r3;{struct Cyc_List_List*_T16=_region_malloc(_T3,0U,sizeof(struct Cyc_List_List));_T5= r4;{struct _tuple2*_T17=_region_malloc(_T5,0U,sizeof(struct _tuple2));_T6= x;
 # 525
 _T17->f0= _T6->hd;_T7= y;_T17->f1= _T7->hd;_T4= (struct _tuple2*)_T17;}_T16->hd= _T4;_T16->tl= 0;_T2= (struct Cyc_List_List*)_T16;}result= _T2;
 prev= result;_T8= x;
@@ -475,7 +475,7 @@ x= _T11->tl;_T12= y;
 y= _T12->tl;goto _TLE4;_TLE6:
 # 538
  if(x!=0)goto _TLEA;else{goto _TLEB;}_TLEB: if(y!=0)goto _TLEA;else{goto _TLE8;}
-_TLEA: _T13= & Cyc_List_List_mismatch_val;_T14= (struct Cyc_List_List_mismatch_exn_struct*)_T13;_throw(_T14);goto _TLE9;_TLE8: _TLE9: _T15= result;
+_TLEA: _T13= & Cyc_List_List_mismatch_val;_T14= (struct Cyc_List_List_mismatch_exn_struct*)_T13;_rethrow(_T14);goto _TLE9;_TLE8: _TLE9: _T15= result;
 return _T15;}
 # 543
 struct Cyc_List_List*Cyc_List_zip(struct Cyc_List_List*x,struct Cyc_List_List*y){struct Cyc_List_List*_T0;_T0= 
@@ -488,7 +488,7 @@ struct Cyc_List_List*result;struct Cyc_List_List*prev;struct Cyc_List_List*temp;
 if(x!=0)goto _TLEC;if(y!=0)goto _TLEC;if(z!=0)goto _TLEC;
 return 0;_TLEC:
  if(x==0)goto _TLF0;else{goto _TLF2;}_TLF2: if(y==0)goto _TLF0;else{goto _TLF1;}_TLF1: if(z==0)goto _TLF0;else{goto _TLEE;}
-_TLF0: _T0= & Cyc_List_List_mismatch_val;_T1= (struct Cyc_List_List_mismatch_exn_struct*)_T0;_throw(_T1);goto _TLEF;_TLEE: _TLEF: _T3= r3;{struct Cyc_List_List*_T1A=_region_malloc(_T3,0U,sizeof(struct Cyc_List_List));_T5= r4;{struct _tuple3*_T1B=_region_malloc(_T5,0U,sizeof(struct _tuple3));_T6= x;
+_TLF0: _T0= & Cyc_List_List_mismatch_val;_T1= (struct Cyc_List_List_mismatch_exn_struct*)_T0;_rethrow(_T1);goto _TLEF;_TLEE: _TLEF: _T3= r3;{struct Cyc_List_List*_T1A=_region_malloc(_T3,0U,sizeof(struct Cyc_List_List));_T5= r4;{struct _tuple3*_T1B=_region_malloc(_T5,0U,sizeof(struct _tuple3));_T6= x;
 # 556
 _T1B->f0= _T6->hd;_T7= y;_T1B->f1= _T7->hd;_T8= z;_T1B->f2= _T8->hd;_T4= (struct _tuple3*)_T1B;}_T1A->hd= _T4;_T1A->tl= 0;_T2= (struct Cyc_List_List*)_T1A;}result= _T2;
 prev= result;_T9= x;
@@ -506,7 +506,7 @@ y= _T15->tl;_T16= z;
 z= _T16->tl;goto _TLF3;_TLF5:
 # 571
  if(x!=0)goto _TLFA;else{goto _TLFC;}_TLFC: if(y!=0)goto _TLFA;else{goto _TLFB;}_TLFB: if(z!=0)goto _TLFA;else{goto _TLF8;}
-_TLFA: _T17= & Cyc_List_List_mismatch_val;_T18= (struct Cyc_List_List_mismatch_exn_struct*)_T17;_throw(_T18);goto _TLF9;_TLF8: _TLF9: _T19= result;
+_TLFA: _T17= & Cyc_List_List_mismatch_val;_T18= (struct Cyc_List_List_mismatch_exn_struct*)_T17;_rethrow(_T18);goto _TLF9;_TLF8: _TLF9: _T19= result;
 return _T19;}
 # 576
 struct Cyc_List_List*Cyc_List_zip3(struct Cyc_List_List*x,struct Cyc_List_List*y,struct Cyc_List_List*z){struct Cyc_List_List*_T0;_T0= 
@@ -592,14 +592,14 @@ _TL118: if(l!=0)goto _TL116;else{goto _TL117;}
 _TL116: _T0= l;_T1= _T0->hd;_T2= (struct _tuple2*)_T1;_T3= _T2[0];_T4= _T3.f0;_T5= x;if(_T4!=_T5)goto _TL119;_T6= l;_T7= _T6->hd;_T8= (struct _tuple2*)_T7;_T9= _T8[0];_TA= _T9.f1;
 return _TA;_TL119: _TB= l;
 # 660
-l= _TB->tl;goto _TL118;_TL117: _TC= & Cyc_Core_Not_found_val;_TD= (struct Cyc_Core_Not_found_exn_struct*)_TC;_throw(_TD);}
+l= _TB->tl;goto _TL118;_TL117: _TC= & Cyc_Core_Not_found_val;_TD= (struct Cyc_Core_Not_found_exn_struct*)_TC;_rethrow(_TD);}
 # 666
 void*Cyc_List_assoc_cmp(int(*cmp)(void*,void*),struct Cyc_List_List*l,void*x){struct Cyc_List_List*_T0;void*_T1;struct _tuple2*_T2;struct _tuple2 _T3;void*_T4;void*_T5;int _T6;struct Cyc_List_List*_T7;void*_T8;struct _tuple2*_T9;struct _tuple2 _TA;void*_TB;struct Cyc_List_List*_TC;struct Cyc_Core_Not_found_exn_struct*_TD;struct Cyc_Core_Not_found_exn_struct*_TE;
 _TL11E: if(l!=0)goto _TL11C;else{goto _TL11D;}
 _TL11C: _T0= l;_T1= _T0->hd;_T2= (struct _tuple2*)_T1;_T3= *_T2;_T4= _T3.f0;_T5= x;_T6= cmp(_T4,_T5);if(_T6!=0)goto _TL11F;_T7= l;_T8= _T7->hd;_T9= (struct _tuple2*)_T8;_TA= *_T9;_TB= _TA.f1;
 return _TB;_TL11F: _TC= l;
 # 667
-l= _TC->tl;goto _TL11E;_TL11D: _TD= & Cyc_Core_Not_found_val;_TE= (struct Cyc_Core_Not_found_exn_struct*)_TD;_throw(_TE);}
+l= _TC->tl;goto _TL11E;_TL11D: _TD= & Cyc_Core_Not_found_val;_TE= (struct Cyc_Core_Not_found_exn_struct*)_TD;_rethrow(_TE);}
 # 677
 struct Cyc_List_List*Cyc_List_delete_cmp(int(*cmp)(void*,void*),struct Cyc_List_List*l,void*x){struct Cyc_List_List*_T0;void*_T1;void*_T2;int _T3;struct Cyc_List_List*_T4;struct Cyc_List_List*_T5;struct Cyc_List_List*_T6;struct Cyc_List_List*_T7;struct Cyc_List_List*_T8;struct Cyc_List_List*_T9;struct Cyc_Core_Not_found_exn_struct*_TA;struct Cyc_Core_Not_found_exn_struct*_TB;
 struct Cyc_List_List*prev=0;
@@ -612,7 +612,7 @@ _T6->tl= _T7->tl;_T8= l;
 return _T8;_TL124:
 # 687
  prev= iter;_T9= iter;
-iter= _T9->tl;goto _TL121;_TL123: _TA= & Cyc_Core_Not_found_val;_TB= (struct Cyc_Core_Not_found_exn_struct*)_TA;_throw(_TB);}
+iter= _T9->tl;goto _TL121;_TL123: _TA= & Cyc_Core_Not_found_val;_TB= (struct Cyc_Core_Not_found_exn_struct*)_TA;_rethrow(_TB);}
 # 693
 static int Cyc_List_ptrequal(void*x,void*y){int _T0;int _T1;_T0= x==y;_T1= !_T0;return _T1;}
 # 698

@@ -36,7 +36,7 @@ void Cyc_Queue_push(struct Cyc_Queue_Queue*q,void*x){
 Cyc_Queue_rpush(Cyc_Core_heap_region,q,x);}
 # 80
 void*Cyc_Queue_take(struct Cyc_Queue_Queue*q){struct Cyc_Queue_Queue*_T0;struct Cyc_List_List*_T1;struct Cyc_Queue_Empty_exn_struct*_T2;struct Cyc_Queue_Empty_exn_struct*_T3;struct Cyc_Queue_Queue*_T4;struct Cyc_List_List*_T5;struct Cyc_Queue_Queue*_T6;struct Cyc_Queue_Queue*_T7;struct Cyc_List_List*_T8;struct Cyc_Queue_Queue*_T9;struct Cyc_List_List*_TA;struct Cyc_Queue_Queue*_TB;struct Cyc_Queue_Queue*_TC;void*_TD;_T0= q;_T1= _T0->front;
-if(_T1!=0)goto _TL4;_T2= & Cyc_Queue_Empty_val;_T3= (struct Cyc_Queue_Empty_exn_struct*)_T2;_throw(_T3);goto _TL5;_TL4: _TL5: _T4= q;_T5= _T4->front;{
+if(_T1!=0)goto _TL4;_T2= & Cyc_Queue_Empty_val;_T3= (struct Cyc_Queue_Empty_exn_struct*)_T2;_rethrow(_T3);goto _TL5;_TL4: _TL5: _T4= q;_T5= _T4->front;{
 # 83
 void*x=_T5->hd;_T6= q;_T7= q;_T8= _T7->front;
 _T6->front= _T8->tl;_T9= q;_TA= _T9->front;
@@ -46,7 +46,7 @@ _TC->len= _TC->len + -1;_TD= x;
 return _TD;}}
 # 91
 void*Cyc_Queue_noalias_take(struct Cyc_Queue_Queue*q,void*null_elem){struct Cyc_Queue_Queue*_T0;struct Cyc_List_List*_T1;struct Cyc_Queue_Empty_exn_struct*_T2;struct Cyc_Queue_Empty_exn_struct*_T3;struct Cyc_Queue_Queue*_T4;struct Cyc_List_List*_T5;struct Cyc_Queue_Queue*_T6;struct Cyc_List_List*_T7;struct Cyc_Queue_Queue*_T8;struct Cyc_Queue_Queue*_T9;struct Cyc_List_List*_TA;struct Cyc_List_List*_TB;struct Cyc_Queue_Queue*_TC;struct Cyc_List_List*_TD;struct Cyc_Queue_Queue*_TE;struct Cyc_Queue_Queue*_TF;void*_T10;_T0= q;_T1= _T0->front;
-if(_T1!=0)goto _TL8;_T2= & Cyc_Queue_Empty_val;_T3= (struct Cyc_Queue_Empty_exn_struct*)_T2;_throw(_T3);goto _TL9;_TL8: _TL9:{
+if(_T1!=0)goto _TL8;_T2= & Cyc_Queue_Empty_val;_T3= (struct Cyc_Queue_Empty_exn_struct*)_T2;_rethrow(_T3);goto _TL9;_TL8: _TL9:{
 # 94
 void*_T11=null_elem;_T4= q;_T5= _T4->front;{void*_T12=_T5->hd;null_elem= _T12;_T6= q;_T7= _T6->front;_T7->hd= _T11;}}_T8= q;_T9= q;_TA= _T9->front;_TB= 
 _check_null(_TA);_T8->front= _TB->tl;_TC= q;_TD= _TC->front;
@@ -58,7 +58,7 @@ return _T10;}
 void*Cyc_Queue_ptr_take(struct Cyc_Queue_Queue*q){void*_T0;_T0= Cyc_Queue_noalias_take(q,0);return _T0;}
 # 105
 void*Cyc_Queue_peek(struct Cyc_Queue_Queue*q){struct Cyc_Queue_Queue*_T0;struct Cyc_List_List*_T1;struct Cyc_Queue_Empty_exn_struct*_T2;struct Cyc_Queue_Empty_exn_struct*_T3;struct Cyc_Queue_Queue*_T4;struct Cyc_List_List*_T5;void*_T6;_T0= q;_T1= _T0->front;
-if(_T1!=0)goto _TLC;_T2= & Cyc_Queue_Empty_val;_T3= (struct Cyc_Queue_Empty_exn_struct*)_T2;_throw(_T3);goto _TLD;_TLC: _TLD: _T4= q;_T5= _T4->front;_T6= _T5->hd;
+if(_T1!=0)goto _TLC;_T2= & Cyc_Queue_Empty_val;_T3= (struct Cyc_Queue_Empty_exn_struct*)_T2;_rethrow(_T3);goto _TLD;_TLC: _TLD: _T4= q;_T5= _T4->front;_T6= _T5->hd;
 # 108
 return _T6;}
 # 112

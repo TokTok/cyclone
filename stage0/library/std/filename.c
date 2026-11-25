@@ -15,7 +15,7 @@ _get_fat_size(_T0,sizeof(char));_T2= _T1 - 1U;{int i=(int)_T2;
 _TL0: if(i >= 0)goto _TL3;else{goto _TL2;}_TL3: _T3= filename;_T4= _T3.curr;_T5= (const char*)_T4;_T6= _check_null(_T5);_T7= i;_T8= _T6[_T7];_T9= (int)_T8;if(_T9!=46)goto _TL1;else{goto _TL2;}
 _TL1: i= i + -1;goto _TL0;_TL2:
  if(i >= 0)goto _TL4;{struct Cyc_Core_Invalid_argument_exn_struct*_T10=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_T10->tag= Cyc_Core_Invalid_argument;
-({__typeof__(_tag_fat("chop_extension",sizeof(char),15U))_T11=_tag_fat("chop_extension",sizeof(char),15U);_T10->f1= _T11;});_TA= (struct Cyc_Core_Invalid_argument_exn_struct*)_T10;}_TB= (void*)_TA;_throw(_TB);goto _TL5;_TL4: _TL5: _TC= filename;_TD= i;_TE= (unsigned long)_TD;_TF= 
+({__typeof__(_tag_fat("chop_extension",sizeof(char),15U))_T11=_tag_fat("chop_extension",sizeof(char),15U);_T10->f1= _T11;});_TA= (struct Cyc_Core_Invalid_argument_exn_struct*)_T10;}_TB= (void*)_TA;_rethrow(_TB);goto _TL5;_TL4: _TL5: _TC= filename;_TD= i;_TE= (unsigned long)_TD;_TF= 
 Cyc_substring(_TC,0,_TE);return _TF;}}
 # 49
 struct _fat_ptr Cyc_Filename_dirname(struct _fat_ptr filename){struct _fat_ptr _T0;unsigned _T1;unsigned _T2;struct _fat_ptr _T3;unsigned char*_T4;const char*_T5;const char*_T6;int _T7;char _T8;int _T9;struct _fat_ptr _TA;struct _fat_ptr _TB;int _TC;unsigned long _TD;struct _fat_ptr _TE;_T0= filename;_T1= 

@@ -318,7 +318,7 @@ long Cyc_Set_equals(struct Cyc_Set_Set*s1,struct Cyc_Set_Set*s2){int _T0;int _T1
 struct Cyc_Set_Absent_exn_struct Cyc_Set_Absent_val={Cyc_Set_Absent};
 # 375
 void*Cyc_Set_choose(struct Cyc_Set_Set*s){struct Cyc_Set_Set*_T0;struct Cyc_List_List*_T1;struct Cyc_Set_Absent_exn_struct*_T2;struct Cyc_Set_Absent_exn_struct*_T3;struct Cyc_Set_Set*_T4;struct Cyc_List_List*_T5;void*_T6;_T0= s;_T1= _T0->nodes;
-if(_T1!=0)goto _TL86;_T2= & Cyc_Set_Absent_val;_T3= (struct Cyc_Set_Absent_exn_struct*)_T2;_throw(_T3);goto _TL87;_TL86: _TL87: _T4= s;_T5= _T4->nodes;_T6= _T5->hd;
+if(_T1!=0)goto _TL86;_T2= & Cyc_Set_Absent_val;_T3= (struct Cyc_Set_Absent_exn_struct*)_T2;_rethrow(_T3);goto _TL87;_TL86: _TL87: _T4= s;_T5= _T4->nodes;_T6= _T5->hd;
 # 378
 return _T6;}
 # 381

@@ -72,7 +72,7 @@ l1= _TA->tl;goto _TLF;_TLE: _TB=
 Cyc_List_imp_rev(rev_ans);return _TB;}struct _union_YYSTYPE_YYINITIALSVAL{int tag;int val;};struct _union_YYSTYPE_Lexer_definition_tok{int tag;struct Cyc_Syntax_Lexer_definition*val;};struct _union_YYSTYPE_Location_tok{int tag;struct Cyc_Syntax_Location*val;};struct _union_YYSTYPE_Int_tok{int tag;int val;};struct _union_YYSTYPE_Entrypoint_List_tok{int tag;struct Cyc_List_List*val;};struct _union_YYSTYPE_Entrypoint_tok{int tag;struct _tuple4*val;};struct _union_YYSTYPE_Acase_List_tok{int tag;struct Cyc_List_List*val;};struct _union_YYSTYPE_Acase_tok{int tag;struct _tuple2*val;};struct _union_YYSTYPE_Regexp_tok{int tag;void*val;};struct _union_YYSTYPE_Char_tok{int tag;char val;};struct _union_YYSTYPE_String_tok{int tag;struct _fat_ptr val;};struct _union_YYSTYPE_Charclass_tok{int tag;struct Cyc_List_List*val;};union Cyc_YYSTYPE{struct _union_YYSTYPE_YYINITIALSVAL YYINITIALSVAL;struct _union_YYSTYPE_Lexer_definition_tok Lexer_definition_tok;struct _union_YYSTYPE_Location_tok Location_tok;struct _union_YYSTYPE_Int_tok Int_tok;struct _union_YYSTYPE_Entrypoint_List_tok Entrypoint_List_tok;struct _union_YYSTYPE_Entrypoint_tok Entrypoint_tok;struct _union_YYSTYPE_Acase_List_tok Acase_List_tok;struct _union_YYSTYPE_Acase_tok Acase_tok;struct _union_YYSTYPE_Regexp_tok Regexp_tok;struct _union_YYSTYPE_Char_tok Char_tok;struct _union_YYSTYPE_String_tok String_tok;struct _union_YYSTYPE_Charclass_tok Charclass_tok;};
 # 86
 static void Cyc_yythrowfail(struct _fat_ptr s){struct Cyc_Core_Failure_exn_struct*_T0;void*_T1;{struct Cyc_Core_Failure_exn_struct*_T2=_cycalloc(sizeof(struct Cyc_Core_Failure_exn_struct));_T2->tag= Cyc_Core_Failure;
-_T2->f1= s;_T0= (struct Cyc_Core_Failure_exn_struct*)_T2;}_T1= (void*)_T0;_throw(_T1);}static char _TmpG0[19U]="lexer_definition_t";
+_T2->f1= s;_T0= (struct Cyc_Core_Failure_exn_struct*)_T2;}_T1= (void*)_T0;_rethrow(_T1);}static char _TmpG0[19U]="lexer_definition_t";
 # 98 "cyclone/tools/cyclex/parser.cyy"
 static struct Cyc_Syntax_Lexer_definition*Cyc_yyget_Lexer_definition_tok(union Cyc_YYSTYPE*yy1){union Cyc_YYSTYPE*_T0;union Cyc_YYSTYPE*_T1;struct _union_YYSTYPE_Lexer_definition_tok _T2;unsigned _T3;union Cyc_YYSTYPE*_T4;struct _union_YYSTYPE_Lexer_definition_tok _T5;struct Cyc_Syntax_Lexer_definition*_T6;
 static struct _fat_ptr s={(unsigned char*)_TmpG0,(unsigned char*)_TmpG0,(unsigned char*)_TmpG0 + 19U};struct Cyc_Syntax_Lexer_definition*_T7;_T0= yy1;_T1= (union Cyc_YYSTYPE*)_T0;_T2= _T1->Lexer_definition_tok;_T3= _T2.tag;if(_T3!=2)goto _TL13;_T4= yy1;{union Cyc_YYSTYPE _T8=*_T4;_T5= _T8.Lexer_definition_tok;_T7= _T5.val;}{struct Cyc_Syntax_Lexer_definition*yy=_T7;_T6= yy;
@@ -233,7 +233,7 @@ if(_TD < _TF)goto _TL2D;
 # 223
 if(yystacksize < 10000)goto _TL2F;_T10= 
 # 225
-_tag_fat("parser stack overflow",sizeof(char),22U);_T11= yystate;_T12= Cyc_yychar;Cyc_yyerror(_T10,_T11,_T12);_T13= & Cyc_Yystack_overflow_val;_T14= (struct Cyc_Yystack_overflow_exn_struct*)_T13;_throw(_T14);goto _TL30;_TL2F: _TL30:
+_tag_fat("parser stack overflow",sizeof(char),22U);_T11= yystate;_T12= Cyc_yychar;Cyc_yyerror(_T10,_T11,_T12);_T13= & Cyc_Yystack_overflow_val;_T14= (struct Cyc_Yystack_overflow_exn_struct*)_T13;_rethrow(_T14);goto _TL30;_TL2F: _TL30:
 # 228
  yystacksize= yystacksize * 2;
 if(yystacksize <= 10000)goto _TL31;

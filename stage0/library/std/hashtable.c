@@ -38,7 +38,7 @@ _TL5: if(p!=0)goto _TL3;else{goto _TL4;}
 _TL3: _TF= p;_T10= _TF->key;_T11= key;_T12= cmp(_T10,_T11);if(_T12!=0)goto _TL6;_T13= p;_T14= _T13->value;
 return _T14;_TL6: _T15= p;
 # 76
-p= _T15->next;goto _TL5;_TL4: _T16= & Cyc_Core_Not_found_val;_T17= (struct Cyc_Core_Not_found_exn_struct*)_T16;_throw(_T17);}}}}
+p= _T15->next;goto _TL5;_TL4: _T16= & Cyc_Core_Not_found_val;_T17= (struct Cyc_Core_Not_found_exn_struct*)_T16;_rethrow(_T17);}}}}
 # 83
 void**Cyc_Hashtable_lookup_opt(struct Cyc_Hashtable_Table*t,void*key){struct Cyc_Hashtable_Table*_T0;struct Cyc_Hashtable_Table*_T1;struct _fat_ptr _T2;unsigned char*_T3;struct Cyc_Hashtable_Bucket*_T4;struct Cyc_Hashtable_Bucket*_T5;struct Cyc_Hashtable_Table*_T6;int(*_T7)(void*);int _T8;unsigned _T9;struct _fat_ptr _TA;unsigned _TB;unsigned _TC;int _TD;struct Cyc_Hashtable_Bucket _TE;struct Cyc_Hashtable_Cell*_TF;void*_T10;void*_T11;int _T12;struct Cyc_Hashtable_Cell*_T13;void**_T14;struct Cyc_Hashtable_Cell*_T15;_T0= t;{
 struct _fat_ptr tab=_T0->tab;_T1= t;{

@@ -148,7 +148,7 @@ struct _fat_ptr msg=Cyc_vrprintf(Cyc_Core_heap_region,fmt,ap);_T0=
 Cyc_Warn_error_p();if(_T0)goto _TL10;else{goto _TL12;}
 _TL12: Cyc_Warn_ice(msg);goto _TL11;_TL10: _TL11:{struct Cyc_Core_Impossible_exn_struct*_T3=_cycalloc(sizeof(struct Cyc_Core_Impossible_exn_struct));_T3->tag= Cyc_Core_Impossible;
 # 137
-_T3->f1= msg;_T1= (struct Cyc_Core_Impossible_exn_struct*)_T3;}_T2= (void*)_T1;_throw(_T2);}
+_T3->f1= msg;_T1= (struct Cyc_Core_Impossible_exn_struct*)_T3;}_T2= (void*)_T1;_rethrow(_T2);}
 # 140
 void*Cyc_Warn_impos(struct _fat_ptr fmt,struct _fat_ptr ap){
 Cyc_Warn_vimpos(fmt,ap);}
@@ -158,7 +158,7 @@ Cyc_Warn_error_p();if(_T0)goto _TL13;else{goto _TL15;}
 _TL15: _T1= _tag_fat("",sizeof(char),1U);Cyc_Warn_ice(_T1);
 Cyc_Warn_verr(loc,fmt,ap);goto _TL14;_TL13: _TL14:{struct Cyc_Core_Impossible_exn_struct*_T4=_cycalloc(sizeof(struct Cyc_Core_Impossible_exn_struct));_T4->tag= Cyc_Core_Impossible;
 # 149
-({__typeof__(_tag_fat("Compiler Error",sizeof(char),15U))_T5=_tag_fat("Compiler Error",sizeof(char),15U);_T4->f1= _T5;});_T2= (struct Cyc_Core_Impossible_exn_struct*)_T4;}_T3= (void*)_T2;_throw(_T3);}
+({__typeof__(_tag_fat("Compiler Error",sizeof(char),15U))_T5=_tag_fat("Compiler Error",sizeof(char),15U);_T4->f1= _T5;});_T2= (struct Cyc_Core_Impossible_exn_struct*)_T4;}_T3= (void*)_T2;_rethrow(_T3);}
 # 152
 void*Cyc_Warn_impos_loc(unsigned loc,struct _fat_ptr fmt,struct _fat_ptr ap){
 # 154
@@ -229,7 +229,7 @@ struct _fat_ptr msg=Cyc_Warn_args2string(args);_T0=
 Cyc_Warn_error_p();if(_T0)goto _TL23;else{goto _TL25;}
 _TL25: Cyc_Warn_ice(msg);goto _TL24;_TL23: _TL24:{struct Cyc_Core_Impossible_exn_struct*_T3=_cycalloc(sizeof(struct Cyc_Core_Impossible_exn_struct));_T3->tag= Cyc_Core_Impossible;
 # 235
-_T3->f1= msg;_T1= (struct Cyc_Core_Impossible_exn_struct*)_T3;}_T2= (void*)_T1;_throw(_T2);}
+_T3->f1= msg;_T1= (struct Cyc_Core_Impossible_exn_struct*)_T3;}_T2= (void*)_T1;_rethrow(_T2);}
 # 237
 void*Cyc_Warn_impos2(struct _fat_ptr args){Cyc_Warn_vimpos2(args);}
 void*Cyc_Warn_vimpos_loc2(unsigned loc,struct _fat_ptr args){long _T0;struct _fat_ptr _T1;struct Cyc_Core_Impossible_exn_struct*_T2;void*_T3;
@@ -238,7 +238,7 @@ Cyc_Warn_error_p();if(_T0)goto _TL26;else{goto _TL28;}
 _TL28: _T1= _tag_fat("",sizeof(char),1U);Cyc_Warn_ice(_T1);
 Cyc_Warn_verr2(loc,args);goto _TL27;_TL26: _TL27:{struct Cyc_Core_Impossible_exn_struct*_T4=_cycalloc(sizeof(struct Cyc_Core_Impossible_exn_struct));_T4->tag= Cyc_Core_Impossible;
 # 244
-_T4->f1= msg;_T2= (struct Cyc_Core_Impossible_exn_struct*)_T4;}_T3= (void*)_T2;_throw(_T3);}
+_T4->f1= msg;_T2= (struct Cyc_Core_Impossible_exn_struct*)_T4;}_T3= (void*)_T2;_rethrow(_T3);}
 # 246
 void*Cyc_Warn_impos_loc2(unsigned loc,struct _fat_ptr args){
 Cyc_Warn_vimpos_loc2(loc,args);}

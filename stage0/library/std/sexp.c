@@ -193,7 +193,7 @@ static void Cyc_Sexp_file_error(struct Cyc___cycFILE*f,int ch,struct _fat_ptr ms
 # 227
 _T8.f1= (unsigned long)_T1;_T0= _T8;}{struct Cyc_Int_pa_PrintArg_struct _T8=_T0;{struct Cyc_String_pa_PrintArg_struct _T9;_T9.tag= 0;_T9.f1= msg;_T2= _T9;}{struct Cyc_String_pa_PrintArg_struct _T9=_T2;void*_TA[2];_TA[0]= & _T8;_TA[1]= & _T9;_T3= Cyc_stderr;_T4= _tag_fat("found '%c'.  %s\n",sizeof(char),17U);_T5= _tag_fat(_TA,sizeof(void*),2);Cyc_fprintf(_T3,_T4,_T5);}}
 Cyc_fclose(f);{struct Cyc_Core_Failure_exn_struct*_T8=_cycalloc(sizeof(struct Cyc_Core_Failure_exn_struct));_T8->tag= Cyc_Core_Failure;
-({__typeof__(_tag_fat("Sexp::file2object error",sizeof(char),24U))_T9=_tag_fat("Sexp::file2object error",sizeof(char),24U);_T8->f1= _T9;});_T6= (struct Cyc_Core_Failure_exn_struct*)_T8;}_T7= (void*)_T6;_throw(_T7);}
+({__typeof__(_tag_fat("Sexp::file2object error",sizeof(char),24U))_T9=_tag_fat("Sexp::file2object error",sizeof(char),24U);_T8->f1= _T9;});_T6= (struct Cyc_Core_Failure_exn_struct*)_T8;}_T7= (void*)_T6;_rethrow(_T7);}
 # 233
 struct Cyc_Sexp_Object Cyc_Sexp_fromfile(struct Cyc___cycFILE*f){struct Cyc_Sexp_Parser _T0;struct _handler_cons*_T1;int _T2;struct Cyc_Sexp_Parser*_T3;struct Cyc_Sexp_Parser*_T4;void*_T5;{struct Cyc_Sexp_Parser _T6;
 # 235
@@ -209,7 +209,7 @@ Cyc_Core_rethrow(e);};}_TL2C:;}}}
 struct Cyc_Sexp_Object Cyc_Sexp_fromfilename(const char*filename){struct Cyc_Core_Failure_exn_struct*_T0;void*_T1;struct Cyc_Sexp_Object _T2;
 struct Cyc___cycFILE*fopt=Cyc_fopen(filename,"r");
 if(fopt!=0)goto _TL2E;{struct Cyc_Core_Failure_exn_struct*_T3=_cycalloc(sizeof(struct Cyc_Core_Failure_exn_struct));_T3->tag= Cyc_Core_Failure;
-({__typeof__(_tag_fat("file not found",sizeof(char),15U))_T4=_tag_fat("file not found",sizeof(char),15U);_T3->f1= _T4;});_T0= (struct Cyc_Core_Failure_exn_struct*)_T3;}_T1= (void*)_T0;_throw(_T1);goto _TL2F;_TL2E: _TL2F: {
+({__typeof__(_tag_fat("file not found",sizeof(char),15U))_T4=_tag_fat("file not found",sizeof(char),15U);_T3->f1= _T4;});_T0= (struct Cyc_Core_Failure_exn_struct*)_T3;}_T1= (void*)_T0;_rethrow(_T1);goto _TL2F;_TL2E: _TL2F: {
 struct Cyc_Sexp_Object res=Cyc_Sexp_fromfile(fopt);
 Cyc_fclose(fopt);_T2= res;
 return _T2;}}struct Cyc_Sexp_StringEnv{struct _fat_ptr str;unsigned length;unsigned offset;};
@@ -230,7 +230,7 @@ return 0;}
 static void Cyc_Sexp_string_error(struct Cyc_Sexp_StringEnv*env,int ch,struct _fat_ptr msg){struct Cyc_Int_pa_PrintArg_struct _T0;int _T1;struct Cyc_String_pa_PrintArg_struct _T2;struct Cyc___cycFILE*_T3;struct _fat_ptr _T4;struct _fat_ptr _T5;struct Cyc_Core_Failure_exn_struct*_T6;void*_T7;{struct Cyc_Int_pa_PrintArg_struct _T8;_T8.tag= 1;_T1= ch;
 # 285
 _T8.f1= (unsigned long)_T1;_T0= _T8;}{struct Cyc_Int_pa_PrintArg_struct _T8=_T0;{struct Cyc_String_pa_PrintArg_struct _T9;_T9.tag= 0;_T9.f1= msg;_T2= _T9;}{struct Cyc_String_pa_PrintArg_struct _T9=_T2;void*_TA[2];_TA[0]= & _T8;_TA[1]= & _T9;_T3= Cyc_stderr;_T4= _tag_fat("found '%c', %s\n",sizeof(char),16U);_T5= _tag_fat(_TA,sizeof(void*),2);Cyc_fprintf(_T3,_T4,_T5);}}{struct Cyc_Core_Failure_exn_struct*_T8=_cycalloc(sizeof(struct Cyc_Core_Failure_exn_struct));_T8->tag= Cyc_Core_Failure;
-({__typeof__(_tag_fat("Sexp::string2object error",sizeof(char),26U))_T9=_tag_fat("Sexp::string2object error",sizeof(char),26U);_T8->f1= _T9;});_T6= (struct Cyc_Core_Failure_exn_struct*)_T8;}_T7= (void*)_T6;_throw(_T7);}
+({__typeof__(_tag_fat("Sexp::string2object error",sizeof(char),26U))_T9=_tag_fat("Sexp::string2object error",sizeof(char),26U);_T8->f1= _T9;});_T6= (struct Cyc_Core_Failure_exn_struct*)_T8;}_T7= (void*)_T6;_rethrow(_T7);}
 # 290
 struct Cyc_Sexp_Object Cyc_Sexp_fromstring(struct _fat_ptr str){struct Cyc_Sexp_StringEnv _T0;struct Cyc_Sexp_Parser _T1;struct Cyc_Sexp_StringEnv*_T2;struct Cyc_Sexp_Parser*_T3;struct Cyc_Sexp_Parser*_T4;struct Cyc_Sexp_Object _T5;{struct Cyc_Sexp_StringEnv _T6;
 # 292

@@ -64,7 +64,7 @@ static struct Cyc_Core_Failure_exn_struct Cyc___fcntl_failure={Cyc_Core_Failure,
 # 95
 int Cyc_fcntl(int fd,int cmd,struct _fat_ptr argv){struct _fat_ptr _T0;unsigned _T1;int _T2;struct _fat_ptr _T3;unsigned _T4;struct Cyc_Core_Failure_exn_struct*_T5;struct Cyc_Core_Failure_exn_struct*_T6;struct _fat_ptr _T7;unsigned char*_T8;void**_T9;void**_TA;int*_TB;int _TC;int _TD;int _TE;_T0= argv;_T1= 
 _get_fat_size(_T0,sizeof(void*));if(_T1!=0U)goto _TL2;_T2= fcntl(fd,cmd);return _T2;
-_TL2: _T3= argv;_T4= _get_fat_size(_T3,sizeof(void*));if(_T4==1U)goto _TL4;_T5= & Cyc___fcntl_failure;_T6= (struct Cyc_Core_Failure_exn_struct*)_T5;_throw(_T6);goto _TL5;
+_TL2: _T3= argv;_T4= _get_fat_size(_T3,sizeof(void*));if(_T4==1U)goto _TL4;_T5= & Cyc___fcntl_failure;_T6= (struct Cyc_Core_Failure_exn_struct*)_T5;_rethrow(_T6);goto _TL5;
 _TL4: _T7= argv;_T8= _T7.curr;_T9= (void**)_T8;_TA= _check_null(_T9);{void*_TF=_TA[0];struct Cyc_flock*_T10;long _T11;_TB= (int*)_TF;_TC= *_TB;if(_TC!=1)goto _TL6;{struct Cyc_Long_FcntlArg_struct*_T12=(struct Cyc_Long_FcntlArg_struct*)_TF;_T11= _T12->f1;}{long arg=_T11;_TD= 
 fcntl_with_arg(fd,cmd,arg);return _TD;}_TL6:{struct Cyc_Flock_FcntlArg_struct*_T12=(struct Cyc_Flock_FcntlArg_struct*)_TF;_T10= _T12->f1;}{struct Cyc_flock*lock=_T10;_TE= 
 fcntl_with_lock(fd,cmd,lock);return _TE;};}_TL5:;}
@@ -83,9 +83,9 @@ static struct Cyc_Core_Failure_exn_struct Cyc___poll_failure_1={Cyc_Core_Failure
 static struct Cyc_Core_Failure_exn_struct Cyc___poll_failure_2={Cyc_Core_Failure,{(unsigned char*)_TmpG3,(unsigned char*)_TmpG3,(unsigned char*)_TmpG3 + 39U}};
 # 123
 int Cyc_poll(struct _fat_ptr a,unsigned long b,int c){struct _fat_ptr _T0;unsigned char*_T1;unsigned _T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc_Core_Failure_exn_struct*_T4;struct _fat_ptr _T5;unsigned _T6;struct Cyc_Core_Failure_exn_struct*_T7;struct Cyc_Core_Failure_exn_struct*_T8;struct _fat_ptr _T9;unsigned char*_TA;struct Cyc_pollfd*_TB;unsigned long _TC;unsigned long _TD;int _TE;unsigned long _TF;int _T10;int _T11;int _T12;_T0= a;_T1= _T0.curr;_T2= (unsigned)_T1;
-if(_T2)goto _TLA;else{goto _TLC;}_TLC: _T3= & Cyc___poll_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_throw(_T4);goto _TLB;_TLA: _TLB: _T5= a;_T6= 
+if(_T2)goto _TLA;else{goto _TLC;}_TLC: _T3= & Cyc___poll_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_rethrow(_T4);goto _TLB;_TLA: _TLB: _T5= a;_T6= 
 _get_fat_size(_T5,sizeof(struct Cyc_pollfd));{int len=(int)_T6;
-if(len >= 1)goto _TLD;_T7= & Cyc___poll_failure_2;_T8= (struct Cyc_Core_Failure_exn_struct*)_T7;_throw(_T8);goto _TLE;_TLD: _TLE: _T9= a;_TA= _untag_fat_ptr(_T9,sizeof(struct Cyc_pollfd),0U);_TB= (struct Cyc_pollfd*)_TA;_TD= b;_TE= len;_TF= (unsigned long)_TE;
+if(len >= 1)goto _TLD;_T7= & Cyc___poll_failure_2;_T8= (struct Cyc_Core_Failure_exn_struct*)_T7;_rethrow(_T8);goto _TLE;_TLD: _TLE: _T9= a;_TA= _untag_fat_ptr(_T9,sizeof(struct Cyc_pollfd),0U);_TB= (struct Cyc_pollfd*)_TA;_TD= b;_TE= len;_TF= (unsigned long)_TE;
 # 128
 if(_TD >= _TF)goto _TLF;_TC= b;goto _TL10;_TLF: _T10= len;_TC= (unsigned long)_T10;_TL10: _T11= c;_T12= 
 # 127
@@ -148,7 +148,7 @@ extern int fclose(struct __abstractFILE*);static char _TmpG4[28U]="fclose: FILE 
 static struct Cyc_Core_Failure_exn_struct Cyc___fclose_failure={Cyc_Core_Failure,{(unsigned char*)_TmpG4,(unsigned char*)_TmpG4,(unsigned char*)_TmpG4 + 28U}};
 # 224
 int Cyc_fclose(struct Cyc___cycFILE*f){struct Cyc___cycFILE*_T0;struct __abstractFILE*_T1;struct Cyc_Core_Failure_exn_struct*_T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc___cycFILE*_T4;struct __abstractFILE*_T5;struct Cyc___cycFILE*_T6;int _T7;_T0= f;_T1= _T0->file;
-if(_T1!=0)goto _TL1F;_T2= & Cyc___fclose_failure;_T3= (struct Cyc_Core_Failure_exn_struct*)_T2;_throw(_T3);goto _TL20;_TL1F: _TL20: _T4= f;_T5= _T4->file;{
+if(_T1!=0)goto _TL1F;_T2= & Cyc___fclose_failure;_T3= (struct Cyc_Core_Failure_exn_struct*)_T2;_rethrow(_T3);goto _TL20;_TL1F: _TL20: _T4= f;_T5= _T4->file;{
 int retc=fclose(_T5);_T6= f;
 _T6->file= 0;_T7= retc;
 return _T7;}}
@@ -194,11 +194,11 @@ static struct Cyc_Core_Failure_exn_struct Cyc___fgets_failure_1={Cyc_Core_Failur
 static struct Cyc_Core_Failure_exn_struct Cyc___fgets_failure_2={Cyc_Core_Failure,{(unsigned char*)_TmpG6,(unsigned char*)_TmpG6,(unsigned char*)_TmpG6 + 27U}};
 # 284
 struct _fat_ptr Cyc_fgets(struct _fat_ptr s,int n,struct Cyc___cycFILE*f){struct _fat_ptr _T0;unsigned char*_T1;unsigned _T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc_Core_Failure_exn_struct*_T4;struct _fat_ptr _T5;unsigned char*_T6;struct _fat_ptr _T7;unsigned _T8;int _T9;unsigned _TA;struct Cyc_Core_Failure_exn_struct*_TB;struct Cyc_Core_Failure_exn_struct*_TC;char*_TD;int _TE;struct Cyc___cycFILE*_TF;struct __abstractFILE*_T10;struct __abstractFILE*_T11;struct _fat_ptr _T12;struct _fat_ptr _T13;_T0= s;_T1= _T0.curr;_T2= (unsigned)_T1;
-if(_T2)goto _TL25;else{goto _TL27;}_TL27: _T3= & Cyc___fgets_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_throw(_T4);goto _TL26;_TL25: _TL26: {
+if(_T2)goto _TL25;else{goto _TL27;}_TL27: _T3= & Cyc___fgets_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_rethrow(_T4);goto _TL26;_TL25: _TL26: {
 char*result;_T5= s;_T6= _untag_fat_ptr_check_bound(_T5,sizeof(char),1U);{
 char*buffer=(char*)_T6;_T7= s;{
 unsigned len=_get_fat_size(_T7,sizeof(char));_T8= len;_T9= n;_TA= (unsigned)_T9;
-if(_T8 >= _TA)goto _TL28;_TB= & Cyc___fgets_failure_2;_TC= (struct Cyc_Core_Failure_exn_struct*)_TB;_throw(_TC);goto _TL29;_TL28: _TL29: _TD= buffer;_TE= n;_TF= f;_T10= _TF->file;_T11= 
+if(_T8 >= _TA)goto _TL28;_TB= & Cyc___fgets_failure_2;_TC= (struct Cyc_Core_Failure_exn_struct*)_TB;_rethrow(_TC);goto _TL29;_TL28: _TL29: _TD= buffer;_TE= n;_TF= f;_T10= _TF->file;_T11= 
 # 291
 _check_null(_T10);result= fgets(_TD,_TE,_T11);
 if(result!=0)goto _TL2A;_T12= 
@@ -239,7 +239,7 @@ static struct Cyc_Core_Failure_exn_struct Cyc___fread_failure={Cyc_Core_Failure,
 # 342
 unsigned long Cyc_fread(struct _fat_ptr ptr,unsigned long size,unsigned long nmemb,struct Cyc___cycFILE*f){unsigned long _T0;struct _fat_ptr _T1;unsigned _T2;unsigned long _T3;unsigned long _T4;struct Cyc_Core_Failure_exn_struct*_T5;struct Cyc_Core_Failure_exn_struct*_T6;struct _fat_ptr _T7;unsigned char*_T8;char*_T9;unsigned long _TA;unsigned long _TB;struct Cyc___cycFILE*_TC;struct __abstractFILE*_TD;struct __abstractFILE*_TE;unsigned long _TF;
 if(size==0U)goto _TL30;else{goto _TL31;}_TL31: _T0= nmemb;_T1= ptr;_T2= _get_fat_size(_T1,sizeof(char));_T3= size;_T4= _T2 / _T3;if(_T0 > _T4)goto _TL30;else{goto _TL2E;}
-_TL30: _T5= & Cyc___fread_failure;_T6= (struct Cyc_Core_Failure_exn_struct*)_T5;_throw(_T6);goto _TL2F;_TL2E: _TL2F: _T7= ptr;_T8= _untag_fat_ptr_check_bound(_T7,sizeof(char),1U);_T9= (char*)_T8;_TA= size;_TB= nmemb;_TC= f;_TD= _TC->file;_TE= 
+_TL30: _T5= & Cyc___fread_failure;_T6= (struct Cyc_Core_Failure_exn_struct*)_T5;_rethrow(_T6);goto _TL2F;_TL2E: _TL2F: _T7= ptr;_T8= _untag_fat_ptr_check_bound(_T7,sizeof(char),1U);_T9= (char*)_T8;_TA= size;_TB= nmemb;_TC= f;_TD= _TC->file;_TE= 
 _check_null(_TD);_TF= fread(_T9,_TA,_TB,_TE);return _TF;}
 # 349
 extern struct __abstractFILE*freopen(const char*,const char*,struct __abstractFILE*);
@@ -296,9 +296,9 @@ static struct Cyc_Core_Failure_exn_struct Cyc___fwrite_failure_1={Cyc_Core_Failu
 static struct Cyc_Core_Failure_exn_struct Cyc___fwrite_failure_2={Cyc_Core_Failure,{(unsigned char*)_TmpG9,(unsigned char*)_TmpG9,(unsigned char*)_TmpG9 + 28U}};
 # 429
 unsigned long Cyc_fwrite(struct _fat_ptr ptr,unsigned long size,unsigned long nmemb,struct Cyc___cycFILE*f){struct _fat_ptr _T0;unsigned char*_T1;unsigned _T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc_Core_Failure_exn_struct*_T4;unsigned long _T5;struct _fat_ptr _T6;unsigned _T7;struct Cyc_Core_Failure_exn_struct*_T8;struct Cyc_Core_Failure_exn_struct*_T9;struct _fat_ptr _TA;unsigned char*_TB;const char*_TC;unsigned long _TD;unsigned long _TE;struct Cyc___cycFILE*_TF;struct __abstractFILE*_T10;struct __abstractFILE*_T11;unsigned long _T12;_T0= ptr;_T1= _T0.curr;_T2= (unsigned)_T1;
-if(_T2)goto _TL36;else{goto _TL38;}_TL38: _T3= & Cyc___fwrite_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_throw(_T4);goto _TL37;
+if(_T2)goto _TL36;else{goto _TL38;}_TL38: _T3= & Cyc___fwrite_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_rethrow(_T4);goto _TL37;
 # 432
-_TL36: _T5= size * nmemb;_T6= ptr;_T7= _get_fat_size(_T6,sizeof(char));if(_T5 <= _T7)goto _TL39;_T8= & Cyc___fwrite_failure_2;_T9= (struct Cyc_Core_Failure_exn_struct*)_T8;_throw(_T9);goto _TL3A;_TL39: _TL3A: _TA= ptr;_TB= _untag_fat_ptr_check_bound(_TA,sizeof(char),1U);_TC= (const char*)_TB;_TD= size;_TE= nmemb;_TF= f;_T10= _TF->file;_T11= 
+_TL36: _T5= size * nmemb;_T6= ptr;_T7= _get_fat_size(_T6,sizeof(char));if(_T5 <= _T7)goto _TL39;_T8= & Cyc___fwrite_failure_2;_T9= (struct Cyc_Core_Failure_exn_struct*)_T8;_rethrow(_T9);goto _TL3A;_TL39: _TL3A: _TA= ptr;_TB= _untag_fat_ptr_check_bound(_TA,sizeof(char),1U);_TC= (const char*)_TB;_TD= size;_TE= nmemb;_TF= f;_T10= _TF->file;_T11= 
 _check_null(_T10);_T12= fwrite(_TC,_TD,_TE,_T11);return _T12;_TL37:;}
 # 438
 extern int getc(struct __abstractFILE*);
@@ -350,8 +350,8 @@ static struct Cyc_Core_Failure_exn_struct Cyc___setvbuf_failure_1={Cyc_Core_Fail
 static struct Cyc_Core_Failure_exn_struct Cyc___setvbuf_failure_2={Cyc_Core_Failure,{(unsigned char*)_TmpGB,(unsigned char*)_TmpGB,(unsigned char*)_TmpGB + 29U}};
 # 506
 int Cyc_setvbuf(struct Cyc___cycFILE*f,struct _fat_ptr buf,int type,unsigned long size){struct _fat_ptr _T0;unsigned char*_T1;unsigned _T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc_Core_Failure_exn_struct*_T4;struct _fat_ptr _T5;unsigned char*_T6;unsigned _T7;struct _fat_ptr _T8;unsigned _T9;unsigned long _TA;struct Cyc_Core_Failure_exn_struct*_TB;struct Cyc_Core_Failure_exn_struct*_TC;struct Cyc___cycFILE*_TD;struct __abstractFILE*_TE;struct __abstractFILE*_TF;struct _fat_ptr _T10;unsigned char*_T11;char*_T12;int _T13;unsigned long _T14;int _T15;_T0= buf;_T1= _T0.curr;_T2= (unsigned)_T1;
-if(_T2)goto _TL3D;else{goto _TL3F;}_TL3F: if(type==2)goto _TL3D;_T3= & Cyc___setvbuf_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_throw(_T4);goto _TL3E;_TL3D: _TL3E: _T5= buf;_T6= _T5.curr;_T7= (unsigned)_T6;
-if(!_T7)goto _TL40;_T8= buf;_T9= _get_fat_size(_T8,sizeof(char));_TA= size;if(_T9 >= _TA)goto _TL40;_TB= & Cyc___setvbuf_failure_2;_TC= (struct Cyc_Core_Failure_exn_struct*)_TB;_throw(_TC);goto _TL41;_TL40: _TL41: _TD= f;_TE= _TD->file;_TF= 
+if(_T2)goto _TL3D;else{goto _TL3F;}_TL3F: if(type==2)goto _TL3D;_T3= & Cyc___setvbuf_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_rethrow(_T4);goto _TL3E;_TL3D: _TL3E: _T5= buf;_T6= _T5.curr;_T7= (unsigned)_T6;
+if(!_T7)goto _TL40;_T8= buf;_T9= _get_fat_size(_T8,sizeof(char));_TA= size;if(_T9 >= _TA)goto _TL40;_TB= & Cyc___setvbuf_failure_2;_TC= (struct Cyc_Core_Failure_exn_struct*)_TB;_rethrow(_TC);goto _TL41;_TL40: _TL41: _TD= f;_TE= _TD->file;_TF= 
 _check_null(_TE);_T10= buf;_T11= _untag_fat_ptr_check_bound(_T10,sizeof(char),1U);_T12= (char*)_T11;_T13= type;_T14= size;_T15= setvbuf(_TF,_T12,_T13,_T14);return _T15;}
 # 512
 void Cyc_setbuf(struct Cyc___cycFILE*f,struct _fat_ptr buf){struct Cyc___cycFILE*_T0;struct _fat_ptr _T1;int _T2;struct _fat_ptr _T3;unsigned char*_T4;unsigned _T5;_T0= f;_T1= buf;_T3= buf;_T4= _T3.curr;_T5= (unsigned)_T4;
@@ -377,13 +377,13 @@ struct Cyc___cycFILE*Cyc_file_open(struct _fat_ptr fname,struct _fat_ptr mode){s
 struct Cyc___cycFILE*f=Cyc_fopen(_T3,_T7);
 if(f!=0)goto _TL44;_T9= fname;_TA= 
 _get_fat_size(_T9,sizeof(char));{unsigned _T16=_TA + 1U;_TC= _check_times(_T16,sizeof(char));{char*_T17=_cycalloc_atomic(_TC);{unsigned _T18=_T16;unsigned i;i= 0;_TL49: if(i < _T18)goto _TL47;else{goto _TL48;}_TL47: _TD= i;_TE= fname;_TF= _TE.curr;_T10= (const char*)_TF;_T11= i;_T12= (int)_T11;_T17[_TD]= _T10[_T12];i= i + 1;goto _TL49;_TL48: _T17[_T18]= 0;}_TB= (char*)_T17;}_T8= _tag_fat(_TB,sizeof(char),_T16);}{struct _fat_ptr fn=_T8;{struct Cyc_FileOpenError_exn_struct*_T16=_cycalloc(sizeof(struct Cyc_FileOpenError_exn_struct));_T16->tag= Cyc_FileOpenError;
-_T16->f1= fn;_T13= (struct Cyc_FileOpenError_exn_struct*)_T16;}_T14= (void*)_T13;_throw(_T14);}goto _TL45;_TL44: _TL45: _T15= f;
+_T16->f1= fn;_T13= (struct Cyc_FileOpenError_exn_struct*)_T16;}_T14= (void*)_T13;_rethrow(_T14);}goto _TL45;_TL44: _TL45: _T15= f;
 # 573
 return _T15;}}
 # 576
 struct Cyc_FileCloseError_exn_struct Cyc_FileCloseError_val={Cyc_FileCloseError};
 void Cyc_file_close(struct Cyc___cycFILE*f){int _T0;struct Cyc_FileCloseError_exn_struct*_T1;struct Cyc_FileCloseError_exn_struct*_T2;_T0= 
-Cyc_fclose(f);if(_T0==0)goto _TL4A;_T1= & Cyc_FileCloseError_val;_T2= (struct Cyc_FileCloseError_exn_struct*)_T1;_throw(_T2);goto _TL4B;_TL4A: _TL4B:;}
+Cyc_fclose(f);if(_T0==0)goto _TL4A;_T1= & Cyc_FileCloseError_val;_T2= (struct Cyc_FileCloseError_exn_struct*)_T1;_rethrow(_T2);goto _TL4B;_TL4A: _TL4B:;}
 # 584 "bazel-out/k8-fastbuild/bin/cyclone/library/std/libc/cycstubs.cyc"
 void Cyc_free(struct _fat_ptr ptr){;}
 # 587
@@ -395,8 +395,8 @@ static struct Cyc_Core_Failure_exn_struct Cyc___qsort_failure_2={Cyc_Core_Failur
 # 594
 void Cyc_qsort(struct _fat_ptr tab,unsigned long nmemb,unsigned szmemb,int(*compar)(const void*,const void*)){struct _fat_ptr _T0;unsigned char*_T1;unsigned _T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc_Core_Failure_exn_struct*_T4;struct _fat_ptr _T5;unsigned _T6;unsigned long _T7;struct Cyc_Core_Failure_exn_struct*_T8;struct Cyc_Core_Failure_exn_struct*_T9;struct _fat_ptr _TA;unsigned char*_TB;void*_TC;unsigned long _TD;unsigned _TE;int(*_TF)(const void*,const void*);_T0= tab;_T1= _T0.curr;_T2= (unsigned)_T1;
 # 596
-if(_T2)goto _TL4C;else{goto _TL4E;}_TL4E: _T3= & Cyc___qsort_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_throw(_T4);goto _TL4D;_TL4C: _TL4D: _T5= tab;_T6= 
-_get_fat_size(_T5,sizeof(void));_T7= nmemb;if(_T6 >= _T7)goto _TL4F;_T8= & Cyc___qsort_failure_2;_T9= (struct Cyc_Core_Failure_exn_struct*)_T8;_throw(_T9);goto _TL50;_TL4F: _TL50: _TA= tab;_TB= _untag_fat_ptr_check_bound(_TA,sizeof(void),1U);_TC= (void*)_TB;_TD= nmemb;_TE= szmemb;_TF= compar;
+if(_T2)goto _TL4C;else{goto _TL4E;}_TL4E: _T3= & Cyc___qsort_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_rethrow(_T4);goto _TL4D;_TL4C: _TL4D: _T5= tab;_T6= 
+_get_fat_size(_T5,sizeof(void));_T7= nmemb;if(_T6 >= _T7)goto _TL4F;_T8= & Cyc___qsort_failure_2;_T9= (struct Cyc_Core_Failure_exn_struct*)_T8;_rethrow(_T9);goto _TL50;_TL4F: _TL50: _TA= tab;_TB= _untag_fat_ptr_check_bound(_TA,sizeof(void),1U);_TC= (void*)_TB;_TD= nmemb;_TE= szmemb;_TF= compar;
 qsort(_TC,_TD,_TE,_TF);}
 # 606 "bazel-out/k8-fastbuild/bin/cyclone/library/std/libc/cycstubs.cyc"
 extern char*__stub_mmap(char*,unsigned,int,int,int,long);
@@ -409,7 +409,7 @@ struct _fat_ptr Cyc_mmap(struct _fat_ptr ignored,unsigned long length,int prot,i
 # 616
 if(prot==4)goto _TL53;else{goto _TL55;}_TL55: if(flags & 2)goto _TL56;else{goto _TL54;}_TL56: if(flags & 1)goto _TL53;else{goto _TL54;}_TL54: if(flags & 256)goto _TL53;else{goto _TL51;}
 # 622
-_TL53: _T0= & Cyc___mmap_failure;_T1= (struct Cyc_Core_Failure_exn_struct*)_T0;_throw(_T1);goto _TL52;
+_TL53: _T0= & Cyc___mmap_failure;_T1= (struct Cyc_Core_Failure_exn_struct*)_T0;_rethrow(_T1);goto _TL52;
 _TL51: if(!(flags & 16))goto _TL57;_T2= 
 _tag_fat(0,0,0);return _T2;
 # 626
@@ -468,48 +468,48 @@ struct Cyc_SocketError_exn_struct Cyc_SocketError_val={Cyc_SocketError};
 extern int accept_in(int,const struct Cyc_sockaddr_in*,unsigned*);struct _tuple27{void*f0;void*f1;};
 # 705
 int Cyc_accept(int fd,struct _fat_ptr ap){struct _fat_ptr _T0;unsigned _T1;struct Cyc_SocketError_exn_struct*_T2;struct Cyc_SocketError_exn_struct*_T3;struct _tuple27 _T4;struct _fat_ptr _T5;unsigned char*_T6;void**_T7;void**_T8;struct _fat_ptr _T9;unsigned char*_TA;void**_TB;void*_TC;int*_TD;int _TE;void*_TF;int*_T10;int _T11;void*_T12;void*_T13;int _T14;struct Cyc_SocketError_exn_struct*_T15;struct Cyc_SocketError_exn_struct*_T16;_T0= ap;_T1= 
-_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL6D;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_throw(_T3);goto _TL6E;_TL6D: _TL6E:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
+_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL6D;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_rethrow(_T3);goto _TL6E;_TL6D: _TL6E:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
 _check_null(_T7);_T17.f0= _T8[0];_T9= ap;_TA= _T9.curr;_TB= (void**)_TA;_T17.f1= _TB[1];_T4= _T17;}{struct _tuple27 _T17=_T4;unsigned*_T18;struct Cyc_sockaddr_in*_T19;_TC= _T17.f0;_TD= (int*)_TC;_TE= *_TD;if(_TE!=0)goto _TL6F;_TF= _T17.f1;_T10= (int*)_TF;_T11= *_T10;if(_T11!=1)goto _TL71;_T12= _T17.f0;{struct Cyc_SA_sockaddr_in_SockAddr_struct*_T1A=(struct Cyc_SA_sockaddr_in_SockAddr_struct*)_T12;_T19= _T1A->f1;}_T13= _T17.f1;{struct Cyc_SA_socklenptr_SockAddr_struct*_T1A=(struct Cyc_SA_socklenptr_SockAddr_struct*)_T13;_T18= _T1A->f1;}{struct Cyc_sockaddr_in*x=_T19;unsigned*y=_T18;_T14= 
 # 709
-accept_in(fd,x,y);return _T14;}_TL71: goto _LL3;_TL6F: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_throw(_T16);;}}
+accept_in(fd,x,y);return _T14;}_TL71: goto _LL3;_TL6F: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_rethrow(_T16);;}}
 # 715
 extern int bind_in(int,const struct Cyc_sockaddr_in*,unsigned);
 # 717
 int Cyc_bind(int fd,struct _fat_ptr ap){struct _fat_ptr _T0;unsigned _T1;struct Cyc_SocketError_exn_struct*_T2;struct Cyc_SocketError_exn_struct*_T3;struct _tuple27 _T4;struct _fat_ptr _T5;unsigned char*_T6;void**_T7;void**_T8;struct _fat_ptr _T9;unsigned char*_TA;void**_TB;void*_TC;int*_TD;int _TE;void*_TF;int*_T10;int _T11;void*_T12;void*_T13;int _T14;struct Cyc_SocketError_exn_struct*_T15;struct Cyc_SocketError_exn_struct*_T16;_T0= ap;_T1= 
-_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL73;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_throw(_T3);goto _TL74;_TL73: _TL74:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
+_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL73;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_rethrow(_T3);goto _TL74;_TL73: _TL74:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
 _check_null(_T7);_T17.f0= _T8[0];_T9= ap;_TA= _T9.curr;_TB= (void**)_TA;_T17.f1= _TB[1];_T4= _T17;}{struct _tuple27 _T17=_T4;unsigned _T18;struct Cyc_sockaddr_in*_T19;_TC= _T17.f0;_TD= (int*)_TC;_TE= *_TD;if(_TE!=0)goto _TL75;_TF= _T17.f1;_T10= (int*)_TF;_T11= *_T10;if(_T11!=2)goto _TL77;_T12= _T17.f0;{struct Cyc_SA_sockaddr_in_SockAddr_struct*_T1A=(struct Cyc_SA_sockaddr_in_SockAddr_struct*)_T12;_T19= _T1A->f1;}_T13= _T17.f1;{struct Cyc_SA_socklen_SockAddr_struct*_T1A=(struct Cyc_SA_socklen_SockAddr_struct*)_T13;_T18= _T1A->f1;}{struct Cyc_sockaddr_in*x=_T19;unsigned y=_T18;_T14= 
 # 721
-bind_in(fd,x,y);return _T14;}_TL77: goto _LL3;_TL75: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_throw(_T16);;}}
+bind_in(fd,x,y);return _T14;}_TL77: goto _LL3;_TL75: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_rethrow(_T16);;}}
 # 727
 extern int connect_in(int,const struct Cyc_sockaddr_in*,unsigned);
 # 729
 int Cyc_connect(int fd,struct _fat_ptr ap){struct _fat_ptr _T0;unsigned _T1;struct Cyc_SocketError_exn_struct*_T2;struct Cyc_SocketError_exn_struct*_T3;struct _tuple27 _T4;struct _fat_ptr _T5;unsigned char*_T6;void**_T7;void**_T8;struct _fat_ptr _T9;unsigned char*_TA;void**_TB;void*_TC;int*_TD;int _TE;void*_TF;int*_T10;int _T11;void*_T12;void*_T13;int _T14;struct Cyc_SocketError_exn_struct*_T15;struct Cyc_SocketError_exn_struct*_T16;_T0= ap;_T1= 
-_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL79;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_throw(_T3);goto _TL7A;_TL79: _TL7A:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
+_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL79;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_rethrow(_T3);goto _TL7A;_TL79: _TL7A:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
 _check_null(_T7);_T17.f0= _T8[0];_T9= ap;_TA= _T9.curr;_TB= (void**)_TA;_T17.f1= _TB[1];_T4= _T17;}{struct _tuple27 _T17=_T4;unsigned _T18;struct Cyc_sockaddr_in*_T19;_TC= _T17.f0;_TD= (int*)_TC;_TE= *_TD;if(_TE!=0)goto _TL7B;_TF= _T17.f1;_T10= (int*)_TF;_T11= *_T10;if(_T11!=2)goto _TL7D;_T12= _T17.f0;{struct Cyc_SA_sockaddr_in_SockAddr_struct*_T1A=(struct Cyc_SA_sockaddr_in_SockAddr_struct*)_T12;_T19= _T1A->f1;}_T13= _T17.f1;{struct Cyc_SA_socklen_SockAddr_struct*_T1A=(struct Cyc_SA_socklen_SockAddr_struct*)_T13;_T18= _T1A->f1;}{struct Cyc_sockaddr_in*x=_T19;unsigned y=_T18;_T14= 
 # 733
-connect_in(fd,x,y);return _T14;}_TL7D: goto _LL3;_TL7B: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_throw(_T16);;}}
+connect_in(fd,x,y);return _T14;}_TL7D: goto _LL3;_TL7B: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_rethrow(_T16);;}}
 # 739
 extern int getpeername_in(int,const struct Cyc_sockaddr_in*,unsigned*);
 # 741
 int Cyc_getpeername(int fd,struct _fat_ptr ap){struct _fat_ptr _T0;unsigned _T1;struct Cyc_SocketError_exn_struct*_T2;struct Cyc_SocketError_exn_struct*_T3;struct _tuple27 _T4;struct _fat_ptr _T5;unsigned char*_T6;void**_T7;void**_T8;struct _fat_ptr _T9;unsigned char*_TA;void**_TB;void*_TC;int*_TD;int _TE;void*_TF;int*_T10;int _T11;void*_T12;void*_T13;int _T14;struct Cyc_SocketError_exn_struct*_T15;struct Cyc_SocketError_exn_struct*_T16;_T0= ap;_T1= 
-_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL7F;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_throw(_T3);goto _TL80;_TL7F: _TL80:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
+_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL7F;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_rethrow(_T3);goto _TL80;_TL7F: _TL80:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
 _check_null(_T7);_T17.f0= _T8[0];_T9= ap;_TA= _T9.curr;_TB= (void**)_TA;_T17.f1= _TB[1];_T4= _T17;}{struct _tuple27 _T17=_T4;unsigned*_T18;struct Cyc_sockaddr_in*_T19;_TC= _T17.f0;_TD= (int*)_TC;_TE= *_TD;if(_TE!=0)goto _TL81;_TF= _T17.f1;_T10= (int*)_TF;_T11= *_T10;if(_T11!=1)goto _TL83;_T12= _T17.f0;{struct Cyc_SA_sockaddr_in_SockAddr_struct*_T1A=(struct Cyc_SA_sockaddr_in_SockAddr_struct*)_T12;_T19= _T1A->f1;}_T13= _T17.f1;{struct Cyc_SA_socklenptr_SockAddr_struct*_T1A=(struct Cyc_SA_socklenptr_SockAddr_struct*)_T13;_T18= _T1A->f1;}{struct Cyc_sockaddr_in*x=_T19;unsigned*y=_T18;_T14= 
 # 745
-getpeername_in(fd,x,y);return _T14;}_TL83: goto _LL3;_TL81: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_throw(_T16);;}}
+getpeername_in(fd,x,y);return _T14;}_TL83: goto _LL3;_TL81: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_rethrow(_T16);;}}
 # 751
 extern int getsockname_in(int,const struct Cyc_sockaddr_in*,unsigned*);
 # 753
 int Cyc_getsockname(int fd,struct _fat_ptr ap){struct _fat_ptr _T0;unsigned _T1;struct Cyc_SocketError_exn_struct*_T2;struct Cyc_SocketError_exn_struct*_T3;struct _tuple27 _T4;struct _fat_ptr _T5;unsigned char*_T6;void**_T7;void**_T8;struct _fat_ptr _T9;unsigned char*_TA;void**_TB;void*_TC;int*_TD;int _TE;void*_TF;int*_T10;int _T11;void*_T12;void*_T13;int _T14;struct Cyc_SocketError_exn_struct*_T15;struct Cyc_SocketError_exn_struct*_T16;_T0= ap;_T1= 
-_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL85;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_throw(_T3);goto _TL86;_TL85: _TL86:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
+_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL85;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_rethrow(_T3);goto _TL86;_TL85: _TL86:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
 _check_null(_T7);_T17.f0= _T8[0];_T9= ap;_TA= _T9.curr;_TB= (void**)_TA;_T17.f1= _TB[1];_T4= _T17;}{struct _tuple27 _T17=_T4;unsigned*_T18;struct Cyc_sockaddr_in*_T19;_TC= _T17.f0;_TD= (int*)_TC;_TE= *_TD;if(_TE!=0)goto _TL87;_TF= _T17.f1;_T10= (int*)_TF;_T11= *_T10;if(_T11!=1)goto _TL89;_T12= _T17.f0;{struct Cyc_SA_sockaddr_in_SockAddr_struct*_T1A=(struct Cyc_SA_sockaddr_in_SockAddr_struct*)_T12;_T19= _T1A->f1;}_T13= _T17.f1;{struct Cyc_SA_socklenptr_SockAddr_struct*_T1A=(struct Cyc_SA_socklenptr_SockAddr_struct*)_T13;_T18= _T1A->f1;}{struct Cyc_sockaddr_in*x=_T19;unsigned*y=_T18;_T14= 
 # 757
-getsockname_in(fd,x,y);return _T14;}_TL89: goto _LL3;_TL87: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_throw(_T16);;}}
+getsockname_in(fd,x,y);return _T14;}_TL89: goto _LL3;_TL87: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_rethrow(_T16);;}}
 # 763
 extern int getsockopt_int(int,int,int,int*,unsigned*);
 extern int getsockopt_timeval(int,int,int,struct Cyc_timeval*,unsigned*);
 # 766
 int Cyc_getsockopt(int fd,int level,int optname,struct _fat_ptr ap){struct _fat_ptr _T0;unsigned _T1;struct Cyc_SocketError_exn_struct*_T2;struct Cyc_SocketError_exn_struct*_T3;struct _tuple27 _T4;struct _fat_ptr _T5;unsigned char*_T6;void**_T7;void**_T8;struct _fat_ptr _T9;unsigned char*_TA;void**_TB;void*_TC;int*_TD;unsigned _TE;void*_TF;int*_T10;unsigned _T11;void*_T12;void*_T13;int _T14;void*_T15;void*_T16;int _T17;int _T18;int _T19;int*_T1A;int*_T1B;unsigned*_T1C;int _T1D;void*_T1E;int*_T1F;unsigned _T20;void*_T21;void*_T22;int _T23;void*_T24;void*_T25;int _T26;int _T27;int _T28;struct Cyc_timeval*_T29;int*_T2A;unsigned*_T2B;int _T2C;struct Cyc_SocketError_exn_struct*_T2D;struct Cyc_SocketError_exn_struct*_T2E;_T0= ap;_T1= 
-_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL8B;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_throw(_T3);goto _TL8C;_TL8B: _TL8C:{struct _tuple27 _T2F;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
+_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL8B;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_rethrow(_T3);goto _TL8C;_TL8B: _TL8C:{struct _tuple27 _T2F;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
 _check_null(_T7);_T2F.f0= _T8[0];_T9= ap;_TA= _T9.curr;_TB= (void**)_TA;_T2F.f1= _TB[1];_T4= _T2F;}{struct _tuple27 _T2F=_T4;struct Cyc_timeval*_T30;int*_T31;unsigned*_T32;int*_T33;_TC= _T2F.f0;_TD= (int*)_TC;_TE= *_TD;switch(_TE){case 0: _TF= _T2F.f1;_T10= (int*)_TF;_T11= *_T10;switch(_T11){case 3: _T12= _T2F.f0;{struct Cyc_SO_int_SockOpt_struct*_T34=(struct Cyc_SO_int_SockOpt_struct*)_T12;_T33= _T34->f1;}_T13= _T2F.f1;{struct Cyc_SO_socklenptr_SockOpt_struct*_T34=(struct Cyc_SO_socklenptr_SockOpt_struct*)_T13;_T32= _T34->f1;}{int*x=_T33;unsigned*y=_T32;_T14= 
 # 770
 getsockopt_int(fd,level,optname,x,y);return _T14;}case 0: _T15= _T2F.f0;{struct Cyc_SO_int_SockOpt_struct*_T34=(struct Cyc_SO_int_SockOpt_struct*)_T15;_T33= _T34->f1;}_T16= _T2F.f1;{struct Cyc_SO_int_SockOpt_struct*_T34=(struct Cyc_SO_int_SockOpt_struct*)_T16;_T31= _T34->f1;}{int*x=_T33;int*y=_T31;_T17= fd;_T18= level;_T19= optname;_T1A= x;_T1B= y;_T1C= (unsigned*)_T1B;_T1D= 
@@ -518,7 +518,7 @@ getsockopt_int(_T17,_T18,_T19,_T1A,_T1C);return _T1D;}default: goto _LL9;};case 
 # 774
 getsockopt_timeval(fd,level,optname,x,y);return _T23;}case 0: _T24= _T2F.f0;{struct Cyc_SO_timeval_SockOpt_struct*_T34=(struct Cyc_SO_timeval_SockOpt_struct*)_T24;_T30= _T34->f1;}_T25= _T2F.f1;{struct Cyc_SO_int_SockOpt_struct*_T34=(struct Cyc_SO_int_SockOpt_struct*)_T25;_T33= _T34->f1;}{struct Cyc_timeval*x=_T30;int*y=_T33;_T26= fd;_T27= level;_T28= optname;_T29= x;_T2A= y;_T2B= (unsigned*)_T2A;_T2C= 
 # 776
-getsockopt_timeval(_T26,_T27,_T28,_T29,_T2B);return _T2C;}default: goto _LL9;};default: _LL9: _T2D= & Cyc_SocketError_val;_T2E= (struct Cyc_SocketError_exn_struct*)_T2D;_throw(_T2E);};}}
+getsockopt_timeval(_T26,_T27,_T28,_T29,_T2B);return _T2C;}default: goto _LL9;};default: _LL9: _T2D= & Cyc_SocketError_val;_T2E= (struct Cyc_SocketError_exn_struct*)_T2D;_rethrow(_T2E);};}}
 # 782
 extern long recv_wrapped(int,struct _fat_ptr,unsigned long,int);
 # 786
@@ -529,10 +529,10 @@ extern long recvfrom_in(int,struct _fat_ptr,unsigned long,int,const struct Cyc_s
 # 794
 long Cyc_recvfrom(int fd,struct _fat_ptr buf,unsigned long n,int flags,struct _fat_ptr ap){struct _fat_ptr _T0;unsigned _T1;struct Cyc_SocketError_exn_struct*_T2;struct Cyc_SocketError_exn_struct*_T3;struct _tuple27 _T4;struct _fat_ptr _T5;unsigned char*_T6;void**_T7;void**_T8;struct _fat_ptr _T9;unsigned char*_TA;void**_TB;void*_TC;int*_TD;int _TE;void*_TF;int*_T10;int _T11;void*_T12;void*_T13;long _T14;struct Cyc_SocketError_exn_struct*_T15;struct Cyc_SocketError_exn_struct*_T16;_T0= ap;_T1= 
 # 796
-_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL90;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_throw(_T3);goto _TL91;_TL90: _TL91:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
+_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL90;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_rethrow(_T3);goto _TL91;_TL90: _TL91:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
 _check_null(_T7);_T17.f0= _T8[0];_T9= ap;_TA= _T9.curr;_TB= (void**)_TA;_T17.f1= _TB[1];_T4= _T17;}{struct _tuple27 _T17=_T4;unsigned*_T18;struct Cyc_sockaddr_in*_T19;_TC= _T17.f0;_TD= (int*)_TC;_TE= *_TD;if(_TE!=0)goto _TL92;_TF= _T17.f1;_T10= (int*)_TF;_T11= *_T10;if(_T11!=1)goto _TL94;_T12= _T17.f0;{struct Cyc_SA_sockaddr_in_SockAddr_struct*_T1A=(struct Cyc_SA_sockaddr_in_SockAddr_struct*)_T12;_T19= _T1A->f1;}_T13= _T17.f1;{struct Cyc_SA_socklenptr_SockAddr_struct*_T1A=(struct Cyc_SA_socklenptr_SockAddr_struct*)_T13;_T18= _T1A->f1;}{struct Cyc_sockaddr_in*x=_T19;unsigned*y=_T18;_T14= 
 # 799
-recvfrom_in(fd,buf,n,flags,x,y);return _T14;}_TL94: goto _LL3;_TL92: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_throw(_T16);;}}
+recvfrom_in(fd,buf,n,flags,x,y);return _T14;}_TL94: goto _LL3;_TL92: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_rethrow(_T16);;}}
 # 805
 extern long send_wrapped(int,struct _fat_ptr,unsigned long,int);
 # 807
@@ -543,24 +543,24 @@ extern long sendto_in(int,struct _fat_ptr,unsigned long,int,const struct Cyc_soc
 # 815
 long Cyc_sendto(int fd,struct _fat_ptr buf,unsigned long n,int flags,struct _fat_ptr ap){struct _fat_ptr _T0;unsigned _T1;struct Cyc_SocketError_exn_struct*_T2;struct Cyc_SocketError_exn_struct*_T3;struct _tuple27 _T4;struct _fat_ptr _T5;unsigned char*_T6;void**_T7;void**_T8;struct _fat_ptr _T9;unsigned char*_TA;void**_TB;void*_TC;int*_TD;int _TE;void*_TF;int*_T10;int _T11;void*_T12;void*_T13;long _T14;struct Cyc_SocketError_exn_struct*_T15;struct Cyc_SocketError_exn_struct*_T16;_T0= ap;_T1= 
 # 817
-_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL96;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_throw(_T3);goto _TL97;_TL96: _TL97:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
+_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL96;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_rethrow(_T3);goto _TL97;_TL96: _TL97:{struct _tuple27 _T17;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
 _check_null(_T7);_T17.f0= _T8[0];_T9= ap;_TA= _T9.curr;_TB= (void**)_TA;_T17.f1= _TB[1];_T4= _T17;}{struct _tuple27 _T17=_T4;unsigned _T18;struct Cyc_sockaddr_in*_T19;_TC= _T17.f0;_TD= (int*)_TC;_TE= *_TD;if(_TE!=0)goto _TL98;_TF= _T17.f1;_T10= (int*)_TF;_T11= *_T10;if(_T11!=2)goto _TL9A;_T12= _T17.f0;{struct Cyc_SA_sockaddr_in_SockAddr_struct*_T1A=(struct Cyc_SA_sockaddr_in_SockAddr_struct*)_T12;_T19= _T1A->f1;}_T13= _T17.f1;{struct Cyc_SA_socklen_SockAddr_struct*_T1A=(struct Cyc_SA_socklen_SockAddr_struct*)_T13;_T18= _T1A->f1;}{struct Cyc_sockaddr_in*x=_T19;unsigned y=_T18;_T14= 
 # 820
-sendto_in(fd,buf,n,flags,x,y);return _T14;}_TL9A: goto _LL3;_TL98: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_throw(_T16);;}}
+sendto_in(fd,buf,n,flags,x,y);return _T14;}_TL9A: goto _LL3;_TL98: _LL3: _T15= & Cyc_SocketError_val;_T16= (struct Cyc_SocketError_exn_struct*)_T15;_rethrow(_T16);;}}
 # 826
 extern int setsockopt_int(int,int,int,const int*,unsigned);
 extern int setsockopt_timeval(int,int,int,const struct Cyc_timeval*,unsigned);
 extern int setsockopt_linger(int,int,int,const struct Cyc_linger*,unsigned);
 # 830
 int Cyc_setsockopt(int fd,int level,int optname,struct _fat_ptr ap){struct _fat_ptr _T0;unsigned _T1;struct Cyc_SocketError_exn_struct*_T2;struct Cyc_SocketError_exn_struct*_T3;struct _tuple27 _T4;struct _fat_ptr _T5;unsigned char*_T6;void**_T7;void**_T8;struct _fat_ptr _T9;unsigned char*_TA;void**_TB;void*_TC;int*_TD;unsigned _TE;void*_TF;int*_T10;int _T11;void*_T12;void*_T13;int _T14;void*_T15;int*_T16;int _T17;void*_T18;void*_T19;int _T1A;void*_T1B;int*_T1C;int _T1D;void*_T1E;void*_T1F;int _T20;struct Cyc_SocketError_exn_struct*_T21;struct Cyc_SocketError_exn_struct*_T22;_T0= ap;_T1= 
-_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL9C;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_throw(_T3);goto _TL9D;_TL9C: _TL9D:{struct _tuple27 _T23;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
+_get_fat_size(_T0,sizeof(void*));if(_T1==2U)goto _TL9C;_T2= & Cyc_SocketError_val;_T3= (struct Cyc_SocketError_exn_struct*)_T2;_rethrow(_T3);goto _TL9D;_TL9C: _TL9D:{struct _tuple27 _T23;_T5= ap;_T6= _T5.curr;_T7= (void**)_T6;_T8= 
 _check_null(_T7);_T23.f0= _T8[0];_T9= ap;_TA= _T9.curr;_TB= (void**)_TA;_T23.f1= _TB[1];_T4= _T23;}{struct _tuple27 _T23=_T4;struct Cyc_linger*_T24;struct Cyc_timeval*_T25;unsigned _T26;int*_T27;_TC= _T23.f0;_TD= (int*)_TC;_TE= *_TD;switch(_TE){case 0: _TF= _T23.f1;_T10= (int*)_TF;_T11= *_T10;if(_T11!=4)goto _TL9F;_T12= _T23.f0;{struct Cyc_SO_int_SockOpt_struct*_T28=(struct Cyc_SO_int_SockOpt_struct*)_T12;_T27= _T28->f1;}_T13= _T23.f1;{struct Cyc_SO_socklen_SockOpt_struct*_T28=(struct Cyc_SO_socklen_SockOpt_struct*)_T13;_T26= _T28->f1;}{int*x=_T27;unsigned y=_T26;_T14= 
 # 834
 setsockopt_int(fd,level,optname,x,y);return _T14;}_TL9F: goto _LL7;case 1: _T15= _T23.f1;_T16= (int*)_T15;_T17= *_T16;if(_T17!=4)goto _TLA1;_T18= _T23.f0;{struct Cyc_SO_timeval_SockOpt_struct*_T28=(struct Cyc_SO_timeval_SockOpt_struct*)_T18;_T25= _T28->f1;}_T19= _T23.f1;{struct Cyc_SO_socklen_SockOpt_struct*_T28=(struct Cyc_SO_socklen_SockOpt_struct*)_T19;_T26= _T28->f1;}{struct Cyc_timeval*x=_T25;unsigned y=_T26;_T1A= 
 # 836
 setsockopt_timeval(fd,level,optname,x,y);return _T1A;}_TLA1: goto _LL7;case 2: _T1B= _T23.f1;_T1C= (int*)_T1B;_T1D= *_T1C;if(_T1D!=4)goto _TLA3;_T1E= _T23.f0;{struct Cyc_SO_linger_SockOpt_struct*_T28=(struct Cyc_SO_linger_SockOpt_struct*)_T1E;_T24= _T28->f1;}_T1F= _T23.f1;{struct Cyc_SO_socklen_SockOpt_struct*_T28=(struct Cyc_SO_socklen_SockOpt_struct*)_T1F;_T26= _T28->f1;}{struct Cyc_linger*x=_T24;unsigned y=_T26;_T20= 
 # 838
-setsockopt_linger(fd,level,optname,x,y);return _T20;}_TLA3: goto _LL7;default: _LL7: _T21= & Cyc_SocketError_val;_T22= (struct Cyc_SocketError_exn_struct*)_T21;_throw(_T22);};}}struct Cyc_timezone{int tz_minuteswest;int tz_dsttime;};
+setsockopt_linger(fd,level,optname,x,y);return _T20;}_TLA3: goto _LL7;default: _LL7: _T21= & Cyc_SocketError_val;_T22= (struct Cyc_SocketError_exn_struct*)_T21;_rethrow(_T22);};}}struct Cyc_timezone{int tz_minuteswest;int tz_dsttime;};
 # 847 "bazel-out/k8-fastbuild/bin/cyclone/library/std/libc/cycstubs.cyc"
 extern int gettimeofday(struct Cyc_timeval*,struct Cyc_timezone*);
 # 849
@@ -585,7 +585,7 @@ static struct Cyc_Core_Failure_exn_struct Cyc___strftime_failure={Cyc_Core_Failu
 # 882
 unsigned long Cyc_strftime(struct _fat_ptr s,unsigned long maxsize,struct _fat_ptr fmt,const struct Cyc_tm*t){unsigned long _T0;struct _fat_ptr _T1;unsigned _T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc_Core_Failure_exn_struct*_T4;struct _fat_ptr _T5;unsigned char*_T6;char*_T7;unsigned long _T8;struct _fat_ptr _T9;unsigned char*_TA;const char*_TB;const struct Cyc_tm*_TC;unsigned long _TD;_T0= maxsize;_T1= s;_T2= 
 # 884
-_get_fat_size(_T1,sizeof(char));if(_T0 <= _T2)goto _TLA5;_T3= & Cyc___strftime_failure;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_throw(_T4);goto _TLA6;_TLA5: _TLA6: _T5= s;_T6= _untag_fat_ptr_check_bound(_T5,sizeof(char),1U);_T7= (char*)_T6;_T8= maxsize;_T9= fmt;_TA= _untag_fat_ptr_check_bound(_T9,sizeof(char),1U);_TB= (const char*)_TA;_TC= t;_TD= 
+_get_fat_size(_T1,sizeof(char));if(_T0 <= _T2)goto _TLA5;_T3= & Cyc___strftime_failure;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_rethrow(_T4);goto _TLA6;_TLA5: _TLA6: _T5= s;_T6= _untag_fat_ptr_check_bound(_T5,sizeof(char),1U);_T7= (char*)_T6;_T8= maxsize;_T9= fmt;_TA= _untag_fat_ptr_check_bound(_T9,sizeof(char),1U);_TB= (const char*)_TA;_TC= t;_TD= 
 strftime(_T7,_T8,_TB,_TC);return _TD;}
 # 675 "bazel-out/k8-fastbuild/bin/cyclone/library/std/libc/unistd.h"
 extern int execvp(const char*,const char**);static char _TmpG10[36U]="execlp arg list not NULL-terminated";
@@ -593,7 +593,7 @@ extern int execvp(const char*,const char**);static char _TmpG10[36U]="execlp arg
 static struct Cyc_Core_Failure_exn_struct Cyc___execlp_failure={Cyc_Core_Failure,{(unsigned char*)_TmpG10,(unsigned char*)_TmpG10,(unsigned char*)_TmpG10 + 36U}};
 # 906
 int Cyc_execlp(const char*path,const char*arg0,struct _fat_ptr argv){struct _fat_ptr _T0;struct _fat_ptr _T1;unsigned _T2;unsigned _T3;int _T4;unsigned char*_T5;const char**_T6;const char*_T7;struct Cyc_Core_Failure_exn_struct*_T8;struct Cyc_Core_Failure_exn_struct*_T9;struct _fat_ptr _TA;struct _fat_ptr _TB;unsigned _TC;const char**_TD;struct _RegionHandle*_TE;unsigned _TF;unsigned _T10;struct _fat_ptr _T11;unsigned char*_T12;const char**_T13;unsigned _T14;unsigned char*_T15;const char**_T16;int _T17;unsigned _T18;struct _fat_ptr _T19;unsigned _T1A;unsigned _T1B;struct _fat_ptr _T1C;int _T1D;unsigned char*_T1E;const char**_T1F;struct _fat_ptr _T20;unsigned char*_T21;const char**_T22;int _T23;unsigned _T24;unsigned char*_T25;const char**_T26;const char*_T27;struct _fat_ptr _T28;unsigned char*_T29;const char**_T2A;_T0= argv;_T1= argv;_T2= 
-_get_fat_size(_T1,sizeof(const char*));_T3= _T2 - 1U;_T4= (int)_T3;_T5= _check_fat_subscript(_T0,sizeof(const char*),_T4);_T6= (const char**)_T5;_T7= *_T6;if(_T7==0)goto _TLA7;_T8= & Cyc___execlp_failure;_T9= (struct Cyc_Core_Failure_exn_struct*)_T8;_throw(_T9);goto _TLA8;_TLA7: _TLA8: {struct _RegionHandle _T2B=_new_region(0U,"r2");struct _RegionHandle*r2=& _T2B;_push_region(r2);_TB= argv;_TC= 
+_get_fat_size(_T1,sizeof(const char*));_T3= _T2 - 1U;_T4= (int)_T3;_T5= _check_fat_subscript(_T0,sizeof(const char*),_T4);_T6= (const char**)_T5;_T7= *_T6;if(_T7==0)goto _TLA7;_T8= & Cyc___execlp_failure;_T9= (struct Cyc_Core_Failure_exn_struct*)_T8;_rethrow(_T9);goto _TLA8;_TLA7: _TLA8: {struct _RegionHandle _T2B=_new_region(0U,"r2");struct _RegionHandle*r2=& _T2B;_push_region(r2);_TB= argv;_TC= 
 # 911
 _get_fat_size(_TB,sizeof(const char*));{unsigned _T2C=_TC + 1U;_TE= r2;_TF= _check_times(_T2C,sizeof(const char*));{const char**_T2D=_region_malloc(_TE,0U,_TF);{unsigned _T2E=_T2C;unsigned i;i= 0;_TLAC: if(i < _T2E)goto _TLAA;else{goto _TLAB;}_TLAA: _T10= i;_T2D[_T10]= 0;i= i + 1;goto _TLAC;_TLAB: _T2D[_T2E]= 0;}_TD= (const char**)_T2D;}_TA= _tag_fat(_TD,sizeof(const char*),_T2C);}{
 # 910
@@ -611,7 +611,7 @@ extern char*getcwd(char*,unsigned long);static char _TmpG11[29U]="getcwd: invali
 static struct Cyc_Core_Failure_exn_struct Cyc___getcwd_failure={Cyc_Core_Failure,{(unsigned char*)_TmpG11,(unsigned char*)_TmpG11,(unsigned char*)_TmpG11 + 29U}};
 # 951
 struct _fat_ptr Cyc_getcwd(struct _fat_ptr buf,unsigned long size){struct _fat_ptr _T0;unsigned _T1;unsigned long _T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc_Core_Failure_exn_struct*_T4;struct _fat_ptr _T5;unsigned char*_T6;char*_T7;unsigned long _T8;struct _fat_ptr _T9;char*_TA;unsigned _TB;_T0= buf;_T1= 
-_get_fat_size(_T0,sizeof(char));_T2= size;if(_T1 >= _T2)goto _TLB5;_T3= & Cyc___getcwd_failure;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_throw(_T4);goto _TLB6;_TLB5: _TLB6: _T5= buf;_T6= _untag_fat_ptr_check_bound(_T5,sizeof(char),1U);_T7= (char*)_T6;_T8= size;{
+_get_fat_size(_T0,sizeof(char));_T2= size;if(_T1 >= _T2)goto _TLB5;_T3= & Cyc___getcwd_failure;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_rethrow(_T4);goto _TLB6;_TLB5: _TLB6: _T5= buf;_T6= _untag_fat_ptr_check_bound(_T5,sizeof(char),1U);_T7= (char*)_T6;_T8= size;{
 char*response=getcwd(_T7,_T8);_TA= response;_TB= (unsigned)_TA;
 if(!_TB)goto _TLB7;_T9= buf;goto _TLB8;_TLB7: _T9= _tag_fat(0,0,0);_TLB8: return _T9;}}
 # 958
@@ -622,9 +622,9 @@ static struct Cyc_Core_Failure_exn_struct Cyc___gethostname_failure_1={Cyc_Core_
 static struct Cyc_Core_Failure_exn_struct Cyc___gethostname_failure_2={Cyc_Core_Failure,{(unsigned char*)_TmpG13,(unsigned char*)_TmpG13,(unsigned char*)_TmpG13 + 46U}};
 # 964
 int Cyc_gethostname(struct _fat_ptr buf,unsigned long count){struct _fat_ptr _T0;unsigned char*_T1;unsigned _T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc_Core_Failure_exn_struct*_T4;unsigned long _T5;struct _fat_ptr _T6;unsigned _T7;struct Cyc_Core_Failure_exn_struct*_T8;struct Cyc_Core_Failure_exn_struct*_T9;struct _fat_ptr _TA;unsigned char*_TB;char*_TC;unsigned long _TD;int _TE;_T0= buf;_T1= _T0.curr;_T2= (unsigned)_T1;
-if(_T2)goto _TLB9;else{goto _TLBB;}_TLBB: _T3= & Cyc___gethostname_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_throw(_T4);goto _TLBA;
+if(_T2)goto _TLB9;else{goto _TLBB;}_TLBB: _T3= & Cyc___gethostname_failure_1;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_rethrow(_T4);goto _TLBA;
 # 967
-_TLB9: _T5= count;_T6= buf;_T7= _get_fat_size(_T6,sizeof(char));if(_T5 <= _T7)goto _TLBC;_T8= & Cyc___gethostname_failure_2;_T9= (struct Cyc_Core_Failure_exn_struct*)_T8;_throw(_T9);goto _TLBD;_TLBC: _TLBD: _TA= buf;_TB= _untag_fat_ptr_check_bound(_TA,sizeof(char),1U);_TC= (char*)_TB;_TD= count;_TE= 
+_TLB9: _T5= count;_T6= buf;_T7= _get_fat_size(_T6,sizeof(char));if(_T5 <= _T7)goto _TLBC;_T8= & Cyc___gethostname_failure_2;_T9= (struct Cyc_Core_Failure_exn_struct*)_T8;_rethrow(_T9);goto _TLBD;_TLBC: _TLBD: _TA= buf;_TB= _untag_fat_ptr_check_bound(_TA,sizeof(char),1U);_TC= (char*)_TB;_TD= count;_TE= 
 gethostname(_TC,_TD);return _TE;_TLBA:;}
 # 973
 extern long read(int,char*,unsigned long);static char _TmpG14[39U]="read: called with count > numelts(buf)";
@@ -632,7 +632,7 @@ extern long read(int,char*,unsigned long);static char _TmpG14[39U]="read: called
 static struct Cyc_Core_Failure_exn_struct Cyc___read_failure={Cyc_Core_Failure,{(unsigned char*)_TmpG14,(unsigned char*)_TmpG14,(unsigned char*)_TmpG14 + 39U}};
 # 977
 long Cyc_read(int fd,struct _fat_ptr buf,unsigned long count){unsigned long _T0;struct _fat_ptr _T1;unsigned _T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc_Core_Failure_exn_struct*_T4;int _T5;struct _fat_ptr _T6;unsigned char*_T7;char*_T8;unsigned long _T9;long _TA;_T0= count;_T1= buf;_T2= 
-_get_fat_size(_T1,sizeof(char));if(_T0 <= _T2)goto _TLBE;_T3= & Cyc___read_failure;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_throw(_T4);goto _TLBF;_TLBE: _TLBF: _T5= fd;_T6= buf;_T7= _untag_fat_ptr_check_bound(_T6,sizeof(char),1U);_T8= (char*)_T7;_T9= count;_TA= 
+_get_fat_size(_T1,sizeof(char));if(_T0 <= _T2)goto _TLBE;_T3= & Cyc___read_failure;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_rethrow(_T4);goto _TLBF;_TLBE: _TLBF: _T5= fd;_T6= buf;_T7= _untag_fat_ptr_check_bound(_T6,sizeof(char),1U);_T8= (char*)_T7;_T9= count;_TA= 
 read(_T5,_T8,_T9);return _TA;}
 # 983
 extern long write(int,const char*,unsigned long);static char _TmpG15[40U]="write: called with count > numelts(buf)";
@@ -640,5 +640,5 @@ extern long write(int,const char*,unsigned long);static char _TmpG15[40U]="write
 static struct Cyc_Core_Failure_exn_struct Cyc___write_failure={Cyc_Core_Failure,{(unsigned char*)_TmpG15,(unsigned char*)_TmpG15,(unsigned char*)_TmpG15 + 40U}};
 # 987
 long Cyc_write(int fd,struct _fat_ptr buf,unsigned long count){unsigned long _T0;struct _fat_ptr _T1;unsigned _T2;struct Cyc_Core_Failure_exn_struct*_T3;struct Cyc_Core_Failure_exn_struct*_T4;int _T5;struct _fat_ptr _T6;unsigned char*_T7;unsigned char*_T8;const char*_T9;unsigned long _TA;long _TB;_T0= count;_T1= buf;_T2= 
-_get_fat_size(_T1,sizeof(char));if(_T0 <= _T2)goto _TLC0;_T3= & Cyc___write_failure;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_throw(_T4);goto _TLC1;_TLC0: _TLC1: _T5= fd;_T6= buf;_T7= _untag_fat_ptr_check_bound(_T6,sizeof(char),1U);_T8= _check_null(_T7);_T9= (const char*)_T8;_TA= count;_TB= 
+_get_fat_size(_T1,sizeof(char));if(_T0 <= _T2)goto _TLC0;_T3= & Cyc___write_failure;_T4= (struct Cyc_Core_Failure_exn_struct*)_T3;_rethrow(_T4);goto _TLC1;_TLC0: _TLC1: _T5= fd;_T6= buf;_T7= _untag_fat_ptr_check_bound(_T6,sizeof(char),1U);_T8= _check_null(_T7);_T9= (const char*)_T8;_TA= count;_TB= 
 write(_T5,_T9,_TA);return _TB;}

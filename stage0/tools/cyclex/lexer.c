@@ -40,7 +40,7 @@ int Cyc_Lexer_line_start_pos=0;
 void Cyc_yyerror(struct _fat_ptr s){struct Cyc_String_pa_PrintArg_struct _T0;struct Cyc_Int_pa_PrintArg_struct _T1;int _T2;struct Cyc___cycFILE*_T3;struct _fat_ptr _T4;struct _fat_ptr _T5;struct Cyc_Parser_Parser_error_exn_struct*_T6;void*_T7;{struct Cyc_String_pa_PrintArg_struct _T8;_T8.tag= 0;
 _T8.f1= s;_T0= _T8;}{struct Cyc_String_pa_PrintArg_struct _T8=_T0;{struct Cyc_Int_pa_PrintArg_struct _T9;_T9.tag= 1;_T2= Cyc_Lexer_line_num;_T9.f1= (unsigned long)_T2;_T1= _T9;}{struct Cyc_Int_pa_PrintArg_struct _T9=_T1;void*_TA[2];_TA[0]= & _T8;_TA[1]= & _T9;_T3= Cyc_stderr;_T4= _tag_fat("%s, line:%d",sizeof(char),12U);_T5= _tag_fat(_TA,sizeof(void*),2);Cyc_fprintf(_T3,_T4,_T5);}}
 Cyc_fflush(Cyc_stderr);{struct Cyc_Parser_Parser_error_exn_struct*_T8=_cycalloc(sizeof(struct Cyc_Parser_Parser_error_exn_struct));_T8->tag= Cyc_Parser_Parser_error;
-_T8->f1= s;_T6= (struct Cyc_Parser_Parser_error_exn_struct*)_T8;}_T7= (void*)_T6;_throw(_T7);}char Cyc_Lexer_Lexical_error[14U]="Lexical_error";struct Cyc_Lexer_Lexical_error_exn_struct{char*tag;struct _fat_ptr f1;int f2;int f3;};static char _TmpG0[1U]="";
+_T8->f1= s;_T6= (struct Cyc_Parser_Parser_error_exn_struct*)_T8;}_T7= (void*)_T6;_rethrow(_T7);}char Cyc_Lexer_Lexical_error[14U]="Lexical_error";struct Cyc_Lexer_Lexical_error_exn_struct{char*tag;struct _fat_ptr f1;int f2;int f3;};static char _TmpG0[1U]="";
 # 48
 static struct _fat_ptr Cyc_Lexer_token_string={(unsigned char*)_TmpG0,(unsigned char*)_TmpG0,(unsigned char*)_TmpG0 + 1U};
 static int Cyc_Lexer_token_char=(int)'D';
@@ -93,7 +93,7 @@ static int Cyc_Lexer_handle_lexical_error(int(*fn)(struct Cyc_Lexing_lexbuf*),st
 int line=Cyc_Lexer_line_num;_T0= 
 Cyc_Lexing_lexeme_start(lbuf);_T1= Cyc_Lexer_line_start_pos;{int column=_T0 - _T1;struct _handler_cons _TA;_T2= & _TA;_push_handler(_T2);{int _TB=0;_T3= setjmp(_TA.handler);if(!_T3)goto _TL7;_TB= 1;goto _TL8;_TL7: _TL8: if(_TB)goto _TL9;else{goto _TLB;}_TLB:{int _TC=
 fn(lbuf);_npop_handler(0);return _TC;}_pop_handler();goto _TLA;_TL9: _T4= Cyc_Core_get_exn_thrown();{void*_TC=(void*)_T4;void*_TD;struct _fat_ptr _TE;_T5= (struct Cyc_Lexer_Lexical_error_exn_struct*)_TC;_T6= _T5->tag;_T7= Cyc_Lexer_Lexical_error;if(_T6!=_T7)goto _TLC;{struct Cyc_Lexer_Lexical_error_exn_struct*_TF=(struct Cyc_Lexer_Lexical_error_exn_struct*)_TC;_TE= _TF->f1;}{struct _fat_ptr msg=_TE;{struct Cyc_Lexer_Lexical_error_exn_struct*_TF=_cycalloc(sizeof(struct Cyc_Lexer_Lexical_error_exn_struct));_TF->tag= Cyc_Lexer_Lexical_error;
-_TF->f1= msg;_TF->f2= line;_TF->f3= column;_T8= (struct Cyc_Lexer_Lexical_error_exn_struct*)_TF;}_T9= (void*)_T8;_throw(_T9);}goto _TLD;_TLC: _TD= _TC;{void*exn=_TD;_rethrow(exn);}_TLD:;}_TLA:;}}}
+_TF->f1= msg;_TF->f2= line;_TF->f3= column;_T8= (struct Cyc_Lexer_Lexical_error_exn_struct*)_TF;}_T9= (void*)_T8;_rethrow(_T9);}goto _TLD;_TLC: _TD= _TC;{void*exn=_TD;_rethrow(exn);}_TLD:;}_TLA:;}}}
 # 112
 int Cyc_Lexer_lexmain(struct Cyc_Lexing_lexbuf*);
 int Cyc_Lexer_action(struct Cyc_Lexing_lexbuf*);
@@ -156,7 +156,7 @@ _TL21: _T2A= Cyc_Lexer_lex_default;_T2B= state;state= _T2A[_T2B];_TL22:
  if(state >= 0)goto _TL23;_T2C= lbuf;_T2D= lbuf;
 _T2C->lex_curr_pos= _T2D->lex_last_pos;_T2E= lbuf;_T2F= _T2E->lex_last_action;_T30= - 1;
 if(_T2F!=_T30)goto _TL25;{struct Cyc_Lexing_Error_exn_struct*_T36=_cycalloc(sizeof(struct Cyc_Lexing_Error_exn_struct));_T36->tag= Cyc_Lexing_Error;
-({__typeof__(_tag_fat("empty token",sizeof(char),12U))_T37=_tag_fat("empty token",sizeof(char),12U);_T36->f1= _T37;});_T31= (struct Cyc_Lexing_Error_exn_struct*)_T36;}_T32= (void*)_T31;_throw(_T32);goto _TL26;
+({__typeof__(_tag_fat("empty token",sizeof(char),12U))_T37=_tag_fat("empty token",sizeof(char),12U);_T36->f1= _T37;});_T31= (struct Cyc_Lexing_Error_exn_struct*)_T36;}_T32= (void*)_T31;_rethrow(_T32);goto _TL26;
 # 189
 _TL25: _T33= lbuf;_T34= _T33->lex_last_action;return _T34;_TL26: goto _TL24;
 # 194
@@ -190,7 +190,7 @@ Cyc_Lexing_lexeme_start(lexbuf);_T17= Cyc_Lexer_line_start_pos;{int column=_T16 
  _TL39: _T1A= Cyc_Lexer_strng(lexbuf);if(_T1A)goto _TL3A;else{goto _TL3B;}
 _TL3A: goto _TL39;_TL3B: _pop_handler();goto _TL37;_TL36: _T1B= Cyc_Core_get_exn_thrown();{void*_T38=(void*)_T1B;void*_T39;struct _fat_ptr _T3A;_T1C= (struct Cyc_Lexer_Lexical_error_exn_struct*)_T38;_T1D= _T1C->tag;_T1E= Cyc_Lexer_Lexical_error;if(_T1D!=_T1E)goto _TL3C;{struct Cyc_Lexer_Lexical_error_exn_struct*_T3B=(struct Cyc_Lexer_Lexical_error_exn_struct*)_T38;_T3A= _T3B->f1;}{struct _fat_ptr msg=_T3A;{struct Cyc_Lexer_Lexical_error_exn_struct*_T3B=_cycalloc(sizeof(struct Cyc_Lexer_Lexical_error_exn_struct));_T3B->tag= Cyc_Lexer_Lexical_error;
 # 161
-_T3B->f1= msg;_T3B->f2= line;_T3B->f3= column;_T1F= (struct Cyc_Lexer_Lexical_error_exn_struct*)_T3B;}_T20= (void*)_T1F;_throw(_T20);}goto _TL3D;_TL3C: _T39= _T38;{void*exn=_T39;_rethrow(exn);}_TL3D:;}_TL37:;}}
+_T3B->f1= msg;_T3B->f2= line;_T3B->f3= column;_T1F= (struct Cyc_Lexer_Lexical_error_exn_struct*)_T3B;}_T20= (void*)_T1F;_rethrow(_T20);}goto _TL3D;_TL3C: _T39= _T38;{void*exn=_T39;_rethrow(exn);}_TL3D:;}_TL37:;}}
 Cyc_Lexer_token_string= Cyc_Lexer_get_stored_string();
 return 260;}}case 5: _T21= 
 # 166
@@ -239,11 +239,11 @@ return _T28;case 22:{struct Cyc_Lexer_Lexical_error_exn_struct*_T36=_cycalloc(si
 # 197 "cyclone/tools/cyclex/lexer.cyl"
 ({__typeof__(Cyc_Lexing_lexeme(lexbuf))_T38=Cyc_Lexing_lexeme(lexbuf);_T37.f1= _T38;});_T2B= _T37;}{struct Cyc_String_pa_PrintArg_struct _T37=_T2B;void*_T38[1];_T38[0]= & _T37;_T2C= _tag_fat("illegal character %s",sizeof(char),21U);_T2D= _tag_fat(_T38,sizeof(void*),1);_T2A= Cyc_aprintf(_T2C,_T2D);}_T36->f1= _T2A;
 _T36->f2= Cyc_Lexer_line_num;_T2E= 
-Cyc_Lexing_lexeme_start(lexbuf);_T2F= Cyc_Lexer_line_start_pos;_T36->f3= _T2E - _T2F;_T29= (struct Cyc_Lexer_Lexical_error_exn_struct*)_T36;}_T30= (void*)_T29;_throw(_T30);default: _T31= lexbuf;_T32= _T31->refill_buff;
+Cyc_Lexing_lexeme_start(lexbuf);_T2F= Cyc_Lexer_line_start_pos;_T36->f3= _T2E - _T2F;_T29= (struct Cyc_Lexer_Lexical_error_exn_struct*)_T36;}_T30= (void*)_T29;_rethrow(_T30);default: _T31= lexbuf;_T32= _T31->refill_buff;
 _T32(lexbuf);_T33= 
 Cyc_Lexer_lexmain_rec(lexbuf,lexstate);return _T33;}{struct Cyc_Lexing_Error_exn_struct*_T36=_cycalloc(sizeof(struct Cyc_Lexing_Error_exn_struct));_T36->tag= Cyc_Lexing_Error;
 # 203
-({__typeof__(_tag_fat("some action didn't return!",sizeof(char),27U))_T37=_tag_fat("some action didn't return!",sizeof(char),27U);_T36->f1= _T37;});_T34= (struct Cyc_Lexing_Error_exn_struct*)_T36;}_T35= (void*)_T34;_throw(_T35);}
+({__typeof__(_tag_fat("some action didn't return!",sizeof(char),27U))_T37=_tag_fat("some action didn't return!",sizeof(char),27U);_T36->f1= _T37;});_T34= (struct Cyc_Lexing_Error_exn_struct*)_T36;}_T35= (void*)_T34;_rethrow(_T35);}
 # 205
 int Cyc_Lexer_lexmain(struct Cyc_Lexing_lexbuf*lexbuf){int _T0;_T0= Cyc_Lexer_lexmain_rec(lexbuf,0);return _T0;}
 int Cyc_Lexer_action_rec(struct Cyc_Lexing_lexbuf*lexbuf,int lexstate){int _T0;int _T1;int _T2;int _T3;int _T4;int _T5;int _T6;int _T7;int _T8;int _T9;int _TA;struct Cyc_Lexer_Lexical_error_exn_struct*_TB;void*_TC;int _TD;int _TE;int _TF;struct Cyc_Lexing_lexbuf*_T10;void(*_T11)(struct Cyc_Lexing_lexbuf*);int _T12;struct Cyc_Lexing_Error_exn_struct*_T13;void*_T14;
@@ -271,7 +271,7 @@ Cyc_Lexer_action(lexbuf);return _T9;case 6:
 Cyc_Lexer_comment(lexbuf);_TA= 
 Cyc_Lexer_action(lexbuf);return _TA;case 7:{struct Cyc_Lexer_Lexical_error_exn_struct*_T15=_cycalloc(sizeof(struct Cyc_Lexer_Lexical_error_exn_struct));_T15->tag= Cyc_Lexer_Lexical_error;
 # 222 "cyclone/tools/cyclex/lexer.cyl"
-({__typeof__(_tag_fat("unterminated action",sizeof(char),20U))_T16=_tag_fat("unterminated action",sizeof(char),20U);_T15->f1= _T16;});_T15->f2= 0;_T15->f3= 0;_TB= (struct Cyc_Lexer_Lexical_error_exn_struct*)_T15;}_TC= (void*)_TB;_throw(_TC);case 8:
+({__typeof__(_tag_fat("unterminated action",sizeof(char),20U))_T16=_tag_fat("unterminated action",sizeof(char),20U);_T15->f1= _T16;});_T15->f2= 0;_T15->f3= 0;_TB= (struct Cyc_Lexer_Lexical_error_exn_struct*)_T15;}_TC= (void*)_TB;_rethrow(_TC);case 8:
 # 223 "cyclone/tools/cyclex/lexer.cyl"
  Cyc_Lexer_line_start_pos= Cyc_Lexing_lexeme_end(lexbuf);
 Cyc_Lexer_line_num= Cyc_Lexer_line_num + 1;_TD= 
@@ -283,7 +283,7 @@ Cyc_Lexer_action(lexbuf);return _TF;default: _T10= lexbuf;_T11= _T10->refill_buf
 _T11(lexbuf);_T12= 
 Cyc_Lexer_action_rec(lexbuf,lexstate);return _T12;}{struct Cyc_Lexing_Error_exn_struct*_T15=_cycalloc(sizeof(struct Cyc_Lexing_Error_exn_struct));_T15->tag= Cyc_Lexing_Error;
 # 232
-({__typeof__(_tag_fat("some action didn't return!",sizeof(char),27U))_T16=_tag_fat("some action didn't return!",sizeof(char),27U);_T15->f1= _T16;});_T13= (struct Cyc_Lexing_Error_exn_struct*)_T15;}_T14= (void*)_T13;_throw(_T14);}
+({__typeof__(_tag_fat("some action didn't return!",sizeof(char),27U))_T16=_tag_fat("some action didn't return!",sizeof(char),27U);_T15->f1= _T16;});_T13= (struct Cyc_Lexing_Error_exn_struct*)_T15;}_T14= (void*)_T13;_rethrow(_T14);}
 # 234
 int Cyc_Lexer_action(struct Cyc_Lexing_lexbuf*lexbuf){int _T0;_T0= Cyc_Lexer_action_rec(lexbuf,1);return _T0;}
 int Cyc_Lexer_strng_rec(struct Cyc_Lexing_lexbuf*lexbuf,int lexstate){int _T0;int _T1;char _T2;char _T3;char _T4;struct Cyc_Lexer_Lexical_error_exn_struct*_T5;void*_T6;char _T7;struct Cyc_Lexing_lexbuf*_T8;void(*_T9)(struct Cyc_Lexing_lexbuf*);int _TA;struct Cyc_Lexing_Error_exn_struct*_TB;void*_TC;
@@ -301,7 +301,7 @@ return 1;case 3: _T4=
 Cyc_Lexer_char_for_octal_code(lexbuf,1);Cyc_Lexer_store_string_char(_T4);
 return 1;case 4:{struct Cyc_Lexer_Lexical_error_exn_struct*_TD=_cycalloc(sizeof(struct Cyc_Lexer_Lexical_error_exn_struct));_TD->tag= Cyc_Lexer_Lexical_error;
 # 244
-({__typeof__(_tag_fat("unterminated string",sizeof(char),20U))_TE=_tag_fat("unterminated string",sizeof(char),20U);_TD->f1= _TE;});_TD->f2= 0;_TD->f3= 0;_T5= (struct Cyc_Lexer_Lexical_error_exn_struct*)_TD;}_T6= (void*)_T5;_throw(_T6);case 5:
+({__typeof__(_tag_fat("unterminated string",sizeof(char),20U))_TE=_tag_fat("unterminated string",sizeof(char),20U);_TD->f1= _TE;});_TD->f2= 0;_TD->f3= 0;_T5= (struct Cyc_Lexer_Lexical_error_exn_struct*)_TD;}_T6= (void*)_T5;_rethrow(_T6);case 5:
 # 246
  Cyc_Lexer_store_string_char('\n');
 Cyc_Lexer_line_start_pos= Cyc_Lexing_lexeme_end(lexbuf);
@@ -312,7 +312,7 @@ Cyc_Lexing_lexeme_char(lexbuf,0);Cyc_Lexer_store_string_char(_T7);return 1;defau
 _T9(lexbuf);_TA= 
 Cyc_Lexer_strng_rec(lexbuf,lexstate);return _TA;}{struct Cyc_Lexing_Error_exn_struct*_TD=_cycalloc(sizeof(struct Cyc_Lexing_Error_exn_struct));_TD->tag= Cyc_Lexing_Error;
 # 255
-({__typeof__(_tag_fat("some action didn't return!",sizeof(char),27U))_TE=_tag_fat("some action didn't return!",sizeof(char),27U);_TD->f1= _TE;});_TB= (struct Cyc_Lexing_Error_exn_struct*)_TD;}_TC= (void*)_TB;_throw(_TC);}
+({__typeof__(_tag_fat("some action didn't return!",sizeof(char),27U))_TE=_tag_fat("some action didn't return!",sizeof(char),27U);_TD->f1= _TE;});_TB= (struct Cyc_Lexing_Error_exn_struct*)_TD;}_TC= (void*)_TB;_rethrow(_TC);}
 # 257
 int Cyc_Lexer_strng(struct Cyc_Lexing_lexbuf*lexbuf){int _T0;_T0= Cyc_Lexer_strng_rec(lexbuf,2);return _T0;}
 int Cyc_Lexer_comment_rec(struct Cyc_Lexing_lexbuf*lexbuf,int lexstate){int _T0;int _T1;int _T2;int _T3;int _T4;int _T5;int _T6;int _T7;int _T8;int _T9;struct Cyc_Lexer_Lexical_error_exn_struct*_TA;void*_TB;int _TC;int _TD;struct Cyc_Lexing_lexbuf*_TE;void(*_TF)(struct Cyc_Lexing_lexbuf*);int _T10;struct Cyc_Lexing_Error_exn_struct*_T11;void*_T12;
@@ -336,7 +336,7 @@ Cyc_Lexer_comment(lexbuf);return _T8;case 6: _T9=
 # 265 "cyclone/tools/cyclex/lexer.cyl"
 Cyc_Lexer_comment(lexbuf);return _T9;case 7:{struct Cyc_Lexer_Lexical_error_exn_struct*_T13=_cycalloc(sizeof(struct Cyc_Lexer_Lexical_error_exn_struct));_T13->tag= Cyc_Lexer_Lexical_error;
 # 266 "cyclone/tools/cyclex/lexer.cyl"
-({__typeof__(_tag_fat("unterminated comment",sizeof(char),21U))_T14=_tag_fat("unterminated comment",sizeof(char),21U);_T13->f1= _T14;});_T13->f2= 0;_T13->f3= 0;_TA= (struct Cyc_Lexer_Lexical_error_exn_struct*)_T13;}_TB= (void*)_TA;_throw(_TB);case 8:
+({__typeof__(_tag_fat("unterminated comment",sizeof(char),21U))_T14=_tag_fat("unterminated comment",sizeof(char),21U);_T13->f1= _T14;});_T13->f2= 0;_T13->f3= 0;_TA= (struct Cyc_Lexer_Lexical_error_exn_struct*)_T13;}_TB= (void*)_TA;_rethrow(_TB);case 8:
 # 267 "cyclone/tools/cyclex/lexer.cyl"
  Cyc_Lexer_line_start_pos= Cyc_Lexing_lexeme_end(lexbuf);
 Cyc_Lexer_line_num= Cyc_Lexer_line_num + 1;_TC= 
@@ -346,6 +346,6 @@ Cyc_Lexer_comment(lexbuf);return _TD;default: _TE= lexbuf;_TF= _TE->refill_buff;
 _TF(lexbuf);_T10= 
 Cyc_Lexer_comment_rec(lexbuf,lexstate);return _T10;}{struct Cyc_Lexing_Error_exn_struct*_T13=_cycalloc(sizeof(struct Cyc_Lexing_Error_exn_struct));_T13->tag= Cyc_Lexing_Error;
 # 275
-({__typeof__(_tag_fat("some action didn't return!",sizeof(char),27U))_T14=_tag_fat("some action didn't return!",sizeof(char),27U);_T13->f1= _T14;});_T11= (struct Cyc_Lexing_Error_exn_struct*)_T13;}_T12= (void*)_T11;_throw(_T12);}
+({__typeof__(_tag_fat("some action didn't return!",sizeof(char),27U))_T14=_tag_fat("some action didn't return!",sizeof(char),27U);_T13->f1= _T14;});_T11= (struct Cyc_Lexing_Error_exn_struct*)_T13;}_T12= (void*)_T11;_rethrow(_T12);}
 # 277
 int Cyc_Lexer_comment(struct Cyc_Lexing_lexbuf*lexbuf){int _T0;_T0= Cyc_Lexer_comment_rec(lexbuf,3);return _T0;}

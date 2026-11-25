@@ -56,7 +56,7 @@ t= _T6->left;goto _TLB;
 _TLA: if(i <= 0)goto _TLC;_T7= t;
 t= _T7->right;goto _TLD;
 # 87
-_TLC: _T8= t;_T9= _T8->key_val;_TA= _T9.f1;return _TA;_TLD: _TLB:;}goto _TL7;_TL9: _TB= & Cyc_Dict_Absent_val;_TC= (struct Cyc_Dict_Absent_exn_struct*)_TB;_throw(_TC);}}}
+_TLC: _T8= t;_T9= _T8->key_val;_TA= _T9.f1;return _TA;_TLD: _TLB:;}goto _TL7;_TL9: _TB= & Cyc_Dict_Absent_val;_TC= (struct Cyc_Dict_Absent_exn_struct*)_TB;_rethrow(_TC);}}}
 # 92
 void*Cyc_Dict_lookup_other(struct Cyc_Dict_Dict d,int(*cmp)(void*,void*),void*key){struct Cyc_Dict_Dict _T0;void*_T1;const struct Cyc_Dict_T*_T2;struct _tuple0 _T3;void*_T4;const struct Cyc_Dict_T*_T5;const struct Cyc_Dict_T*_T6;const struct Cyc_Dict_T*_T7;struct _tuple0 _T8;void*_T9;struct Cyc_Dict_Absent_exn_struct*_TA;struct Cyc_Dict_Absent_exn_struct*_TB;_T0= d;{
 const struct Cyc_Dict_T*t=_T0.t;
@@ -67,7 +67,7 @@ t= _T5->left;goto _TL12;
 _TL11: if(i <= 0)goto _TL13;_T6= t;
 t= _T6->right;goto _TL14;
 # 101
-_TL13: _T7= t;_T8= _T7->key_val;_T9= _T8.f1;return _T9;_TL14: _TL12:;}goto _TLE;_TL10: _TA= & Cyc_Dict_Absent_val;_TB= (struct Cyc_Dict_Absent_exn_struct*)_TA;_throw(_TB);}}
+_TL13: _T7= t;_T8= _T7->key_val;_T9= _T8.f1;return _T9;_TL14: _TL12:;}goto _TLE;_TL10: _TA= & Cyc_Dict_Absent_val;_TB= (struct Cyc_Dict_Absent_exn_struct*)_TA;_rethrow(_TB);}}
 # 106
 void**Cyc_Dict_lookup_opt(struct Cyc_Dict_Dict d,void*key){struct Cyc_Dict_Dict _T0;struct Cyc_Dict_Dict _T1;void*_T2;const struct Cyc_Dict_T*_T3;struct _tuple0 _T4;void*_T5;const struct Cyc_Dict_T*_T6;const struct Cyc_Dict_T*_T7;const struct Cyc_Dict_T*_T8;void**_T9;_T0= d;{
 int(*rel)(void*,void*)=_T0.rel;_T1= d;{
@@ -122,7 +122,7 @@ _T7->color= 1U;{struct Cyc_Dict_Dict _TB;_T9= d;
 _TB.rel= _T9.rel;_TA= d;_TB.r= _TA.r;_TB.t= ans;_T8= _TB;}return _T8;}}
 # 177
 struct Cyc_Dict_Dict Cyc_Dict_insert_new(struct Cyc_Dict_Dict d,void*key,void*data){long _T0;struct Cyc_Dict_Absent_exn_struct*_T1;struct Cyc_Dict_Absent_exn_struct*_T2;struct Cyc_Dict_Dict _T3;_T0= 
-Cyc_Dict_member(d,key);if(!_T0)goto _TL9B;_T1= & Cyc_Dict_Absent_val;_T2= (struct Cyc_Dict_Absent_exn_struct*)_T1;_throw(_T2);goto _TL9C;_TL9B: _TL9C: _T3= 
+Cyc_Dict_member(d,key);if(!_T0)goto _TL9B;_T1= & Cyc_Dict_Absent_val;_T2= (struct Cyc_Dict_Absent_exn_struct*)_T1;_rethrow(_T2);goto _TL9C;_TL9B: _TL9C: _T3= 
 # 180
 Cyc_Dict_insert(d,key,data);return _T3;}
 # 183
@@ -300,7 +300,7 @@ struct Cyc_Dict_Dict Cyc_Dict_map_c(void*(*f)(void*,void*),void*env,struct Cyc_D
 Cyc_Dict_rmap_c(_T0,_T1,_T2,_T3);return _T4;}
 # 381
 struct _tuple0*Cyc_Dict_rchoose(struct _RegionHandle*r,struct Cyc_Dict_Dict d){struct Cyc_Dict_Dict _T0;const struct Cyc_Dict_T*_T1;struct Cyc_Dict_Absent_exn_struct*_T2;struct Cyc_Dict_Absent_exn_struct*_T3;struct _tuple0*_T4;struct _RegionHandle*_T5;struct Cyc_Dict_Dict _T6;const struct Cyc_Dict_T*_T7;struct _tuple0 _T8;struct Cyc_Dict_Dict _T9;const struct Cyc_Dict_T*_TA;struct _tuple0 _TB;_T0= d;_T1= _T0.t;
-if(_T1!=0)goto _TLD3;_T2= & Cyc_Dict_Absent_val;_T3= (struct Cyc_Dict_Absent_exn_struct*)_T2;_throw(_T3);goto _TLD4;_TLD3: _TLD4: _T5= r;{struct _tuple0*_TC=_region_malloc(_T5,0U,sizeof(struct _tuple0));_T6= d;_T7= _T6.t;_T8= _T7->key_val;
+if(_T1!=0)goto _TLD3;_T2= & Cyc_Dict_Absent_val;_T3= (struct Cyc_Dict_Absent_exn_struct*)_T2;_rethrow(_T3);goto _TLD4;_TLD3: _TLD4: _T5= r;{struct _tuple0*_TC=_region_malloc(_T5,0U,sizeof(struct _tuple0));_T6= d;_T7= _T6.t;_T8= _T7->key_val;
 # 384
 _TC->f0= _T8.f0;_T9= d;_TA= _T9.t;_TB= _TA->key_val;_TC->f1= _TB.f1;_T4= (struct _tuple0*)_TC;}return _T4;}
 # 387
@@ -484,7 +484,7 @@ void*Cyc_Dict_marshal(struct _RegionHandle*rgn,void*env,void*(*write_key)(void*,
 struct Cyc_List_List*dict_list=Cyc_Dict_rto_list(rgn,dict);
 int len=Cyc_List_length(dict_list);{struct Cyc_Core_Failure_exn_struct*_T12=_cycalloc(sizeof(struct Cyc_Core_Failure_exn_struct));_T12->tag= Cyc_Core_Failure;
 # 604
-({__typeof__(_tag_fat("Dict::marshal: Write failure",sizeof(char),29U))_T13=_tag_fat("Dict::marshal: Write failure",sizeof(char),29U);_T12->f1= _T13;});_T0= (struct Cyc_Core_Failure_exn_struct*)_T12;}_T1= (void*)_T0;_throw(_T1);
+({__typeof__(_tag_fat("Dict::marshal: Write failure",sizeof(char),29U))_T13=_tag_fat("Dict::marshal: Write failure",sizeof(char),29U);_T12->f1= _T13;});_T0= (struct Cyc_Core_Failure_exn_struct*)_T12;}_T1= (void*)_T0;_rethrow(_T1);
 # 606
 _TL11B: if(dict_list!=0)goto _TL11C;else{goto _TL11D;}
 _TL11C: _T3= write_key;{void*(*_T12)(void*,struct Cyc___cycFILE*,struct _tuple0*)=(void*(*)(void*,struct Cyc___cycFILE*,struct _tuple0*))_T3;_T2= _T12;}_T4= env;_T5= fp;_T6= dict_list;_T7= _T6->hd;_T8= (struct _tuple0*)_T7;env= _T2(_T4,_T5,_T8);_TA= write_val;{
@@ -498,7 +498,7 @@ struct Cyc_Dict_Dict Cyc_Dict_unmarshal(struct _RegionHandle*rgn,void*env,int(*c
 struct Cyc_Dict_Dict dict=Cyc_Dict_empty(_T0);
 int len=Cyc_getw(fp);_T1= len;_T2= - 1;
 if(_T1!=_T2)goto _TL11E;{struct Cyc_Core_Failure_exn_struct*_T6=_cycalloc(sizeof(struct Cyc_Core_Failure_exn_struct));_T6->tag= Cyc_Core_Failure;
-({__typeof__(_tag_fat("Dict::unmarshal: list length is -1",sizeof(char),35U))_T7=_tag_fat("Dict::unmarshal: list length is -1",sizeof(char),35U);_T6->f1= _T7;});_T3= (struct Cyc_Core_Failure_exn_struct*)_T6;}_T4= (void*)_T3;_throw(_T4);goto _TL11F;_TL11E: _TL11F:{
+({__typeof__(_tag_fat("Dict::unmarshal: list length is -1",sizeof(char),35U))_T7=_tag_fat("Dict::unmarshal: list length is -1",sizeof(char),35U);_T6->f1= _T7;});_T3= (struct Cyc_Core_Failure_exn_struct*)_T6;}_T4= (void*)_T3;_rethrow(_T4);goto _TL11F;_TL11E: _TL11F:{
 int i=0;_TL123: if(i < len)goto _TL121;else{goto _TL122;}
 _TL121:{void*key=read_key(env,fp);
 void*val=read_val(env,fp);

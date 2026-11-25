@@ -11,12 +11,12 @@ int Cyc_Xarray_length(struct Cyc_Xarray_Xarray*xarr){struct Cyc_Xarray_Xarray*_T
 # 27
 void*Cyc_Xarray_get(struct Cyc_Xarray_Xarray*xarr,int i){int _T0;struct Cyc_Xarray_Xarray*_T1;int _T2;struct Cyc_Core_Invalid_argument_exn_struct*_T3;void*_T4;struct Cyc_Xarray_Xarray*_T5;struct _fat_ptr _T6;int _T7;unsigned char*_T8;void**_T9;void*_TA;
 if(i < 0)goto _TL2;else{goto _TL3;}_TL3: _T0= i;_T1= xarr;_T2= _T1->num_elmts;if(_T0 >= _T2)goto _TL2;else{goto _TL0;}
-_TL2:{struct Cyc_Core_Invalid_argument_exn_struct*_TB=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_TB->tag= Cyc_Core_Invalid_argument;({__typeof__(_tag_fat("Xarray::get: bad index",sizeof(char),23U))_TC=_tag_fat("Xarray::get: bad index",sizeof(char),23U);_TB->f1= _TC;});_T3= (struct Cyc_Core_Invalid_argument_exn_struct*)_TB;}_T4= (void*)_T3;_throw(_T4);goto _TL1;_TL0: _TL1: _T5= xarr;_T6= _T5->elmts;_T7= i;_T8= _check_fat_subscript(_T6,sizeof(void*),_T7);_T9= (void**)_T8;_TA= *_T9;
+_TL2:{struct Cyc_Core_Invalid_argument_exn_struct*_TB=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_TB->tag= Cyc_Core_Invalid_argument;({__typeof__(_tag_fat("Xarray::get: bad index",sizeof(char),23U))_TC=_tag_fat("Xarray::get: bad index",sizeof(char),23U);_TB->f1= _TC;});_T3= (struct Cyc_Core_Invalid_argument_exn_struct*)_TB;}_T4= (void*)_T3;_rethrow(_T4);goto _TL1;_TL0: _TL1: _T5= xarr;_T6= _T5->elmts;_T7= i;_T8= _check_fat_subscript(_T6,sizeof(void*),_T7);_T9= (void**)_T8;_TA= *_T9;
 return _TA;}
 # 33
 void Cyc_Xarray_set(struct Cyc_Xarray_Xarray*xarr,int i,void*a){int _T0;struct Cyc_Xarray_Xarray*_T1;int _T2;struct Cyc_Core_Invalid_argument_exn_struct*_T3;void*_T4;struct Cyc_Xarray_Xarray*_T5;struct _fat_ptr _T6;int _T7;unsigned char*_T8;void**_T9;
 if(i < 0)goto _TL6;else{goto _TL7;}_TL7: _T0= i;_T1= xarr;_T2= _T1->num_elmts;if(_T0 >= _T2)goto _TL6;else{goto _TL4;}
-_TL6:{struct Cyc_Core_Invalid_argument_exn_struct*_TA=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_TA->tag= Cyc_Core_Invalid_argument;({__typeof__(_tag_fat("Xarray::set: bad index",sizeof(char),23U))_TB=_tag_fat("Xarray::set: bad index",sizeof(char),23U);_TA->f1= _TB;});_T3= (struct Cyc_Core_Invalid_argument_exn_struct*)_TA;}_T4= (void*)_T3;_throw(_T4);goto _TL5;_TL4: _TL5: _T5= xarr;_T6= _T5->elmts;_T7= i;_T8= _check_fat_subscript(_T6,sizeof(void*),_T7);_T9= (void**)_T8;
+_TL6:{struct Cyc_Core_Invalid_argument_exn_struct*_TA=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_TA->tag= Cyc_Core_Invalid_argument;({__typeof__(_tag_fat("Xarray::set: bad index",sizeof(char),23U))_TB=_tag_fat("Xarray::set: bad index",sizeof(char),23U);_TA->f1= _TB;});_T3= (struct Cyc_Core_Invalid_argument_exn_struct*)_TA;}_T4= (void*)_T3;_rethrow(_T4);goto _TL5;_TL4: _TL5: _T5= xarr;_T6= _T5->elmts;_T7= i;_T8= _check_fat_subscript(_T6,sizeof(void*),_T7);_T9= (void**)_T8;
 *_T9= a;}
 # 39
 struct Cyc_Xarray_Xarray*Cyc_Xarray_rcreate_empty(struct _RegionHandle*r){struct Cyc_Xarray_Xarray*_T0;struct _RegionHandle*_T1;
@@ -27,14 +27,14 @@ struct Cyc_Xarray_Xarray*Cyc_Xarray_create_empty (void){struct Cyc_Xarray_Xarray
 # 46
 struct Cyc_Xarray_Xarray*Cyc_Xarray_rcreate(struct _RegionHandle*r,int len,void*a){struct Cyc_Core_Invalid_argument_exn_struct*_T0;void*_T1;struct Cyc_Xarray_Xarray*_T2;struct _RegionHandle*_T3;struct _fat_ptr _T4;int _T5;void**_T6;unsigned _T7;unsigned _T8;unsigned _T9;
 if(len >= 0)goto _TL8;{struct Cyc_Core_Invalid_argument_exn_struct*_TA=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_TA->tag= Cyc_Core_Invalid_argument;
-({__typeof__(_tag_fat("xarrays must have a non-negative size buffer",sizeof(char),45U))_TB=_tag_fat("xarrays must have a non-negative size buffer",sizeof(char),45U);_TA->f1= _TB;});_T0= (struct Cyc_Core_Invalid_argument_exn_struct*)_TA;}_T1= (void*)_T0;_throw(_T1);goto _TL9;_TL8: _TL9: _T3= r;{struct Cyc_Xarray_Xarray*_TA=_region_malloc(_T3,0U,sizeof(struct Cyc_Xarray_Xarray));_T5= len;{unsigned _TB=(unsigned)_T5;_T7= Cyc_Core_unique_qual;_T8= _check_times(_TB,sizeof(void*));{void**_TC=_aqual_malloc(_T7,_T8);{unsigned _TD=_TB;unsigned i;i= 0;_TLD: if(i < _TD)goto _TLB;else{goto _TLC;}_TLB: _T9= i;
+({__typeof__(_tag_fat("xarrays must have a non-negative size buffer",sizeof(char),45U))_TB=_tag_fat("xarrays must have a non-negative size buffer",sizeof(char),45U);_TA->f1= _TB;});_T0= (struct Cyc_Core_Invalid_argument_exn_struct*)_TA;}_T1= (void*)_T0;_rethrow(_T1);goto _TL9;_TL8: _TL9: _T3= r;{struct Cyc_Xarray_Xarray*_TA=_region_malloc(_T3,0U,sizeof(struct Cyc_Xarray_Xarray));_T5= len;{unsigned _TB=(unsigned)_T5;_T7= Cyc_Core_unique_qual;_T8= _check_times(_TB,sizeof(void*));{void**_TC=_aqual_malloc(_T7,_T8);{unsigned _TD=_TB;unsigned i;i= 0;_TLD: if(i < _TD)goto _TLB;else{goto _TLC;}_TLB: _T9= i;
 _TC[_T9]= a;i= i + 1;goto _TLD;_TLC:;}_T6= (void**)_TC;}_T4= _tag_fat(_T6,sizeof(void*),_TB);}_TA->elmts= _T4;_TA->num_elmts= 0;_T2= (struct Cyc_Xarray_Xarray*)_TA;}return _T2;}
 # 52
 struct Cyc_Xarray_Xarray*Cyc_Xarray_create(int len,void*a){struct Cyc_Xarray_Xarray*_T0;_T0= Cyc_Xarray_rcreate(Cyc_Core_heap_region,len,a);return _T0;}
 # 54
 struct Cyc_Xarray_Xarray*Cyc_Xarray_rsingleton(struct _RegionHandle*r,int len,void*a){struct Cyc_Core_Invalid_argument_exn_struct*_T0;void*_T1;struct Cyc_Xarray_Xarray*_T2;struct Cyc_Xarray_Xarray*_T3;
 if(len >= 1)goto _TLE;{struct Cyc_Core_Invalid_argument_exn_struct*_T4=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_T4->tag= Cyc_Core_Invalid_argument;
-({__typeof__(_tag_fat("singleton xarray must have size >=1",sizeof(char),36U))_T5=_tag_fat("singleton xarray must have size >=1",sizeof(char),36U);_T4->f1= _T5;});_T0= (struct Cyc_Core_Invalid_argument_exn_struct*)_T4;}_T1= (void*)_T0;_throw(_T1);goto _TLF;_TLE: _TLF: {
+({__typeof__(_tag_fat("singleton xarray must have size >=1",sizeof(char),36U))_T5=_tag_fat("singleton xarray must have size >=1",sizeof(char),36U);_T4->f1= _T5;});_T0= (struct Cyc_Core_Invalid_argument_exn_struct*)_T4;}_T1= (void*)_T0;_rethrow(_T1);goto _TLF;_TLE: _TLF: {
 struct Cyc_Xarray_Xarray*x=Cyc_Xarray_rcreate(r,len,a);_T2= x;
 _T2->num_elmts= 1;_T3= x;
 return _T3;}}
@@ -170,12 +170,12 @@ void(*_T8)(void**)=(void(*)(void**))_T4;_T3= _T8;}_T5= newarr;_T6= _untag_fat_pt
 # 184
 void Cyc_Xarray_delete(struct Cyc_Xarray_Xarray*xarr,int num){int _T0;int _T1;struct Cyc_Core_Invalid_argument_exn_struct*_T2;void*_T3;struct Cyc_Xarray_Xarray*_T4;int _T5;_T0= num;_T1= 
 Cyc_Xarray_length(xarr);if(_T0 <= _T1)goto _TL60;{struct Cyc_Core_Invalid_argument_exn_struct*_T6=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_T6->tag= Cyc_Core_Invalid_argument;
-({__typeof__(_tag_fat("number deleted is greater than length of xarray",sizeof(char),48U))_T7=_tag_fat("number deleted is greater than length of xarray",sizeof(char),48U);_T6->f1= _T7;});_T2= (struct Cyc_Core_Invalid_argument_exn_struct*)_T6;}_T3= (void*)_T2;_throw(_T3);goto _TL61;_TL60: _TL61: _T4= xarr;_T5= num;
+({__typeof__(_tag_fat("number deleted is greater than length of xarray",sizeof(char),48U))_T7=_tag_fat("number deleted is greater than length of xarray",sizeof(char),48U);_T6->f1= _T7;});_T2= (struct Cyc_Core_Invalid_argument_exn_struct*)_T6;}_T3= (void*)_T2;_rethrow(_T3);goto _TL61;_TL60: _TL61: _T4= xarr;_T5= num;
 _T4->num_elmts= _T4->num_elmts - _T5;}
 # 190
 void Cyc_Xarray_remove(struct Cyc_Xarray_Xarray*xarr,int i){int _T0;struct Cyc_Xarray_Xarray*_T1;int _T2;int _T3;struct Cyc_Core_Invalid_argument_exn_struct*_T4;void*_T5;int _T6;struct Cyc_Xarray_Xarray*_T7;int _T8;int _T9;struct Cyc_Xarray_Xarray*_TA;struct _fat_ptr _TB;int _TC;unsigned char*_TD;void**_TE;struct Cyc_Xarray_Xarray*_TF;struct _fat_ptr _T10;int _T11;unsigned char*_T12;void**_T13;struct Cyc_Xarray_Xarray*_T14;
 if(i < 0)goto _TL64;else{goto _TL65;}_TL65: _T0= i;_T1= xarr;_T2= _T1->num_elmts;_T3= _T2 - 1;if(_T0 > _T3)goto _TL64;else{goto _TL62;}
-_TL64:{struct Cyc_Core_Invalid_argument_exn_struct*_T15=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_T15->tag= Cyc_Core_Invalid_argument;({__typeof__(_tag_fat("xarray index out of bounds",sizeof(char),27U))_T16=_tag_fat("xarray index out of bounds",sizeof(char),27U);_T15->f1= _T16;});_T4= (struct Cyc_Core_Invalid_argument_exn_struct*)_T15;}_T5= (void*)_T4;_throw(_T5);goto _TL63;_TL62: _TL63:{
+_TL64:{struct Cyc_Core_Invalid_argument_exn_struct*_T15=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_T15->tag= Cyc_Core_Invalid_argument;({__typeof__(_tag_fat("xarray index out of bounds",sizeof(char),27U))_T16=_tag_fat("xarray index out of bounds",sizeof(char),27U);_T15->f1= _T16;});_T4= (struct Cyc_Core_Invalid_argument_exn_struct*)_T15;}_T5= (void*)_T4;_rethrow(_T5);goto _TL63;_TL62: _TL63:{
 int j=i;_TL69: _T6= j;_T7= xarr;_T8= _T7->num_elmts;_T9= _T8 - 1;if(_T6 < _T9)goto _TL67;else{goto _TL68;}
 _TL67: _TA= xarr;_TB= _TA->elmts;_TC= j;_TD= _check_fat_subscript(_TB,sizeof(void*),_TC);_TE= (void**)_TD;_TF= xarr;_T10= _TF->elmts;_T11= j + 1;_T12= _check_fat_subscript(_T10,sizeof(void*),_T11);_T13= (void**)_T12;*_TE= *_T13;
 # 193

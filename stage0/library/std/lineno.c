@@ -72,7 +72,7 @@ _TL12: _T2A= Cyc_Lineno_lex_default;_T2B= state;state= _T2A[_T2B];_TL13:
  if(state >= 0)goto _TL14;_T2C= lbuf;_T2D= lbuf;
 _T2C->lex_curr_pos= _T2D->lex_last_pos;_T2E= lbuf;_T2F= _T2E->lex_last_action;_T30= - 1;
 if(_T2F!=_T30)goto _TL16;{struct Cyc_Lexing_Error_exn_struct*_T36=_cycalloc(sizeof(struct Cyc_Lexing_Error_exn_struct));_T36->tag= Cyc_Lexing_Error;
-({__typeof__(_tag_fat("empty token",sizeof(char),12U))_T37=_tag_fat("empty token",sizeof(char),12U);_T36->f1= _T37;});_T31= (struct Cyc_Lexing_Error_exn_struct*)_T36;}_T32= (void*)_T31;_throw(_T32);goto _TL17;
+({__typeof__(_tag_fat("empty token",sizeof(char),12U))_T37=_tag_fat("empty token",sizeof(char),12U);_T36->f1= _T37;});_T31= (struct Cyc_Lexing_Error_exn_struct*)_T36;}_T32= (void*)_T31;_rethrow(_T32);goto _TL17;
 # 87
 _TL16: _T33= lbuf;_T34= _T33->lex_last_action;return _T34;_TL17: goto _TL15;
 # 92
@@ -89,7 +89,7 @@ lexstate= Cyc_Lineno_lex_engine(lexstate,lexbuf);_T0= lexstate;_T1= (int)_T0;swi
 _T3(lexbuf);_T4= 
 Cyc_Lineno_token_rec(lexbuf,lexstate);return _T4;}{struct Cyc_Lexing_Error_exn_struct*_T7=_cycalloc(sizeof(struct Cyc_Lexing_Error_exn_struct));_T7->tag= Cyc_Lexing_Error;
 # 55
-({__typeof__(_tag_fat("some action didn't return!",sizeof(char),27U))_T8=_tag_fat("some action didn't return!",sizeof(char),27U);_T7->f1= _T8;});_T5= (struct Cyc_Lexing_Error_exn_struct*)_T7;}_T6= (void*)_T5;_throw(_T6);}
+({__typeof__(_tag_fat("some action didn't return!",sizeof(char),27U))_T8=_tag_fat("some action didn't return!",sizeof(char),27U);_T7->f1= _T8;});_T5= (struct Cyc_Lexing_Error_exn_struct*)_T7;}_T6= (void*)_T5;_rethrow(_T6);}
 # 57
 enum Cyc_Lineno_token_val Cyc_Lineno_token(struct Cyc_Lexing_lexbuf*lexbuf){enum Cyc_Lineno_token_val _T0;_T0= Cyc_Lineno_token_rec(lexbuf,0);return _T0;}struct _tuple0{struct _fat_ptr f0;int f1;};
 # 64 "cyclone/library/std/lineno.cyl"
@@ -164,7 +164,7 @@ places= _T32->tl;}goto _TL4D;_TL4F:
 # 142
  line= line + 1;goto _TL3F;_TL41:;}_pop_handler();goto _TL3D;_TL3C: _T33= Cyc_Core_get_exn_thrown();{void*_T36=(void*)_T33;void*_T37;_T37= _T36;{void*y=_T37;
 # 146
-Cyc_file_close(f);_throw(y);};}_TL3D:;}}
+Cyc_file_close(f);_rethrow(y);};}_TL3D:;}}
 # 149
 Cyc_file_close(f);
 return;}}

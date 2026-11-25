@@ -139,7 +139,7 @@ static struct Cyc_Hashtable_Table*bhashtbl=0;{
 struct Cyc_Hashtable_Table*(*_T59)(struct Cyc_Hashtable_Table**,int(*)(int,int),int(*)(int))=(struct Cyc_Hashtable_Table*(*)(struct Cyc_Hashtable_Table**,int(*)(int,int),int(*)(int)))Cyc_PP_init_table;_T0= _T59;}_T1= & bhashtbl;_T2= Cyc_Core_intcmp;_T4= Cyc_Core_identity;{int(*_T59)(int)=(int(*)(int))_T4;_T3= _T59;}{struct Cyc_Hashtable_Table*t=_T0(_T1,_T2,_T3);
 # 187
 if(i >= 0)goto _TL1A;{struct Cyc_Core_Failure_exn_struct*_T59=_cycalloc(sizeof(struct Cyc_Core_Failure_exn_struct));_T59->tag= Cyc_Core_Failure;
-({__typeof__(_tag_fat("nlblanks",sizeof(char),9U))_T5A=_tag_fat("nlblanks",sizeof(char),9U);_T59->f1= _T5A;});_T5= (struct Cyc_Core_Failure_exn_struct*)_T59;}_T6= (void*)_T5;_throw(_T6);goto _TL1B;_TL1A: _TL1B: {struct _handler_cons _T59;_T7= & _T59;_push_handler(_T7);{int _T5A=0;_T8= setjmp(_T59.handler);if(!_T8)goto _TL1C;_T5A= 1;goto _TL1D;_TL1C: _TL1D: if(_T5A)goto _TL1E;else{goto _TL20;}_TL20: _TA= Cyc_Hashtable_lookup;{
+({__typeof__(_tag_fat("nlblanks",sizeof(char),9U))_T5A=_tag_fat("nlblanks",sizeof(char),9U);_T59->f1= _T5A;});_T5= (struct Cyc_Core_Failure_exn_struct*)_T59;}_T6= (void*)_T5;_rethrow(_T6);goto _TL1B;_TL1A: _TL1B: {struct _handler_cons _T59;_T7= & _T59;_push_handler(_T7);{int _T5A=0;_T8= setjmp(_T59.handler);if(!_T8)goto _TL1C;_T5A= 1;goto _TL1D;_TL1C: _TL1D: if(_T5A)goto _TL1E;else{goto _TL20;}_TL20: _TA= Cyc_Hashtable_lookup;{
 # 190
 struct _fat_ptr*(*_T5B)(struct Cyc_Hashtable_Table*,int)=(struct _fat_ptr*(*)(struct Cyc_Hashtable_Table*,int))_TA;_T9= _T5B;}_TB= _T9(t,i);{struct _fat_ptr _T5B=*_TB;_npop_handler(0);return _T5B;}_pop_handler();goto _TL1F;_TL1E: _TC= Cyc_Core_get_exn_thrown();{void*_T5B=(void*)_TC;void*_T5C;_TD= (struct Cyc_Core_Not_found_exn_struct*)_T5B;_TE= _TD->tag;_TF= Cyc_Core_Not_found;if(_TE!=_TF)goto _TL21;_T10= Cyc_PP_tex_output;
 # 193
@@ -391,7 +391,7 @@ struct Cyc_PP_Doc*Cyc_PP_cats_arr(struct _fat_ptr docs){struct _fat_ptr _T0;stru
 unsigned long sz=_get_fat_size(_T0,sizeof(struct Cyc_PP_Doc*));
 # 467
 if(sz!=0U)goto _TL84;{struct Cyc_Core_Failure_exn_struct*_T23=_cycalloc(sizeof(struct Cyc_Core_Failure_exn_struct));_T23->tag= Cyc_Core_Failure;
-({__typeof__(_tag_fat("cats_arr -- size zero array",sizeof(char),28U))_T24=_tag_fat("cats_arr -- size zero array",sizeof(char),28U);_T23->f1= _T24;});_T1= (struct Cyc_Core_Failure_exn_struct*)_T23;}_T2= (void*)_T1;_throw(_T2);goto _TL85;_TL84: _TL85: _T3= docs;_T4= _T3.curr;_T5= (struct Cyc_PP_Doc**)_T4;_T6= 
+({__typeof__(_tag_fat("cats_arr -- size zero array",sizeof(char),28U))_T24=_tag_fat("cats_arr -- size zero array",sizeof(char),28U);_T23->f1= _T24;});_T1= (struct Cyc_Core_Failure_exn_struct*)_T23;}_T2= (void*)_T1;_rethrow(_T2);goto _TL85;_TL84: _TL85: _T3= docs;_T4= _T3.curr;_T5= (struct Cyc_PP_Doc**)_T4;_T6= 
 _check_null(_T5);{struct Cyc_PP_Doc*d=_T6[0];_T7= d;{
 int mw=_T7->mw;_T8= d;{
 int mwo=_T8->mw;{

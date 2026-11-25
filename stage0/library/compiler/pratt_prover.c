@@ -8,13 +8,13 @@ enum Cyc_Absyn_Scope{Cyc_Absyn_Static =0U,Cyc_Absyn_Abstract =1U,Cyc_Absyn_Publi
 enum Cyc_Absyn_Size_of{Cyc_Absyn_Char_sz =0U,Cyc_Absyn_Short_sz =1U,Cyc_Absyn_Int_sz =2U,Cyc_Absyn_Long_sz =3U,Cyc_Absyn_LongLong_sz =4U,Cyc_Absyn_Int128_sz =5U};
 # 180
 enum Cyc_Absyn_Sign{Cyc_Absyn_Signed =0U,Cyc_Absyn_Unsigned =1U,Cyc_Absyn_None =2U};struct Cyc_Absyn_IntCon_Absyn_TyCon_struct{int tag;enum Cyc_Absyn_Sign f1;enum Cyc_Absyn_Size_of f2;};struct Cyc_Absyn_AppType_Absyn_Type_struct{int tag;void*f1;struct Cyc_List_List*f2;};struct Cyc_Absyn_ValueofType_Absyn_Type_struct{int tag;struct Cyc_Absyn_Exp*f1;};
-# 596 "cyclone/library/compiler/absyn.h"
+# 600 "cyclone/library/compiler/absyn.h"
 enum Cyc_Absyn_Primop{Cyc_Absyn_Plus =0U,Cyc_Absyn_Times =1U,Cyc_Absyn_Minus =2U,Cyc_Absyn_Div =3U,Cyc_Absyn_Mod =4U,Cyc_Absyn_Eq =5U,Cyc_Absyn_Neq =6U,Cyc_Absyn_Gt =7U,Cyc_Absyn_Lt =8U,Cyc_Absyn_Gte =9U,Cyc_Absyn_Lte =10U,Cyc_Absyn_Not =11U,Cyc_Absyn_Bitnot =12U,Cyc_Absyn_Bitand =13U,Cyc_Absyn_Bitor =14U,Cyc_Absyn_Bitxor =15U,Cyc_Absyn_Bitlshift =16U,Cyc_Absyn_Bitlrshift =17U,Cyc_Absyn_Numelts =18U,Cyc_Absyn_Tagof =19U,Cyc_Absyn_UDiv =20U,Cyc_Absyn_UMod =21U,Cyc_Absyn_UGt =22U,Cyc_Absyn_ULt =23U,Cyc_Absyn_UGte =24U,Cyc_Absyn_ULte =25U};
-# 656
+# 660
 enum Cyc_Absyn_Coercion{Cyc_Absyn_Unknown_coercion =0U,Cyc_Absyn_No_coercion =1U,Cyc_Absyn_Null_to_NonNull =2U,Cyc_Absyn_Subset_coercion =3U,Cyc_Absyn_Other_coercion =4U};struct Cyc_Absyn_Cast_e_Absyn_Raw_exp_struct{int tag;void*f1;struct Cyc_Absyn_Exp*f2;long f3;enum Cyc_Absyn_Coercion f4;};struct Cyc_Absyn_Exp{void*topt;void*r;unsigned loc;void*annot;};struct Cyc_Absyn_Vardecl{enum Cyc_Absyn_Scope sc;struct _tuple0*name;unsigned varloc;struct Cyc_Absyn_Tqual tq;void*type;struct Cyc_Absyn_Exp*initializer;void*rgn;struct Cyc_List_List*attributes;long escapes;long is_proto;struct Cyc_Absyn_Exp*rename;};
-# 1066
+# 1070
 void*Cyc_Absyn_compress(void*);
-# 1242
+# 1246
 struct Cyc_Absyn_Exp*Cyc_Absyn_valueof_exp(void*,unsigned);struct Cyc___cycFILE;
 # 53 "./cyclone/library/std/cycboot.h"
 extern struct Cyc___cycFILE*Cyc_stderr;struct Cyc_String_pa_PrintArg_struct{int tag;struct _fat_ptr f1;};struct Cyc_Int_pa_PrintArg_struct{int tag;unsigned long f1;};
@@ -438,7 +438,7 @@ _T9->unsigned_distances= dist;_TLC4:;}
 inline static void Cyc_PrattProver_set_dist(struct Cyc_PrattProver_Graph*g,struct Cyc_PrattProver_Node*i,struct Cyc_PrattProver_Node*j,int dist,long is_signed){struct Cyc_PrattProver_Inconsistent_exn_struct*_T0;struct Cyc_PrattProver_Inconsistent_exn_struct*_T1;int*_T2;int _T3;int _T4;int*_T5;struct Cyc_PrattProver_Graph*_T6;int*_T7;int _T8;int _T9;struct Cyc_PrattProver_Inconsistent_exn_struct*_TA;struct Cyc_PrattProver_Inconsistent_exn_struct*_TB;
 # 634
 if(i!=j)goto _TLC5;
-if(dist >= 0)goto _TLC7;_T0= & Cyc_PrattProver_inconsistent;_T1= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T0;_throw(_T1);goto _TLC8;
+if(dist >= 0)goto _TLC7;_T0= & Cyc_PrattProver_inconsistent;_T1= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T0;_rethrow(_T1);goto _TLC8;
 # 638
 _TLC7: return;_TLC8: goto _TLC6;_TLC5: _TLC6: {
 # 640
@@ -456,7 +456,7 @@ _T6->changed= 1;{
 int*ji_dist=Cyc_PrattProver_lookup_dist(j,i,is_signed);
 if(ji_dist==0)goto _TLCD;_T7= ji_dist;_T8= *_T7;_T9= dist;{
 struct _tuple16 _TC=Cyc_PrattProver_is_signed_int_overflow(_T8,_T9);int _TD;long _TE;_TE= _TC.f0;_TD= _TC.f1;{long overflow=_TE;int sum=_TD;
-if(sum >= 0)goto _TLCF;_TA= & Cyc_PrattProver_inconsistent;_TB= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_TA;_throw(_TB);goto _TLD0;_TLCF: _TLD0:;}}goto _TLCE;_TLCD: _TLCE:
+if(sum >= 0)goto _TLCF;_TA= & Cyc_PrattProver_inconsistent;_TB= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_TA;_rethrow(_TB);goto _TLD0;_TLCF: _TLD0:;}}goto _TLCE;_TLCD: _TLCE:
 # 667
  return;}}}
 # 670
@@ -532,7 +532,7 @@ struct _tuple16 _T34=Cyc_PrattProver_is_signed_int_overflow(du_unsigned,uv_unsig
 # 752
 if(_T24)goto _TL104;else{goto _TL105;}_TL105: if(sum < dv_unsigned)goto _TL103;else{goto _TL104;}_TL104: _T25= overflow;if(_T25)goto _TL106;else{goto _TL101;}_TL106: if(sum < 0)goto _TL103;else{goto _TL101;}
 # 756
-_TL103: _T26= & Cyc_PrattProver_inconsistent;_T27= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T26;_throw(_T27);goto _TL102;_TL101: _TL102:;}}}}_TLFB: _T28= dists;
+_TL103: _T26= & Cyc_PrattProver_inconsistent;_T27= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T26;_rethrow(_T27);goto _TL102;_TL101: _TL102:;}}}}_TLFB: _T28= dists;
 # 743
 dists= _T28->next;goto _TLFE;_TLFD:;}_T29= node;{
 # 759
@@ -546,7 +546,7 @@ if(dv_signed!=Cyc_PrattProver_INT_MIN)goto _TL10B;goto _TL107;_TL10B: {
 struct _tuple16 _T34=Cyc_PrattProver_is_signed_int_overflow(du_signed,uv_signed);int _T35;long _T36;_T36= _T34.f0;_T35= _T34.f1;{long overflow=_T36;int sum=_T35;_T2E= overflow;
 if(_T2E)goto _TL110;else{goto _TL111;}_TL111: if(sum < dv_signed)goto _TL10F;else{goto _TL110;}_TL110: _T2F= overflow;if(_T2F)goto _TL112;else{goto _TL10D;}_TL112: if(sum < 0)goto _TL10F;else{goto _TL10D;}
 # 772
-_TL10F: _T30= & Cyc_PrattProver_inconsistent;_T31= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T30;_throw(_T31);goto _TL10E;_TL10D: _TL10E:;}}}}_TL107: _T32= dists;
+_TL10F: _T30= & Cyc_PrattProver_inconsistent;_T31= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T30;_rethrow(_T31);goto _TL10E;_TL10D: _TL10E:;}}}}_TL107: _T32= dists;
 # 760
 dists= _T32->next;goto _TL10A;_TL109:;}}}_T33= node;
 # 741
@@ -1345,9 +1345,9 @@ return;_TL2B4: goto _LL9;case Cyc_AssnDef_SLte: _TF= c1;_T10= (int)_TF;_T11= c2;
 if(_T10 > _T12)goto _TL2B6;
 return;_TL2B6: goto _LL9;default: _T14= Cyc_Warn_impos;{
 # 1868
-int(*_T5B)(struct _fat_ptr,struct _fat_ptr)=(int(*)(struct _fat_ptr,struct _fat_ptr))_T14;_T13= _T5B;}_T15= _tag_fat("Vcgen: found bad primop in add_constraint",sizeof(char),42U);_T16= _tag_fat(0U,sizeof(void*),0);_T13(_T15,_T16);}_LL9: _T17= & Cyc_PrattProver_inconsistent;_T18= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T17;_throw(_T18);}goto _TL2AE;_TL2AD: _T19= _T58.f0;{struct Cyc_AssnDef_Uint_AssnDef_Term_struct*_T5B=(struct Cyc_AssnDef_Uint_AssnDef_Term_struct*)_T19;_T5A= _T5B->f1;}{unsigned c1=_T5A;_T1A= p;_T1B= (int)_T1A;switch(_T1B){case Cyc_AssnDef_ULt:
+int(*_T5B)(struct _fat_ptr,struct _fat_ptr)=(int(*)(struct _fat_ptr,struct _fat_ptr))_T14;_T13= _T5B;}_T15= _tag_fat("Vcgen: found bad primop in add_constraint",sizeof(char),42U);_T16= _tag_fat(0U,sizeof(void*),0);_T13(_T15,_T16);}_LL9: _T17= & Cyc_PrattProver_inconsistent;_T18= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T17;_rethrow(_T18);}goto _TL2AE;_TL2AD: _T19= _T58.f0;{struct Cyc_AssnDef_Uint_AssnDef_Term_struct*_T5B=(struct Cyc_AssnDef_Uint_AssnDef_Term_struct*)_T19;_T5A= _T5B->f1;}{unsigned c1=_T5A;_T1A= p;_T1B= (int)_T1A;switch(_T1B){case Cyc_AssnDef_ULt:
 # 1915
- if(c1!=4294967295U)goto _TL2B9;_T1C= & Cyc_PrattProver_inconsistent;_T1D= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T1C;_throw(_T1D);goto _TL2BA;_TL2B9: _TL2BA:
+ if(c1!=4294967295U)goto _TL2B9;_T1C= & Cyc_PrattProver_inconsistent;_T1D= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T1C;_rethrow(_T1D);goto _TL2BA;_TL2B9: _TL2BA:
 # 1921
  c1= c1 + 1U;goto _LL23;case Cyc_AssnDef_ULte: _LL23:
 # 1928
@@ -1357,7 +1357,7 @@ Cyc_AssnDef_zero();_T20= t2;_T21= Cyc_PrattProver_INT_MIN;Cyc_PrattProver_set_di
 _TL2BB: _T22= g;_T23= Cyc_AssnDef_zero();_T24= t2;_T25= c1;_T26= (int)_T25;_T27= - _T26;Cyc_PrattProver_set_distance(_T22,_T23,_T24,_T27,0);_TL2BC:
  return;case Cyc_AssnDef_SLt:
 # 1935
- if(c1!=2147483647U)goto _TL2BD;_T28= & Cyc_PrattProver_inconsistent;_T29= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T28;_throw(_T29);goto _TL2BE;_TL2BD: _TL2BE:
+ if(c1!=2147483647U)goto _TL2BD;_T28= & Cyc_PrattProver_inconsistent;_T29= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T28;_rethrow(_T29);goto _TL2BE;_TL2BD: _TL2BE:
 # 1941
  c1= c1 + 1U;goto _LL27;case Cyc_AssnDef_SLte: _LL27: _T2A= c1;_T2B= Cyc_PrattProver_INT_MIN;_T2C= (unsigned)_T2B;
 # 1946
@@ -1367,7 +1367,7 @@ Cyc_AssnDef_zero();_T2F= t2;_T30= c1;_T31= (int)_T30;_T32= - _T31;Cyc_PrattProve
 # 1950
 int(*_T5B)(struct _fat_ptr,struct _fat_ptr)=(int(*)(struct _fat_ptr,struct _fat_ptr))_T34;_T33= _T5B;}_T35= _tag_fat("Vcgen: found bad primop in add_constraint",sizeof(char),42U);_T36= _tag_fat(0U,sizeof(void*),0);_T33(_T35,_T36);};}_TL2AE: goto _TL2AC;_TL2AB: _T37= _T58.f1;_T38= (int*)_T37;_T39= *_T38;if(_T39!=0)goto _TL2C1;_T3A= _T58.f1;{struct Cyc_AssnDef_Uint_AssnDef_Term_struct*_T5B=(struct Cyc_AssnDef_Uint_AssnDef_Term_struct*)_T3A;_T5A= _T5B->f1;}{unsigned c2=_T5A;_T3B= p;_T3C= (int)_T3B;switch(_T3C){case Cyc_AssnDef_ULt:
 # 1879
- if(c2!=0U)goto _TL2C4;_T3D= & Cyc_PrattProver_inconsistent;_T3E= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T3D;_throw(_T3E);goto _TL2C5;_TL2C4: _TL2C5:
+ if(c2!=0U)goto _TL2C4;_T3D= & Cyc_PrattProver_inconsistent;_T3E= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T3D;_rethrow(_T3E);goto _TL2C5;_TL2C4: _TL2C5:
 # 1885
  c2= c2 - 1U;goto _LL18;case Cyc_AssnDef_ULte: _LL18:
 # 1890
@@ -1375,7 +1375,7 @@ int(*_T5B)(struct _fat_ptr,struct _fat_ptr)=(int(*)(struct _fat_ptr,struct _fat_
 Cyc_AssnDef_zero();_T42= c2;_T43= (int)_T42;Cyc_PrattProver_set_distance(_T3F,_T40,_T41,_T43,0);goto _TL2C7;_TL2C6: _TL2C7:
  return;case Cyc_AssnDef_SLt: _T44= c2;_T45= Cyc_PrattProver_INT_MIN;_T46= (unsigned)_T45;
 # 1895
-if(_T44!=_T46)goto _TL2C8;_T47= & Cyc_PrattProver_inconsistent;_T48= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T47;_throw(_T48);goto _TL2C9;_TL2C8: _TL2C9:
+if(_T44!=_T46)goto _TL2C8;_T47= & Cyc_PrattProver_inconsistent;_T48= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T47;_rethrow(_T48);goto _TL2C9;_TL2C8: _TL2C9:
 # 1901
  c2= c2 - 1U;goto _LL1C;case Cyc_AssnDef_SLte: _LL1C: _T49= g;_T4A= t1;_T4B= 
 # 1905
@@ -1628,7 +1628,7 @@ Cyc_PrattProver_add_numelts_info(0,g);
 # 2365
 Cyc_PrattProver_break_term_in_graph(0,g);
 # 2370
-Cyc_PrattProver_associate_ud_sd_in_graph(0,g);{long _T61=0;_npop_handler(0);return _T61;}default: _T51= & Cyc_PrattProver_inconsistent;_T52= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T51;_throw(_T52);};}goto _TL346;_TL348: _pop_handler();goto _TL344;_TL343: _T53= Cyc_Core_get_exn_thrown();{void*_T5E=(void*)_T53;void*_T5F;_T54= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T5E;_T55= _T54->tag;_T56= Cyc_PrattProver_Inconsistent;if(_T55!=_T56)goto _TL366;
+Cyc_PrattProver_associate_ud_sd_in_graph(0,g);{long _T61=0;_npop_handler(0);return _T61;}default: _T51= & Cyc_PrattProver_inconsistent;_T52= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T51;_rethrow(_T52);};}goto _TL346;_TL348: _pop_handler();goto _TL344;_TL343: _T53= Cyc_Core_get_exn_thrown();{void*_T5E=(void*)_T53;void*_T5F;_T54= (struct Cyc_PrattProver_Inconsistent_exn_struct*)_T5E;_T55= _T54->tag;_T56= Cyc_PrattProver_Inconsistent;if(_T55!=_T56)goto _TL366;
 # 2387
 if(ors!=0)goto _TL368;
 # 2389

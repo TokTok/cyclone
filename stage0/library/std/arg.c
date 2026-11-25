@@ -40,7 +40,7 @@ _TL3: _T16= x;_T17= l;_T18= _T17->hd;_T19= (struct _tuple0*)_T18;_T1A= *_T19;_T1
 return _T21;_TL7: _TL4: _T22= l;
 l= _T22->tl;}goto _TL0;_TL2:{struct Cyc_Core_Not_found_exn_struct*_T25=_cycalloc(sizeof(struct Cyc_Core_Not_found_exn_struct));
 # 75
-_T25->tag= Cyc_Core_Not_found;_T23= (struct Cyc_Core_Not_found_exn_struct*)_T25;}_T24= (void*)_T23;_throw(_T24);}
+_T25->tag= Cyc_Core_Not_found;_T23= (struct Cyc_Core_Not_found_exn_struct*)_T25;}_T24= (void*)_T23;_rethrow(_T24);}
 # 84
 static struct _fat_ptr Cyc_Arg_Justify_break_line(struct Cyc_Buffer_t*b,int howmuch,struct _fat_ptr s){struct _fat_ptr _T0;unsigned char*_T1;char*_T2;struct _fat_ptr _T3;unsigned long _T4;struct _fat_ptr _T5;unsigned _T6;int(*_T7)(struct _fat_ptr,struct _fat_ptr,unsigned);void*(*_T8)(struct _fat_ptr,struct _fat_ptr,unsigned);struct _fat_ptr _T9;struct _fat_ptr _TA;int _TB;unsigned long _TC;unsigned long _TD;struct _fat_ptr _TE;struct _fat_ptr _TF;int _T10;unsigned char*_T11;const char*_T12;char _T13;int _T14;int _T15;int _T16;int _T17;int _T18;unsigned long _T19;unsigned long _T1A;struct _fat_ptr _T1B;unsigned char*_T1C;const char*_T1D;int _T1E;char _T1F;int _T20;struct _fat_ptr _T21;unsigned char*_T22;const char*_T23;int _T24;char _T25;int _T26;int _T27;int _T28;unsigned long _T29;unsigned long _T2A;struct _fat_ptr _T2B;unsigned char*_T2C;const char*_T2D;int _T2E;char _T2F;int _T30;struct _fat_ptr _T31;unsigned char*_T32;const char*_T33;int _T34;char _T35;int _T36;int _T37;int _T38;unsigned long _T39;unsigned long _T3A;struct _fat_ptr _T3B;unsigned char*_T3C;const char*_T3D;int _T3E;char _T3F;int _T40;struct _fat_ptr _T41;int _T42;struct _fat_ptr _T43;_T0= s;_T1= _T0.curr;_T2= (char*)_T1;
 if(_T2!=0)goto _TL9;_T3= 

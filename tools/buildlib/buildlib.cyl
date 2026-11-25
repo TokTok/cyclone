@@ -471,6 +471,9 @@ and slurp = parse /* returns 1 if more to do, 0 if all done */
 { return 1; }
 | "__restrict_arr" /* glibc C99 restrict array */
 { return 1; }
+| "typedef" ws+ "__float128" ws+ "_Float128" ws* ";"
+{ log("Warning: typedef __float128 _Float128 deleted\n");
+  return 1; }
 | [^ '"']{ fputc(lexeme_char(lexbuf,0),(FILE @)slurp_out); return 1; }
 
 and slurp_string = parse /* returns 1 if more to do, 0 if all done */

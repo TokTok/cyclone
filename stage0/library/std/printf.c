@@ -25,7 +25,7 @@ _tag_fat("unsigned long *",sizeof(char),16U);return _T9;default: _TA=
 _tag_fat("unsigned long long *",sizeof(char),21U);return _TA;};}
 # 101
 static void*Cyc_badarg(struct _fat_ptr s){struct Cyc_Core_Invalid_argument_exn_struct*_T0;void*_T1;void*_T2;void*_T3;{struct Cyc_Core_Invalid_argument_exn_struct*_T4=_cycalloc(sizeof(struct Cyc_Core_Invalid_argument_exn_struct));_T4->tag= Cyc_Core_Invalid_argument;
-_T4->f1= s;_T0= (struct Cyc_Core_Invalid_argument_exn_struct*)_T4;}_T1= (void*)_T0;_T2= _throw(_T1);_T3= (void*)_T2;return _T3;}
+_T4->f1= s;_T0= (struct Cyc_Core_Invalid_argument_exn_struct*)_T4;}_T1= (void*)_T0;_T2= _rethrow(_T1);_T3= (void*)_T2;return _T3;}
 # 106
 static int Cyc_va_arg_int(struct _fat_ptr ap){struct _fat_ptr _T0;unsigned char*_T1;void**_T2;int*_T3;int _T4;unsigned long _T5;int _T6;int(*_T7)(struct _fat_ptr);struct _fat_ptr _T8;int _T9;_T0= ap;_T1= _check_fat_subscript(_T0,sizeof(void*),0U);_T2= (void**)_T1;{
 void*_TA=*_T2;unsigned long _TB;_T3= (int*)_TA;_T4= *_T3;if(_T4!=1)goto _TL1;{struct Cyc_Int_pa_PrintArg_struct*_TC=(struct Cyc_Int_pa_PrintArg_struct*)_TA;_TB= _TC->f1;}{unsigned long i=_TB;_T5= i;_T6= (int)_T5;
@@ -66,27 +66,27 @@ return _T7;}default:{struct Cyc_String_pa_PrintArg_struct _T14;_T14.tag= 0;_TA= 
 # 157
 ({__typeof__(Cyc_parg2string(_TD))_T15=Cyc_parg2string(_TD);_T14.f1= _T15;});_T9= _T14;}{struct Cyc_String_pa_PrintArg_struct _T14=_T9;void*_T15[1];_T15[0]= & _T14;_TE= 
 # 156
-_tag_fat("printf expected double but found %s",sizeof(char),36U);_TF= _tag_fat(_T15,sizeof(void*),1);_T8= Cyc_aprintf(_TE,_TF);}_T10= Cyc_badarg(_T8);_throw(_T10);};}}
+_tag_fat("printf expected double but found %s",sizeof(char),36U);_TF= _tag_fat(_T15,sizeof(void*),1);_T8= Cyc_aprintf(_TE,_TF);}_T10= Cyc_badarg(_T8);_rethrow(_T10);};}}
 # 162
 static short*Cyc_va_arg_short_ptr(struct _fat_ptr ap){struct _fat_ptr _T0;unsigned char*_T1;void**_T2;int*_T3;int _T4;short*_T5;struct _fat_ptr _T6;void*_T7;_T0= ap;_T1= _check_fat_subscript(_T0,sizeof(void*),0U);_T2= (void**)_T1;{
 void*_T8=*_T2;short*_T9;_T3= (int*)_T8;_T4= *_T3;if(_T4!=5)goto _TLE;{struct Cyc_ShortPtr_pa_PrintArg_struct*_TA=(struct Cyc_ShortPtr_pa_PrintArg_struct*)_T8;_T9= _TA->f1;}{short*p=_T9;_T5= p;
 return _T5;}_TLE: _T6= 
-_tag_fat("printf expected short pointer",sizeof(char),30U);_T7= Cyc_badarg(_T6);_throw(_T7);;}}
+_tag_fat("printf expected short pointer",sizeof(char),30U);_T7= Cyc_badarg(_T6);_rethrow(_T7);;}}
 # 170
 static unsigned long*Cyc_va_arg_int_ptr(struct _fat_ptr ap){struct _fat_ptr _T0;unsigned char*_T1;void**_T2;int*_T3;int _T4;unsigned long*_T5;struct _fat_ptr _T6;void*_T7;_T0= ap;_T1= _check_fat_subscript(_T0,sizeof(void*),0U);_T2= (void**)_T1;{
 void*_T8=*_T2;unsigned long*_T9;_T3= (int*)_T8;_T4= *_T3;if(_T4!=6)goto _TL10;{struct Cyc_IntPtr_pa_PrintArg_struct*_TA=(struct Cyc_IntPtr_pa_PrintArg_struct*)_T8;_T9= _TA->f1;}{unsigned long*p=_T9;_T5= p;
 return _T5;}_TL10: _T6= 
-_tag_fat("printf expected int pointer",sizeof(char),28U);_T7= Cyc_badarg(_T6);_throw(_T7);;}}
+_tag_fat("printf expected int pointer",sizeof(char),28U);_T7= Cyc_badarg(_T6);_rethrow(_T7);;}}
 # 178
 static unsigned long long*Cyc_va_arg_longlong_ptr(struct _fat_ptr ap){struct _fat_ptr _T0;unsigned char*_T1;void**_T2;int*_T3;int _T4;unsigned long long*_T5;struct _fat_ptr _T6;void*_T7;_T0= ap;_T1= _check_fat_subscript(_T0,sizeof(void*),0U);_T2= (void**)_T1;{
 void*_T8=*_T2;unsigned long long*_T9;_T3= (int*)_T8;_T4= *_T3;if(_T4!=7)goto _TL12;{struct Cyc_LongLongPtr_pa_PrintArg_struct*_TA=(struct Cyc_LongLongPtr_pa_PrintArg_struct*)_T8;_T9= _TA->f1;}{unsigned long long*p=_T9;_T5= p;
 return _T5;}_TL12: _T6= 
-_tag_fat("printf expected long long pointer",sizeof(char),34U);_T7= Cyc_badarg(_T6);_throw(_T7);;}}
+_tag_fat("printf expected long long pointer",sizeof(char),34U);_T7= Cyc_badarg(_T6);_rethrow(_T7);;}}
 # 186
 static const struct _fat_ptr Cyc_va_arg_string(struct _fat_ptr ap){struct _fat_ptr _T0;unsigned char*_T1;void**_T2;int*_T3;int _T4;struct _fat_ptr _T5;struct _fat_ptr _T6;void*_T7;_T0= ap;_T1= _check_fat_subscript(_T0,sizeof(void*),0U);_T2= (void**)_T1;{
 void*_T8=*_T2;struct _fat_ptr _T9;_T3= (int*)_T8;_T4= *_T3;if(_T4!=0)goto _TL14;{struct Cyc_String_pa_PrintArg_struct*_TA=(struct Cyc_String_pa_PrintArg_struct*)_T8;_T9= _TA->f1;}{struct _fat_ptr s=_T9;_T5= s;
 return _T5;}_TL14: _T6= 
-_tag_fat("printf expected string",sizeof(char),23U);_T7= Cyc_badarg(_T6);_throw(_T7);;}}
+_tag_fat("printf expected string",sizeof(char),23U);_T7= Cyc_badarg(_T6);_rethrow(_T7);;}}
 # 203
 int Cyc___cvt_double(double,int,int,int*,int,struct _fat_ptr,struct _fat_ptr);
 # 233 "cyclone/library/std/printf.cyc"
@@ -651,7 +651,7 @@ _TL1DF: _T130= t;_T131= _T130.curr;_T132= (char*)_T131;_T133= startp;_T134= _T13
 if(_T140==46)goto _TL1E3;_T141= & t;
 _fat_ptr_inplace_plus(_T141,sizeof(char),1);goto _TL1E4;_TL1E3: _TL1E4: goto _TL1DE;_TL1DD: _TL1DE: _TL1D6: goto _LL0;default:{struct Cyc_Core_Impossible_exn_struct*_T14A=_cycalloc(sizeof(struct Cyc_Core_Impossible_exn_struct));_T14A->tag= Cyc_Core_Impossible;
 # 989
-({__typeof__(_tag_fat("__cvt_double",sizeof(char),13U))_T14B=_tag_fat("__cvt_double",sizeof(char),13U);_T14A->f1= _T14B;});_T142= (struct Cyc_Core_Impossible_exn_struct*)_T14A;}_T143= (void*)_T142;_throw(_T143);}_LL0: _T144= t;_T145= _T144.curr;_T146= startp;_T147= _T146.curr;_T148= _T145 - _T147;_T149= _T148 / sizeof(char);
+({__typeof__(_tag_fat("__cvt_double",sizeof(char),13U))_T14B=_tag_fat("__cvt_double",sizeof(char),13U);_T14A->f1= _T14B;});_T142= (struct Cyc_Core_Impossible_exn_struct*)_T14A;}_T143= (void*)_T142;_rethrow(_T143);}_LL0: _T144= t;_T145= _T144.curr;_T146= startp;_T147= _T146.curr;_T148= _T145 - _T147;_T149= _T148 / sizeof(char);
 # 991
 return _T149;}
 # 995

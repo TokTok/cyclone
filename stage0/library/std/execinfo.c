@@ -38,7 +38,7 @@ extern int backtrace(int*,int);
 int Cyc_Execinfo_backtrace(struct _fat_ptr array,int size){int _T0;unsigned _T1;struct _fat_ptr _T2;unsigned _T3;struct Cyc_Core_Failure_exn_struct*_T4;void*_T5;struct _fat_ptr _T6;unsigned char*_T7;int*_T8;int _T9;int _TA;_T0= size;_T1= (unsigned)_T0;_T2= array;_T3= 
 # 41
 _get_fat_size(_T2,sizeof(int));if(_T1 <= _T3)goto _TL0;{struct Cyc_Core_Failure_exn_struct*_TB=_cycalloc(sizeof(struct Cyc_Core_Failure_exn_struct));_TB->tag= Cyc_Core_Failure;
-({__typeof__(_tag_fat("backtrace: size > numelts(array)",sizeof(char),33U))_TC=_tag_fat("backtrace: size > numelts(array)",sizeof(char),33U);_TB->f1= _TC;});_T4= (struct Cyc_Core_Failure_exn_struct*)_TB;}_T5= (void*)_T4;_throw(_T5);goto _TL1;_TL0: _TL1: _T6= array;_T7= _untag_fat_ptr_check_bound(_T6,sizeof(int),1U);_T8= (int*)_T7;_T9= size;_TA= 
+({__typeof__(_tag_fat("backtrace: size > numelts(array)",sizeof(char),33U))_TC=_tag_fat("backtrace: size > numelts(array)",sizeof(char),33U);_TB->f1= _TC;});_T4= (struct Cyc_Core_Failure_exn_struct*)_TB;}_T5= (void*)_T4;_rethrow(_T5);goto _TL1;_TL0: _TL1: _T6= array;_T7= _untag_fat_ptr_check_bound(_T6,sizeof(int),1U);_T8= (int*)_T7;_T9= size;_TA= 
 backtrace(_T8,_T9);return _TA;
 # 47
 return 0;}

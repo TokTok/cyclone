@@ -106,7 +106,7 @@ _T37.f1= (unsigned long)_T1F;_TA= _T37;}{struct Cyc_Int_pa_PrintArg_struct _T37=
 _tag_fat("%d states, %d transitions, table size %d bytes\n",sizeof(char),48U);_T22= _tag_fat(_T38,sizeof(void*),3);Cyc_fprintf(_T20,_T21,_T22);}}}_T23= tables;_T24= _T23->trans;_T25= 
 # 161
 _get_fat_size(_T24,sizeof(int));if(_T25 <= 32768U)goto _TL1A;{struct Cyc_Output_Table_overflow_exn_struct*_T35=_cycalloc(sizeof(struct Cyc_Output_Table_overflow_exn_struct));_T35->tag= Cyc_Output_Table_overflow;
-_T35->f1= 0;_T26= (struct Cyc_Output_Table_overflow_exn_struct*)_T35;}_T27= (void*)_T26;_throw(_T27);goto _TL1B;_TL1A: _TL1B:
+_T35->f1= 0;_T26= (struct Cyc_Output_Table_overflow_exn_struct*)_T35;}_T27= (void*)_T26;_rethrow(_T27);goto _TL1B;_TL1A: _TL1B:
  Cyc_Output_copy_chunk(sourcename,ic,oc,header);_T28= oc;_T29= 
 _tag_fat("using Lexing {\n\n",sizeof(char),17U);_T2A= _tag_fat(0U,sizeof(void*),0);Cyc_fprintf(_T28,_T29,_T2A);
 Cyc_Output_output_tables(oc,tables);
